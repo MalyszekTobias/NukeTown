@@ -1,6 +1,7 @@
 import pyray as rl
 from app.displays.base import BaseDisplay
 from app.cameras import twodcamera
+from app import assets
 
 
 class TwoDGameDisplay(BaseDisplay):
@@ -13,6 +14,8 @@ class TwoDGameDisplay(BaseDisplay):
 
         self.texture =  rl.load_render_texture(game.width, game.height)
         rl.set_texture_filter(self.texture.texture, rl.TextureFilter.TEXTURE_FILTER_BILINEAR)
+
+        self.jeff_image = assets.images["Jeff"]
 
         self.bloom_shader = self.game.bloom_shader
         self.shader_resolution_location = rl.get_shader_location(self.bloom_shader, "resolution")
@@ -32,7 +35,10 @@ class TwoDGameDisplay(BaseDisplay):
         self.camera.begin_mode()
 
         rl.draw_fps(10, 10)
-        rl.draw_rectangle(int(self.square_pos[0]), int(self.square_pos[1]), 20, 20, rl.RED)
+        # rl.draw_rectangle(int(self.square_pos[0]), int(self.square_pos[1]), 20, 20, rl.RED)
+        scale = 20.0 / float(self.jeff_image.width)
+        rl.draw_texture_ex(self.jeff_image, rl.Vector2(float(self.square_pos[0]), float(self.square_pos[1])), 0.0,
+                           scale, rl.WHITE)
 
         self.camera.end_mode()
         rl.end_texture_mode()

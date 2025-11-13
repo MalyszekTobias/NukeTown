@@ -4,6 +4,7 @@ import math
 import pyray as rl
 from app.displays.base import BaseDisplay
 from app.cameras import threedcamera
+from app import assets
 
 
 class ThreeDGameDisplay(BaseDisplay):
@@ -32,7 +33,7 @@ class ThreeDGameDisplay(BaseDisplay):
         )
         self.delta_time = 0
 
-        self.model = rl.load_model("app/models/shiba/scene.gltf")
+        self.model = assets.models["shiba"]
 
         self.model_scale = rl.Vector3(2.0, 2.0, 2.0)
         self.model_rot_axis = rl.Vector3(0.0, 1.0, 0.0)

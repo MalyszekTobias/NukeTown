@@ -1,6 +1,7 @@
 import pyray as rl
 
 from app.displays import startscreen, twodgame, threedgame
+from app import assets
 
 
 class Game:
@@ -8,7 +9,8 @@ class Game:
         self.width, self.height = 800, 600
         rl.init_window(self.width, self.height, "raylib template?")
         rl.set_exit_key(rl.KeyboardKey.KEY_NULL)
-        self.bloom_shader = rl.load_shader("", "app/shaders/bloom.fs")
+        assets.load()
+        self.bloom_shader = assets.shaders["bloom"]
         self.base_display = startscreen.StartDisplay(self)
         self.twodgame = twodgame.TwoDGameDisplay(self)
         self.threedgame = threedgame.ThreeDGameDisplay(self)
