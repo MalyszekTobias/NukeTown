@@ -14,8 +14,12 @@ class Game:
         self.bloom_shader = assets.shaders["bloom"]
         self.base_display = startscreen.StartDisplay(self)
         self.crafting_display = crafting.Crafting_Menu(self)
+
+        self.atomic_masses = [1, 2, 8, 11, 16, 26, 30, 36, 56]
         self.player = player.Player(self)
-        self.player.spawn_friend(1)
+
+        for mass in self.atomic_masses:
+            self.player.spawn_friend(mass)
         self.twodgame = twodgame.TwoDGameDisplay(self, self.player)
         self.current_display = self.base_display
         self.crafting = False
