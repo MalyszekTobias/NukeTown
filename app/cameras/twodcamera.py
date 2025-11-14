@@ -1,14 +1,14 @@
 import pyray
 
 class Camera:
-    def __init__(self, width, height, target_x, target_y, smooth_factor, initial_zoom=10.0):
+    def __init__(self, width, height, target_x, target_y, smooth_factor, initial_zoom=100.0):
         self.camera = pyray.Camera2D()
         self.camera.target = pyray.Vector2(target_x, target_y)
         self.camera.offset = pyray.Vector2(width / 2, height / 2)
         self.camera.rotation = 0.0
         self.camera.zoom = initial_zoom
         self.smooth_factor = smooth_factor
-        self.target_zoom = self.calculate_target_zoom(width, height)
+        self.target_zoom = self.calculate_target_zoom(width, height)*7
 
     def calculate_target_zoom(self, width, height):
         reference_width = 1366
