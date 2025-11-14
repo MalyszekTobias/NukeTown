@@ -28,6 +28,8 @@ def load():
     images["Bullet_Good_Explode"] = rl.load_texture("app/assets/Spritesheets/Bullet_Good_Explode.png")
     images["Bullet_Bad"] = rl.load_texture("app/assets/Spritesheets/Bullet_Bad.png")
     images["Bullet_Bad_Explode"] = rl.load_texture("app/assets/Spritesheets/Bullet_Bad_Explode.png")
+    images["Bullet_Bad_Create"] = rl.load_texture("app/assets/Spritesheets/Bullet_Bad_Create.png")
+    images["Bullet_Good_Create"] = rl.load_texture("app/assets/Spritesheets/Bullet_Good_Create.png")
     # images["Elektrownia"] = rl.load_texture("app/assets/Spritesheets/Komin.png")
     images["Wall_horizontal"] = rl.load_texture("app/assets/images/Wall_1.png")
     images["Wall_vertical"] = rl.load_texture("app/assets/images/Wall_2.png")
