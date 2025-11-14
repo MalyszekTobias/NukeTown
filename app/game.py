@@ -1,6 +1,6 @@
 import pyray as rl
 
-from app.displays import startscreen, twodgame, threedgame
+from app.displays import startscreen, twodgame
 from app import assets
 
 
@@ -13,7 +13,6 @@ class Game:
         self.bloom_shader = assets.shaders["bloom"]
         self.base_display = startscreen.StartDisplay(self)
         self.twodgame = twodgame.TwoDGameDisplay(self)
-        self.threedgame = threedgame.ThreeDGameDisplay(self)
         self.current_display = self.base_display
 
         # controller
