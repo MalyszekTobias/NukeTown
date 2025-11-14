@@ -89,9 +89,10 @@ class TwoDGameDisplay(BaseDisplay):
         # clear the render texture to transparent so only player pixels contribute to bloom
         rl.clear_background((0, 0, 0, 0))
         self.camera.begin_mode()
-        self.player.render()
         for friend in self.player.friends:
             friend.render()
+            friend.update()
+        self.player.render()
         self.camera.end_mode()
         rl.end_texture_mode()
 
