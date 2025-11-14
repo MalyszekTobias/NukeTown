@@ -13,8 +13,8 @@ class Player:
         self.frame_timer = 0.0
         self.frame_duration = 0.08
         self.radius = 40
-        self.x = 100
-        self.y = 100
+        self.x = 0
+        self.y = 0
         self.up = False
         self.down = False
         self.left = False
