@@ -25,3 +25,4 @@ def load():
     images["Elektrownia"] = rl.load_texture("app/assets/images/Spritesheets/Komin.png")
     images["Wall_horizontal"] = rl.load_texture("app/assets/images/Wall_1.png")
     images["Wall_vertical"] = rl.load_texture("app/assets/images/Wall_2.png")
+    images["Wall_corner"] = rl.load_texture("app/assets/images/Corner.png")

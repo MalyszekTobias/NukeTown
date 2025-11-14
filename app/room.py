@@ -135,21 +135,28 @@ class Room:
         # wall textures: horizontal for top/bottom, vertical for left/right
         wall_h_tex = assets.images.get("Wall_horizontal")
         wall_v_tex = assets.images.get("Wall_vertical")
+        wall_corner_tex = assets.images.get("Wall_corner")
 
         x0, y0, w, h = self.x, self.y, self.width, self.height
-        corners = {
+        corners = [
             (x0, y0),
             (x0 + w - 1, y0),
             (x0, y0 + h - 1),
             (x0 + w - 1, y0 + h - 1),
-        }
+        ]
 
         for wx, wy in self.wall_tiles():
             dest_x = wx * tile_size
             dest_y = wy * tile_size
 
-            if (wx, wy) in corners:
-                pyray.draw_rectangle(dest_x, dest_y, tile_size, tile_size, pyray.WHITE)
+            if (wx, wy) == corners[0]:
+                pyray.draw_texture_ex(wall_corner_tex, (dest_x + tile_size/3, dest_y + int(tile_size/3)+2/3), 0, 1 / 4 / tile_size, pyray.WHITE)
+            elif (wx, wy) == corners[1]:
+                pyray.draw_texture_ex(wall_corner_tex, (dest_x - tile_size/3, dest_y + int(tile_size/3)+2/3), 0, 1 / 4 / tile_size, pyray.WHITE)
+            elif (wx, wy) == corners[2]:
+                pyray.draw_texture_ex(wall_corner_tex, (dest_x + tile_size/3, dest_y - int(tile_size/3)), 0, 1 / 4 / tile_size, pyray.WHITE)
+            elif (wx, wy) == corners[3]:
+                pyray.draw_texture_ex(wall_corner_tex, (dest_x - tile_size/3, dest_y - int(tile_size/3)), 0, 1 / 4 / tile_size, pyray.WHITE)
             elif wy == y0:
                 pyray.draw_texture_ex(wall_h_tex, (dest_x, dest_y + tile_size/3), 0, 1 / 4 / tile_size, pyray.WHITE)
             elif wy == y0 + h - 1:
