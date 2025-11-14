@@ -2,6 +2,7 @@ import pyray as rl
 
 from app.displays import startscreen, twodgame,crafting
 from app import assets
+from app import player
 
 
 class Game:
@@ -12,7 +13,8 @@ class Game:
         assets.load()
         self.bloom_shader = assets.shaders["bloom"]
         self.base_display = startscreen.StartDisplay(self)
-        self.twodgame = twodgame.TwoDGameDisplay(self)
+        self.player = player.Player(self)
+        self.twodgame = twodgame.TwoDGameDisplay(self, self.player)
         self.current_display = self.base_display
         self.crafting = False
         # controller
