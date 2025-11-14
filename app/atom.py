@@ -9,6 +9,7 @@ class Atom:
         self.weight = weight
         self.leader = leader
         self.img = self.get_sprite()
+        print(self.img.width, self.img.height)
         self.num_of_frames = int(self.img.height / self.img.width)
         self.frame_width = int(self.img.width)
         self.frame_height = int(self.img.height / self.num_of_frames)
@@ -33,11 +34,28 @@ class Atom:
         self.run_tilt = 4
 
     def get_sprite(self):
-        if self.weight == 0:
+        if self.weight in [0, 92]:
             return assets.images["movingblob"]
         elif self.weight == 1:
-            return assets.images["movingblob"]
-
+            print("Loading Hydrogen sprite")
+            return assets.images["Hydrogen"]
+        elif self.weight == 2:
+            return assets.images["Helium"]
+        elif self.weight == 8:
+            return assets.images["Oxygen"]
+        elif self.weight == 16:
+            return assets.images["Sulphur"]
+        elif self.weight == 11:
+            return assets.images["Sodium"]
+        elif self.weight == 26:
+            return assets.images["Iron"]
+        elif self.weight == 30:
+            return assets.images["Zinc"]
+        elif self.weight == 56:
+            return assets.images["Barium"]
+        elif self.weight == 36:
+            return assets.images["Krypton"]
+        return assets.images.get("movingblob")
     def movement(self):
         if self.up and self.velUp < self.maxSpeed:
             self.velUp += self.acceleration
