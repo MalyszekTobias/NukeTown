@@ -20,7 +20,7 @@ class TwoDGameDisplay(BaseDisplay):
         self.bloom_shader = self.game.bloom_shader
         self.shader_resolution_location = rl.get_shader_location(self.bloom_shader, "resolution")
         self.shader_time_location = rl.get_shader_location(self.bloom_shader, "time")
-
+        self.crafting=False
         res = rl.ffi.new("float[2]", [float(self.game.width), float(self.game.height)])
         rl.set_shader_value(self.bloom_shader, self.shader_resolution_location, res,
                             rl.ShaderUniformDataType.SHADER_UNIFORM_VEC2)
@@ -77,5 +77,7 @@ class TwoDGameDisplay(BaseDisplay):
         else:
             self.square_pos[0] += self.game.left_joystick_x * self.speed * self.delta_time
             self.square_pos[1] += self.game.left_joystick_y * self.speed * self.delta_time
+
+
 
 
