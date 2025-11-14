@@ -1,7 +1,7 @@
 import pyray as rl
 from app.displays.base import BaseDisplay
 from app.cameras import twodcamera
-from app import assets
+from app import assets, map, room
 
 
 class TwoDGameDisplay(BaseDisplay):
@@ -20,6 +20,13 @@ class TwoDGameDisplay(BaseDisplay):
         self.bloom_shader = self.game.bloom_shader
         self.shader_resolution_location = rl.get_shader_location(self.bloom_shader, "resolution")
         self.shader_time_location = rl.get_shader_location(self.bloom_shader, "time")
+
+        self.map = map.Map()
+        self.map.add_room(room.Room(10, 10, 5, 5))
+        self.map.add_room(room.Room(20, 15, 17, 100))
+        self.map.add_room(room.Room(20, -1, 10, 10))
+        self.map.connect_rooms()
+
         self.crafting=False
         res = rl.ffi.new("float[2]", [float(self.game.width), float(self.game.height)])
         rl.set_shader_value(self.bloom_shader, self.shader_resolution_location, res,
@@ -35,6 +42,9 @@ class TwoDGameDisplay(BaseDisplay):
         self.camera.begin_mode()
 
         rl.draw_fps(10, 10)
+
+        self.map.draw()
+
         # rl.draw_rectangle(int(self.square_pos[0]), int(self.square_pos[1]), 20, 20, rl.RED)
         scale = 20.0 / float(self.jeff_image.width)
         rl.draw_texture_ex(self.jeff_image, rl.Vector2(float(self.square_pos[0]), float(self.square_pos[1])), 0.0,
