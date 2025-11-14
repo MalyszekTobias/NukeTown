@@ -42,12 +42,13 @@ class TwoDGameDisplay(BaseDisplay):
 
         self.camera.begin_mode()
 
-        rl.draw_fps(10, 10)
+
 
         self.map.draw()
         self.player.render()
         # rl.draw_rectangle(int(self.square_pos[0]), int(self.square_pos[1]), 20, 20, rl.RED)
         self.camera.end_mode()
+        rl.draw_fps(10, 10)
         rl.end_texture_mode()
 
         #shader stuff
