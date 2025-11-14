@@ -1,6 +1,7 @@
 import pyray
 
 from typing import Set, Tuple
+from app import assets
 
 Tile = Tuple[int, int]
 
@@ -41,4 +42,9 @@ class Room:
         pw = self.width * tile_size
         ph = self.height * tile_size
         pyray.draw_rectangle_lines(px, py, pw, ph, color)
-        pyray.draw_rectangle(px + tile_size, py + tile_size, pw - 2 * tile_size, ph - 2 * tile_size, (10, 10, 10, 255))
+
+        floor_tex = assets.images["Floor_Default"]
+        if floor_tex:
+            for tx, ty in self.background_tiles():
+                pyray.draw_texture_ex(floor_tex, (tx * tile_size, ty * tile_size),0, 1/4/tile_size, pyray.WHITE)
+
