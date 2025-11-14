@@ -1,6 +1,6 @@
 import pyray as rl
 
-from app.displays import startscreen, twodgame, threedgame
+from app.displays import startscreen, twodgame,crafting
 from app import assets
 
 
@@ -13,9 +13,8 @@ class Game:
         self.bloom_shader = assets.shaders["bloom"]
         self.base_display = startscreen.StartDisplay(self)
         self.twodgame = twodgame.TwoDGameDisplay(self)
-        self.threedgame = threedgame.ThreeDGameDisplay(self)
         self.current_display = self.base_display
-
+        self.crafting = False
         # controller
         self.gamepad_id = 0
         self.gamepad_deadzone = 0.25
@@ -31,7 +30,17 @@ class Game:
     def loop(self):
         while not rl.window_should_close():
             self.update()
+            self.controls()
             self.render()
+
+    def controls(self):
+        if rl.is_key_pressed(rl.KeyboardKey.KEY_C):
+            if self.crafting==False:
+                self.crafting = True
+                self.current_display = crafting.Crafting_Menu(self)
+            else:
+                self.current_display = twodgame.TwoDGameDisplay(self)
+                self.crafting = False
 
     def render(self):
         rl.begin_drawing()
@@ -49,7 +58,13 @@ class Game:
         if self.gamepad_enabled:
             self.left_joystick_x = rl.get_gamepad_axis_movement(self.gamepad_id, rl.GamepadAxis.GAMEPAD_AXIS_LEFT_X)
             self.left_joystick_y = rl.get_gamepad_axis_movement(self.gamepad_id, rl.GamepadAxis.GAMEPAD_AXIS_LEFT_Y)
+            self.right_joystick_x = rl.get_gamepad_axis_movement(self.gamepad_id, rl.GamepadAxis.GAMEPAD_AXIS_RIGHT_X)
+            self.right_joystick_y = rl.get_gamepad_axis_movement(self.gamepad_id, rl.GamepadAxis.GAMEPAD_AXIS_RIGHT_Y)
             if abs(self.left_joystick_x) < self.gamepad_deadzone:
                 self.left_joystick_x = 0.0
             if abs(self.left_joystick_y) < self.gamepad_deadzone:
                 self.left_joystick_y = 0.0
+            if abs(self.right_joystick_x) < self.gamepad_deadzone:
+                self.right_joystick_x = 0.0
+            if abs(self.right_joystick_y) < self.gamepad_deadzone:
+                self.right_joystick_y = 0.0
