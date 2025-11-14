@@ -27,3 +27,4 @@ def load():
     images["Wall_vertical"] = rl.load_texture("app/assets/images/Wall_2.png")
     images["Elektrownia"] = rl.load_texture("app/assets/images/Spritesheets/Cobalt_jump.png")
     images["Oxygen_Standby"] = rl.load_texture("app/assets/images/Oxygen_Standby.png")
+    images["Wall_corner"] = rl.load_texture("app/assets/images/Corner.png")
