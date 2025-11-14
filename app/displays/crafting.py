@@ -28,7 +28,8 @@ class Crafting_Menu(BaseDisplay):
         self.objects = []
         # a=GameObject(self,assets.images["Jeff"],0,0,10,10)
         # t1=TextObject(self,'aaa',0,0,100,rl.WHITE)
-        self.inventory=Inventory({"oxygen":2,"hydrogen":2,"zinc":3,"sodium":0,"krypton":10,"barium":11,"sulphur":67,"iron":11,"helium":1000},self,0,0,100,200)
+        # self.inventory=Inventory({"oxygen":2,"hydrogen":2,"zinc":3,"sodium":2,"krypton":10,"barium":11,"sulphur":67,"iron":11,"helium":1000},self,0,0,100,200)
+        self.inventory=Inventory({"hydrogen":1000},self,0,0,100,200)
         # self.oxygen1=Atom(self,assets.images["Oxygen_Standby"] ,1000,100,100,100,"O",8,40)
         self.atom_bar=Atom_Bar(self,self.game.width//2,0,self.game.width//2,100)
         self.table=Table(self,self.game.width//2,0,self.game.width//2,self.game.height)
@@ -55,6 +56,7 @@ class Crafting_Menu(BaseDisplay):
 
 
         if rl.is_key_pressed(rl.KeyboardKey.KEY_C) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_UP):
+            self.table.clear()
             self.game.current_display = self.game.twodgame
             self.game.crafting = False
 
@@ -204,7 +206,6 @@ class Inventory():
         self.inv=inv
         self.atom_images={}
 
-
     def add_element(self,atom,amount):
         if atom in self.inv:
             self.inv[atom] += amount
@@ -266,6 +267,30 @@ class Atom_Bar():
             i += 1
             self.atom_images[a]=Atom(self.display, atom_properites[a][2], x + self.w-i*100, y, 100, 100, atom_properites[a][0], atom_properites[a][1], 40)
 
+    def update(self):
+        for i in self.atom_images.values():
+            try:
+                i.delete()
+            except:
+                pass
+        self.inv = self.display.get_inv()
+        self.atom_images = {}
+        atom_properites = {"hydrogen": ['H', 1, assets.images["Hydrogen_Standby"]],
+                           "helium": ['He', 2, assets.images["Helium_Standby"]],
+                           "oxygen": ['O', 8, assets.images["Oxygen_Standby"]],
+                           "sodium": ['Na', 11, assets.images["Sodium_Standby"]],
+                           "iron": ['Fe', 26, assets.images["Iron_Standby"]],
+                           "zinc": ['Zn', 30, assets.images["Zinc_Standby"]],
+                           "barium": ['Ba', 56, assets.images["Barium_Standby"]],
+                           "krypton": ['Kr', 36, assets.images["Krypton_Standby"]],
+                           "sulphur": ['S', 16, assets.images["Sulphur_Standby"]]}
+        i = 0
+        for a in self.inv.keys():
+            # print(a)
+            i += 1
+            self.atom_images[a] = Atom(self.display, atom_properites[a][2], self.x + self.w - i * 100, self.y, 100, 100,
+                                       atom_properites[a][0], atom_properites[a][1], 40)
+
 
 
 
@@ -298,13 +323,13 @@ class Table():
                            "sulphur": ['S', 16, assets.images["Sulphur_Standby"]]}
         self.translator={"H":"hydrogen","He":"helium","O":"oxygen","Na":"sodium","Ba":"barium","Kr":"krypton","Zn":"zinc","S":"sulphur","Fe":"iron"}
         self.values=[[1,"hydrogen"],[2,"helium"],[8,"oxygen"],[11,"sodium"],[16,"sulphur"],[26,"iron"],[30,"zinc"],[36,"krypton"],[56,"barium"],[92,"uranium"]]
+
     def do_fusion(self):
         if self.protons>92:
             print('nope')
         else:
             a=True
             i=len(self.values)-1
-            print()
             while a:
                 if self.protons>=self.values[i][0]:
                     self.clear_before_fusion()
@@ -317,13 +342,24 @@ class Table():
     def clear(self):
         for atom in self.atoms:
             print(atom.name)
-            self.display.inventory.inv[self.translator[atom.name]]+=1
-            atom.delete()
+            try:
+                self.display.inventory.inv[self.translator[atom.name]]+=1
+            except:
+                self.display.inventory.inv[self.translator[atom.name]] = 1
+                # self.display.inventory.update()
+                self.display.atom_bar.update()
+            try:
+                atom.delete()
+            except:
+                pass
         self.atoms=[]
         self.protons=0
     def clear_before_fusion(self):
         for atom in self.atoms:
             print(atom.name)
-            atom.delete()
+            try:
+                atom.delete()
+            except:
+                pass
         self.atoms=[]
         self.protons=0
