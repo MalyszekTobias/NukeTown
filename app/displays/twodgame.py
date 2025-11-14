@@ -129,7 +129,7 @@ class TwoDGameDisplay(BaseDisplay):
 
         self.player.update()
 
-        if rl.is_key_pressed(rl.KeyboardKey.KEY_C):
+        if rl.is_key_pressed(rl.KeyboardKey.KEY_C) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_UP):
             if self.game.crafting==False:
                 self.game.crafting = True
                 self.game.current_display = self.game.crafting_display
