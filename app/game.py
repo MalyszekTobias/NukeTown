@@ -9,6 +9,7 @@ class Game:
     def __init__(self):
         self.width, self.height = 1920, 1080
         rl.init_window(self.width, self.height, "raylib template?")
+        rl.toggle_fullscreen()
         rl.set_exit_key(rl.KeyboardKey.KEY_NULL)
         assets.load()
         self.bloom_shader = assets.shaders["bloom"]
