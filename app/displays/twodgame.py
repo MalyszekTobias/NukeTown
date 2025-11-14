@@ -1,4 +1,6 @@
 import pyray as rl
+
+from app.REACTOR import Reactor
 from app.displays.base import BaseDisplay
 from app.cameras import twodcamera
 from app import assets, map, room
@@ -7,10 +9,11 @@ from app.ui import text
 
 class TwoDGameDisplay(BaseDisplay):
     def __init__(self, game, player, enemies):
+        self.player = player
+        super().__init__(game)
         self.game = game
         self.player = player
         self.enemies = enemies
-        super().__init__(game)
         self.delta_time = rl.get_frame_time()
         self.camera = twodcamera.Camera(self.game.width, self.game.height, 0, 0, 3)
         self.enemy_blobs = []
@@ -19,6 +22,8 @@ class TwoDGameDisplay(BaseDisplay):
         rl.set_texture_filter(self.texture.texture, rl.TextureFilter.TEXTURE_FILTER_BILINEAR)
 
         self.jeff_image = assets.images["Jeff"]
+
+        Reactor(self)
 
         self.bloom_shader = self.game.bloom_shader
         self.shader_resolution_location = rl.get_shader_location(self.bloom_shader, "resolution")
@@ -97,6 +102,10 @@ class TwoDGameDisplay(BaseDisplay):
             friend.render()
         for e in self.enemies:
             e.render()
+
+        for object in self.game_objects:
+            object.render()
+
         self.player.render()
         self.camera.end_mode()
         rl.end_texture_mode()
@@ -143,6 +152,9 @@ class TwoDGameDisplay(BaseDisplay):
 
         for friend in self.player.friends:
             friend.update(self.map.rooms, self.map.corridor_tiles)
+
+        for object in self.game_objects:
+            object.update()
 
         if rl.is_key_pressed(rl.KeyboardKey.KEY_C) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_UP):
             if self.game.crafting==False:
