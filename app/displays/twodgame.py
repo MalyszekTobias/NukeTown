@@ -72,7 +72,7 @@ class TwoDGameDisplay(BaseDisplay):
         # draw player
         px = x + padding + int((player_map_x - min_x) * scale)
         py = y + padding + int((player_map_y - min_y) * scale)
-        rl.draw_circle(px, py, 3, rl.RED)
+        rl.draw_circle(px, py, 3, rl.GREEN)
 
     def render(self):
         rl.begin_texture_mode(self.texture)
