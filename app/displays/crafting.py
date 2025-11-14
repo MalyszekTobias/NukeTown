@@ -27,7 +27,7 @@ class Crafting_Menu(BaseDisplay):
         self.objects = []
         # a=GameObject(self,assets.images["Jeff"],0,0,10,10)
         # t1=TextObject(self,'aaa',0,0,100,rl.WHITE)
-        self.inventory=Inventory({"oxygen":2,"hydrogen":2},self,0,0,50,200)
+        self.inventory=Inventory({"oxygen":2,"hydrogen":2},self,0,0,30,200)
     def render(self):
         rl.begin_texture_mode(self.texture)
         print(self.square_pos)
@@ -123,6 +123,7 @@ class Inventory():
         self.h = h
         self.inv={}
         self.display.objects.append(self)
+        self.inv=inv
     def add_element(self,atom,amount):
         if atom in self.inv:
             self.inv[atom] += amount
@@ -130,4 +131,8 @@ class Inventory():
             self.inv[atom] = amount
     def draw(self):
         rl.draw_text("Inventory", self.x, self.y, self.w, rl.WHITE, )
+        i=0
+        for atom in self.inv:
+            i+=1
+            rl.draw_text(f"{atom}: {self.inv[atom]}",self.x,self.y+self.w*i,self.w,rl.WHITE)
 

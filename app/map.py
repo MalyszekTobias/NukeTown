@@ -10,6 +10,7 @@ class Map:
     def __init__(self):
         self.rooms: List[Room] = []
         self.corridor_tiles: Set[Tile] = set()
+        self.tile_size: int = 16
 
     def add_room(self, room: Room):
         self.rooms.append(room)
@@ -40,7 +41,8 @@ class Map:
             b = rooms_sorted[i + 1].center()
             self.corridor_tiles.update(self._create_corridor_between(a, b))
 
-    def draw(self, tile_size: int = 16):
+    def draw(self):
+        tile_size = self.tile_size
         # draw rooms (walls) and corridors
         # corridors first (different color)
         for (x, y) in self.corridor_tiles:

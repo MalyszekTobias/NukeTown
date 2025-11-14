@@ -33,7 +33,46 @@ class TwoDGameDisplay(BaseDisplay):
         rl.set_shader_value(self.bloom_shader, self.shader_resolution_location, res,
                             rl.ShaderUniformDataType.SHADER_UNIFORM_VEC2)
 
+    def draw_minimap(self):
+        if not getattr(self.map, "rooms", None):
+            return
 
+        size = 300
+        margin = 10
+        x = self.game.width - size - margin
+        y = margin
+        padding = 4
+        content_size = size - padding * 2
+
+        # compute map bounds
+        min_x = min((r.x for r in self.map.rooms), default=0)
+        max_x = max((r.x + r.width for r in self.map.rooms), default=1)
+        min_y = min((r.y for r in self.map.rooms), default=0)
+        max_y = max((r.y + r.height for r in self.map.rooms), default=1)
+
+        map_w = max(1, max_x - min_x)
+        map_h = max(1, max_y - min_y)
+        scale = min(content_size / map_w, content_size / map_h)
+
+        # background + border
+        rl.draw_rectangle(x-5, y-5, size+10, size+10, rl.DARKGRAY)
+        rl.draw_rectangle(x, y, size, size, rl.BLACK)
+
+        # draw rooms
+        for rm in self.map.rooms:
+            rx = x + padding + int((rm.x - min_x) * scale)
+            ry = y + padding + int((rm.y - min_y) * scale)
+            rw = max(1, int(rm.width * scale))
+            rh = max(1, int(rm.height * scale))
+            rl.draw_rectangle(rx, ry, rw, rh, rl.WHITE)
+            rl.draw_rectangle_lines(rx, ry, rw, rh, rl.GRAY)
+        tile_size = self.map.tile_size
+        player_map_x = float(self.player.x) / float(tile_size)
+        player_map_y = float(self.player.y) / float(tile_size)
+        # draw player
+        px = x + padding + int((player_map_x - min_x) * scale)
+        py = y + padding + int((player_map_y - min_y) * scale)
+        rl.draw_circle(px, py, 3, rl.GREEN)
 
     def render(self):
         rl.begin_texture_mode(self.texture)
@@ -48,7 +87,7 @@ class TwoDGameDisplay(BaseDisplay):
         self.player.render()
         # rl.draw_rectangle(int(self.square_pos[0]), int(self.square_pos[1]), 20, 20, rl.RED)
         self.camera.end_mode()
-        rl.draw_fps(10, 10)
+
         rl.end_texture_mode()
 
         #shader stuff
@@ -61,6 +100,8 @@ class TwoDGameDisplay(BaseDisplay):
         rl.draw_texture_pro(self.texture.texture, src, dst, rl.Vector2(0.0, 0.0), 0.0, rl.WHITE)
 
         rl.end_shader_mode()
+        self.draw_minimap()
+        rl.draw_fps(10, 10)
         if self.game.gamepad_enabled:
             rl.draw_text(f"Gamepad X: {self.game.left_joystick_x:.2f}  Y: {self.game.left_joystick_y:.2f}", 10, 130, 20, rl.YELLOW)
 
