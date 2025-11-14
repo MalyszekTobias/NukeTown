@@ -22,7 +22,7 @@ class Player:
         self.clicked = False
         self.velUp = 0
         self.velRight = 0
-        self.maxSpeed = 0.012
+        self.maxSpeed = 0.12
         self.acceleration = 0.0002
         self.gameHeight = self.game.height
         self.gameWidth = self.game.width
