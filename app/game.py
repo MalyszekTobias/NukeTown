@@ -11,6 +11,7 @@ class Game:
         rl.init_window(self.width, self.height, "raylib template?")
         rl.toggle_fullscreen()
         rl.set_exit_key(rl.KeyboardKey.KEY_NULL)
+        rl.set_target_fps(75)
         assets.load()
         self.bloom_shader = assets.shaders["bloom"]
         self.base_display = startscreen.StartDisplay(self)
