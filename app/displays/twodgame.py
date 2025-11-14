@@ -113,6 +113,8 @@ class TwoDGameDisplay(BaseDisplay):
                          rl.YELLOW, )
 
     def update(self):
+        if self.game.music_manager.current is None:
+            self.game.music_manager.play_music2()
         self.delta_time = rl.get_frame_time()
 
         if self.intro:
@@ -137,6 +139,9 @@ class TwoDGameDisplay(BaseDisplay):
             if self.game.crafting==False:
                 self.game.crafting = True
                 self.game.current_display = self.game.crafting_display
+                if self.game.music_manager.current != 1:
+                    print(self.game.music_manager.current)
+                    self.game.music_manager.play_music1()
 
 
 
