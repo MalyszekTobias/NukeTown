@@ -22,4 +22,4 @@ def load():
     images["Zinc"] = rl.load_texture("app/assets/images/Spritesheets/Zinc.png")
     images["Barium"] = rl.load_texture("app/assets/images/Spritesheets/Barrium.png")
     images["Krypton"] = rl.load_texture("app/assets/images/Spritesheets/Cobalt_jump.png")
-    images["Elektrownia"] = rl.load_texture("app/assets/images/Spritesheets/Cobalt_jump.png")
+    images["Elektrownia"] = rl.load_texture("app/assets/images/Spritesheets/Komin.png")
