@@ -119,7 +119,7 @@ class Atom:
                 else:
                     self.x = self.gameWidth - self.radius
 
-    def update(self, rooms = None):
+    def update(self, rooms = None, corridor_tiles = None):
         self.rect = rl.Rectangle(self.x - self.radius / 2, self.y - self.radius / 2,
                                 self.radius, self.radius)
         if self.leader is None:
@@ -177,15 +177,15 @@ class Atom:
             else:
                 self.current_frame = 0
                 self.frame_timer = 0.0
-        self._resolve_wall_collisions(rooms, 16)
+        self._resolve_wall_collisions(rooms, 16, corridor_tiles)
 
-    def _resolve_wall_collisions(self, rooms, tile_size):
+    def _resolve_wall_collisions(self, rooms, tile_size, corridor_tiles=None):
         """Rect vs rect: push atom out of first colliding wall rect."""
         if not rooms:
             return
         ax, ay, aw, ah = self.rect.x, self.rect.y, self.rect.width, self.rect.height
         for room in rooms:
-            for (wx, wy, ww, wh) in room.collision_rects(tile_size):
+            for (wx, wy, ww, wh) in room.collision_rects(tile_size, corridor_tiles):
                 # AABB overlap test
                 if ax < wx + ww and ax + aw > wx and ay < wy + wh and ay + ah > wy:
                     # compute penetration depths on each side
