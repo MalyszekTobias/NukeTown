@@ -96,8 +96,10 @@ class Player:
             self.left = rl.is_key_down(rl.KeyboardKey.KEY_A)
             self.right = rl.is_key_down(rl.KeyboardKey.KEY_D)
         else:
-            self.square_pos[0] += self.game.left_joystick_x * self.speed * self.delta_time
-            self.square_pos[1] += self.game.left_joystick_y * self.speed * self.delta_time
+            self.up = self.game.left_joystick_y < -self.game.gamepad_deadzone
+            self.down = self.game.left_joystick_y > self.game.gamepad_deadzone
+            self.left = self.game.left_joystick_x < -self.game.gamepad_deadzone
+            self.right = self.game.left_joystick_x > self.game.gamepad_deadzone
         self.movement()
 
     def render(self):
