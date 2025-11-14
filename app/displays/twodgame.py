@@ -130,10 +130,10 @@ class TwoDGameDisplay(BaseDisplay):
                             rl.ShaderUniformDataType.SHADER_UNIFORM_FLOAT)
 
 
-        self.player.update()
+        self.player.update(self.map.rooms)
 
         for friend in self.player.friends:
-            friend.update()
+            friend.update(self.map.rooms)
 
         if rl.is_key_pressed(rl.KeyboardKey.KEY_C) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_UP):
             if self.game.crafting==False:

@@ -16,7 +16,10 @@ class Atom:
         self.current_frame = 0
         self.frame_timer = 0.0
         self.frame_duration = 0.08
-        self.radius = 40
+        self.radius = 10
+
+        self.rect = rl.Rectangle(0, 0, self.radius, self.radius)
+
         self.x = 100
         self.y = 100
         self.up = False
@@ -117,7 +120,9 @@ class Atom:
                 else:
                     self.x = self.gameWidth - self.radius
 
-    def update(self):
+    def update(self, rooms = None):
+        self.rect = rl.Rectangle(self.x - self.radius / 2, self.y - self.radius / 2,
+                                self.radius, self.radius)
         if self.leader is None:
             if not self.game.gamepad_enabled:
                 self.up = rl.is_key_down(rl.KeyboardKey.KEY_W)
@@ -173,6 +178,37 @@ class Atom:
             else:
                 self.current_frame = 0
                 self.frame_timer = 0.0
+        self._resolve_wall_collisions(rooms, 16)
+
+    def _resolve_wall_collisions(self, rooms, tile_size):
+        """Rect vs rect: push atom out of first colliding wall rect."""
+        if not rooms:
+            return
+        ax, ay, aw, ah = self.rect.x, self.rect.y, self.rect.width, self.rect.height
+        for room in rooms:
+            for (wx, wy, ww, wh) in room.collision_rects(tile_size):
+                # AABB overlap test
+                if ax < wx + ww and ax + aw > wx and ay < wy + wh and ay + ah > wy:
+                    # compute penetration depths on each side
+                    pen_left = (ax + aw) - wx
+                    pen_right = (wx + ww) - ax
+                    pen_top = (ay + ah) - wy
+                    pen_bottom = (wy + wh) - ay
+                    # choose smallest penetration axis
+                    min_pen = min(pen_left, pen_right, pen_top, pen_bottom)
+                    if min_pen == pen_left:
+                        # push atom left
+                        ax -= pen_left
+                    elif min_pen == pen_right:
+                        ax += pen_right
+                    elif min_pen == pen_top:
+                        ay -= pen_top
+                    else:  # pen_bottom
+                        ay += pen_bottom
+                    # write back center from rect
+                    self.x = ax + aw / 2
+                    self.y = ay + ah / 2
+                    return
 
     def render(self):
         if self.leader == None:
@@ -198,6 +234,7 @@ class Atom:
                 for friend in self.game.player.friends:
                     friend.set_destination(15)
         rl.draw_texture_pro(self.img, src, dst, origin, angle, rl.WHITE)
+        rl.draw_rectangle_lines(int(self.rect.x), int(self.rect.y), int(self.rect.width), int(self.rect.height), rl.RED)
 
     def set_destination(self, radius):
         x = rl.get_random_value(- radius, radius)
