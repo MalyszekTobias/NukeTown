@@ -40,6 +40,30 @@ class Room:
                 tiles.add((x, y))
         return tiles
 
+    def collision_rects(self, tile_size: int):
+        """Return wall collision rectangles matching drawn wall thickness."""
+        thickness = max(2, tile_size // 2)  # wall thickness in pixels
+        x0, y0, w, h = self.x, self.y, self.width, self.height
+        px = x0 * tile_size
+        py = y0 * tile_size
+        pw = w * tile_size
+        ph = h * tile_size
+        rects = []
+        # top (inside shift)
+        rects.append((px, py + thickness, pw, thickness))
+        # bottom
+        rects.append((px, py + ph - 2 * thickness, pw, thickness))
+        # left
+        rects.append((px + thickness, py, thickness, ph))
+        # right
+        rects.append((px + pw - 2 * thickness, py, thickness, ph))
+        # corner pads (optional small squares to block diagonals)
+        corner_size = thickness
+        rects.append((px + thickness, py + thickness, corner_size, corner_size))  # top-left
+        rects.append((px + pw - 2 * thickness, py + thickness, corner_size, corner_size))  # top-right
+        rects.append((px + thickness, py + ph - 2 * thickness, corner_size, corner_size))  # bottom-left
+        rects.append((px + pw - 2 * thickness, py + ph - 2 * thickness, corner_size, corner_size))  # bottom-right
+        return rects
     def randomize_floors(
         self,
         cracked_chance: float = 0.02,
