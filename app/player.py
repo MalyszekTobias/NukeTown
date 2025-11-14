@@ -16,8 +16,8 @@ class Player:
         self.clicked = False
         self.velUp = 0
         self.velRight = 0
-        self.maxSpeed = 0.1
-        self.acceleration = 0.001
+        self.maxSpeed = 0.12
+        self.acceleration = 0.0002
         self.gameHeight = self.game.height
         self.gameWidth = self.game.width
         self.hpHeight = 30
@@ -101,7 +101,6 @@ class Player:
         self.movement()
 
     def render(self):
-        print(123)
         scale = 20 / float(self.img.width)
 
         rl.draw_texture_ex(self.img, rl.Vector2(float(self.x), float(self.y)), 0.0,
