@@ -92,6 +92,7 @@ class TwoDGameDisplay(BaseDisplay):
         self.player.render()
         for friend in self.player.friends:
             friend.render()
+            friend.update()
         self.camera.end_mode()
         rl.end_texture_mode()
 
