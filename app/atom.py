@@ -32,6 +32,8 @@ class Atom:
         self.gameWidth = self.game.width
         self.hpHeight = 30
         self.run_tilt = 4
+        self.target_x = None
+        self.target_y = None
 
     def get_sprite(self):
         if self.weight in [0, 92]:
@@ -116,16 +118,37 @@ class Atom:
                     self.x = self.gameWidth - self.radius
 
     def update(self):
-        if not self.game.gamepad_enabled:
-            self.up = rl.is_key_down(rl.KeyboardKey.KEY_W)
-            self.down = rl.is_key_down(rl.KeyboardKey.KEY_S)
-            self.left = rl.is_key_down(rl.KeyboardKey.KEY_A)
-            self.right = rl.is_key_down(rl.KeyboardKey.KEY_D)
-        else:
-            self.up = self.game.left_joystick_y < -self.game.gamepad_deadzone
-            self.down = self.game.left_joystick_y > self.game.gamepad_deadzone
-            self.left = self.game.left_joystick_x < -self.game.gamepad_deadzone
-            self.right = self.game.left_joystick_x > self.game.gamepad_deadzone
+        if self.leader is None:
+            if not self.game.gamepad_enabled:
+                self.up = rl.is_key_down(rl.KeyboardKey.KEY_W)
+                self.down = rl.is_key_down(rl.KeyboardKey.KEY_S)
+                self.left = rl.is_key_down(rl.KeyboardKey.KEY_A)
+                self.right = rl.is_key_down(rl.KeyboardKey.KEY_D)
+            else:
+                self.up = self.game.left_joystick_y < -self.game.gamepad_deadzone
+                self.down = self.game.left_joystick_y > self.game.gamepad_deadzone
+                self.left = self.game.left_joystick_x < -self.game.gamepad_deadzone
+                self.right = self.game.left_joystick_x > self.game.gamepad_deadzone
+        elif self.target_x != None and self.target_y != None:
+            if self.x < self.target_x:
+                self.right = True
+                self.left = False
+            elif self.x > self.target_x:
+                self.left = True
+                self.right = False
+            if self.y > self.target_y:
+                self.up = True
+                self.down = False
+            elif self.y < self.target_y:
+                self.down = True
+                self.up = False
+
+            if abs(self.x - self.target_x) < 8:
+                self.left = False
+                self.right = False
+            if abs(self.y - self.target_y) < 8:
+                self.up = False
+                self.down = False
         self.movement()
 
         dt = rl.get_frame_time()
@@ -141,7 +164,11 @@ class Atom:
             self.frame_timer = 0.0
 
     def render(self):
-        scale = 20.0 / float(self.frame_width)
+        if self.leader == None:
+            scale = 14.0 / float(self.frame_width)
+        else:
+            scale = 6.0 / float(self.frame_width)
+
         src = rl.Rectangle(0.0, float(self.frame_height * self.current_frame),
                            float(self.frame_width), float(self.frame_height))
         dst_w = float(self.frame_width) * scale
@@ -155,4 +182,14 @@ class Atom:
             angle = self.run_tilt
         elif self.velRight < 0:
             angle = -self.run_tilt
+        if self.leader == None:
+            if self.velRight > 0.09 or self.velRight < -0.09 or self.velUp > 0.09 or self.velUp < -0.09:
+                for friend in self.game.player.friends:
+                    friend.set_destination(15)
         rl.draw_texture_pro(self.img, src, dst, origin, angle, rl.WHITE)
+
+    def set_destination(self, radius):
+        x = rl.get_random_value(- radius, radius)
+        y = rl.get_random_value(- radius, radius)
+        self.target_x = self.leader.x + x
+        self.target_y = self.leader.y + y
