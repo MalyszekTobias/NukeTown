@@ -8,10 +8,8 @@ class TwoDGameDisplay(BaseDisplay):
     def __init__(self, game, player):
         self.player = player
         super().__init__(game)
-        self.square_pos = [200, 200]
-        self.speed = 200
         self.delta_time = rl.get_frame_time()
-        self.camera = twodcamera.Camera(self.game.width, self.game.height, self.square_pos[0], self.square_pos[1], 3)
+        self.camera = twodcamera.Camera(self.game.width, self.game.height, 0, 0, 3)
 
         self.texture =  rl.load_render_texture(game.width, game.height)
         rl.set_texture_filter(self.texture.texture, rl.TextureFilter.TEXTURE_FILTER_BILINEAR)
