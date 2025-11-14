@@ -1,5 +1,6 @@
 from email.mime import image
 import copy
+
 from app.ui import text
 
 import pyray as rl
