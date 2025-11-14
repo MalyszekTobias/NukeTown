@@ -39,7 +39,6 @@ class Atom:
         if self.weight in [0, 92]:
             return assets.images["movingblob"]
         elif self.weight == 1:
-            print("Loading Hydrogen sprite")
             return assets.images["Hydrogen"]
         elif self.weight == 2:
             return assets.images["Helium"]
