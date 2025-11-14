@@ -30,7 +30,7 @@ class Atom:
         self.gameHeight = self.game.height
         self.gameWidth = self.game.width
         self.hpHeight = 30
-        print(self.weight)
+        self.run_tilt = 4
 
     def get_sprite(self):
         if self.weight == 0:
@@ -132,4 +132,9 @@ class Atom:
         dst_y = float(self.y) - dst_h / 2.0
         dst = rl.Rectangle(dst_x, dst_y, dst_w, dst_h)
         origin = rl.Vector2(0.0, 0.0)
-        rl.draw_texture_pro(self.img, src, dst, origin, 0.0, rl.WHITE)
+        angle = 0
+        if self.velRight > 0:
+            angle = self.run_tilt
+        elif self.velRight < 0:
+            angle = -self.run_tilt
+        rl.draw_texture_pro(self.img, src, dst, origin, angle, rl.WHITE)
