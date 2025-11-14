@@ -33,17 +33,8 @@ class Game:
     def loop(self):
         while not rl.window_should_close():
             self.update()
-            self.controls()
             self.render()
 
-    def controls(self):
-        if rl.is_key_pressed(rl.KeyboardKey.KEY_C):
-            if self.crafting==False:
-                self.crafting = True
-                self.current_display = self.crafting_display
-            else:
-                self.current_display = self.twodgame
-                self.crafting = False
 
     def render(self):
         rl.begin_drawing()
