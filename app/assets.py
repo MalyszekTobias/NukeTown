@@ -44,5 +44,7 @@ def load():
     images["Iron_Standby"] = rl.load_texture("app/assets/images/Iron_Standby.png")
     images["Krypton_Standby"] = rl.load_texture("app/assets/images/Cobalt_Stand.png")
     images["Wall_corner"] = rl.load_texture("app/assets/images/Corner.png")
+    images["Table"] = rl.load_texture("app/assets/images/Table.png")
+    images["Tablica"] = rl.load_texture("app/assets/images/Tablica.png")
 
     font = rl.load_font('app/assets/Fonts/Chernobyl.otf')
