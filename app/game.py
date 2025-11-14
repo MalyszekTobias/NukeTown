@@ -41,7 +41,7 @@ class Game:
                 self.crafting = True
                 self.current_display = crafting.Crafting_Menu(self)
             else:
-                self.current_display = twodgame.TwoDGameDisplay(self)
+                self.current_display = self.twodgame
                 self.crafting = False
 
     def render(self):
