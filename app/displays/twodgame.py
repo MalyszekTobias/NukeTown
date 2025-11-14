@@ -30,6 +30,10 @@ class TwoDGameDisplay(BaseDisplay):
         res = rl.ffi.new("float[2]", [float(self.game.width), float(self.game.height)])
         rl.set_shader_value(self.bloom_shader, self.shader_resolution_location, res,
                             rl.ShaderUniformDataType.SHADER_UNIFORM_VEC2)
+        self.start_zoom = self.camera.camera.zoom
+        self.intro = True
+        self._intro_tolerance = 0.01
+        self.camera.camera.zoom = 100.0  # start zoomed in
 
     def draw_minimap(self):
         if not getattr(self.map, "rooms", None):
@@ -107,6 +111,13 @@ class TwoDGameDisplay(BaseDisplay):
 
     def update(self):
         self.delta_time = rl.get_frame_time()
+
+        if self.intro:
+            self.camera.zoom_intro(self.delta_time)
+            # stop the intro once the camera zoom reaches (close enough to) the target
+            if abs(self.camera.camera.zoom - self.camera.target_zoom) < 0.01:
+                self.intro = False
+
         self.camera.update_target(self.player.x, self.player.y, self.delta_time)
 
         t = rl.ffi.new("float *", float(rl.get_time()))
