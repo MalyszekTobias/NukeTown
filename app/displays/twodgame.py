@@ -91,7 +91,6 @@ class TwoDGameDisplay(BaseDisplay):
         self.camera.begin_mode()
         for friend in self.player.friends:
             friend.render()
-            friend.update()
         self.player.render()
         self.camera.end_mode()
         rl.end_texture_mode()
@@ -129,6 +128,9 @@ class TwoDGameDisplay(BaseDisplay):
 
 
         self.player.update()
+
+        for friend in self.player.friends:
+            friend.update()
 
         if rl.is_key_pressed(rl.KeyboardKey.KEY_C) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_UP):
             if self.game.crafting==False:
