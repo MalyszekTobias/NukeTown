@@ -160,8 +160,19 @@ class Atom:
                 self.frame_timer -= self.frame_duration
                 self.current_frame = (self.current_frame + 1) % self.num_of_frames
         else:
-            self.current_frame = 0
-            self.frame_timer = 0.0
+            # If we're mid-animation, continue advancing frames until we wrap back to frame 0,
+            # then stop there. If already at frame 0, keep it idle.
+            if self.current_frame != 0:
+                self.frame_timer += dt
+                while self.frame_timer >= self.frame_duration:
+                    self.frame_timer -= self.frame_duration
+                    self.current_frame = (self.current_frame + 1) % self.num_of_frames
+                    if self.current_frame == 0:
+                        self.frame_timer = 0.0
+                        break
+            else:
+                self.current_frame = 0
+                self.frame_timer = 0.0
 
     def render(self):
         if self.leader == None:
