@@ -1,4 +1,5 @@
 import pyray
+from app.ui import text
 
 class Button:
     def __init__(self, game, x, y, width, height, text, text_size, text_color, button_color, hover_color, click_color):
@@ -37,4 +38,4 @@ class Button:
         text_width = pyray.measure_text(self.text, self.text_size)
         text_x = self.rect.x + (self.rect.width - text_width) / 2
         text_y = self.rect.y + (self.rect.height - self.text_size) / 2
-        pyray.draw_text(self.text, int(text_x), int(text_y), self.text_size, self.text_color)
+        text.draw_text(self.text, int(text_x), int(text_y), self.text_size, self.text_color)

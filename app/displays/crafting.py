@@ -1,4 +1,5 @@
 from email.mime import image
+from app.ui import text
 
 import pyray as rl
 from app.displays.base import BaseDisplay
@@ -48,7 +49,7 @@ class Crafting_Menu(BaseDisplay):
         # shader stuff
 
         if self.game.gamepad_enabled:
-            rl.draw_text(f"Gamepad X: {self.game.left_joystick_x:.2f}  Y: {self.game.left_joystick_y:.2f}", 10, 130, 20,
+            text.draw_text(f"Gamepad X: {self.game.left_joystick_x:.2f}  Y: {self.game.left_joystick_y:.2f}", 10, 130, 20,
                          rl.YELLOW)
 
     def update(self):
@@ -61,6 +62,7 @@ class Crafting_Menu(BaseDisplay):
         if rl.is_key_pressed(rl.KeyboardKey.KEY_C) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_UP):
             self.game.current_display = self.game.twodgame
             self.game.crafting = False
+
         if rl.is_mouse_button_pressed(0):
             self.mouse=rl.get_mouse_position()
             print(self.mouse.x,self.mouse.y)
@@ -118,7 +120,7 @@ class TextObject():
 
     def draw(self):
         # print('bb')
-        rl.draw_text(self.text,self.x,self.y,self.w,self.color,)
+        text.draw_text(self.text,self.x,self.y,self.w,self.color,)
     def delete(self):
         self.display.objects.remove(self)
 class Rect():
@@ -155,11 +157,11 @@ class Inventory():
         else:
             self.inv[atom] = amount
     def draw(self):
-        rl.draw_text("Inventory", self.x, self.y, self.w, rl.WHITE, )
+        text.draw_text("Inventory", self.x, self.y, self.w, rl.WHITE, )
         i=0
         for atom in self.inv:
             i+=1
-            rl.draw_text(f"{atom}: {self.inv[atom]}",self.x,self.y+self.w*i,self.w,rl.WHITE)
+            text.draw_text(f"{atom}: {self.inv[atom]}",self.x,self.y+self.w*i,self.w,rl.WHITE)
 
 class Atom():
     def __init__(self,display,image,x,y,w,h,name,mass,font_w):

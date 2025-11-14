@@ -2,6 +2,7 @@ import pyray as rl
 from app.displays.base import BaseDisplay
 from app.cameras import twodcamera
 from app import assets, map, room
+from app.ui import text
 
 
 class TwoDGameDisplay(BaseDisplay):
@@ -97,7 +98,6 @@ class TwoDGameDisplay(BaseDisplay):
         for e in self.enemies:
             e.render()
         self.player.render()
-
         self.camera.end_mode()
         rl.end_texture_mode()
 
@@ -114,10 +114,12 @@ class TwoDGameDisplay(BaseDisplay):
         self.draw_minimap()
         rl.draw_fps(10, 10)
         if self.game.gamepad_enabled:
-            rl.draw_text(f"Gamepad X: {self.game.left_joystick_x:.2f}  Y: {self.game.left_joystick_y:.2f}", 10, 130, 20,
-                         rl.YELLOW)
+            text.draw_text(f"Gamepad X: {self.game.left_joystick_x:.2f}  Y: {self.game.left_joystick_y:.2f}", 10, 130, 20,
+                         rl.YELLOW, )
 
     def update(self):
+        if self.game.music_manager.current is None:
+            self.game.music_manager.play_music2()
         self.delta_time = rl.get_frame_time()
 
         if self.intro:
@@ -138,7 +140,19 @@ class TwoDGameDisplay(BaseDisplay):
             enemy.update()
         self.player.update()
 
+        for friend in self.player.friends:
+            friend.update()
+
         if rl.is_key_pressed(rl.KeyboardKey.KEY_C) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_UP):
             if self.game.crafting==False:
                 self.game.crafting = True
                 self.game.current_display = self.game.crafting_displa
+                self.game.current_display = self.game.crafting_display
+                if self.game.music_manager.current != 1:
+                    print(self.game.music_manager.current)
+                    self.game.music_manager.play_music1()
+
+
+
+
+
