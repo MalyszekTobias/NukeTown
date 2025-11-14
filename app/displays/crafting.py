@@ -1,4 +1,4 @@
-from email.mime import image
+
 from app.ui import text
 
 import pyray as rl
