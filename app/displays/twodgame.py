@@ -139,10 +139,10 @@ class TwoDGameDisplay(BaseDisplay):
         for enemy in self.enemies:
             enemy.update()
 
-        self.player.update(self.map.rooms)
+        self.player.update(self.map.rooms, self.map.corridor_tiles)
 
         for friend in self.player.friends:
-            friend.update(self.map.rooms)
+            friend.update(self.map.rooms, self.map.corridor_tiles)
 
         if rl.is_key_pressed(rl.KeyboardKey.KEY_C) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_UP):
             if self.game.crafting==False:
