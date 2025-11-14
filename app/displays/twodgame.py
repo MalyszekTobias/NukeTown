@@ -5,11 +5,14 @@ from app import assets, map, room
 
 
 class TwoDGameDisplay(BaseDisplay):
-    def __init__(self, game, player):
+    def __init__(self, game, player, enemies):
+        self.game = game
         self.player = player
+        self.enemies = enemies
         super().__init__(game)
         self.delta_time = rl.get_frame_time()
         self.camera = twodcamera.Camera(self.game.width, self.game.height, 0, 0, 3)
+        self.enemy_blobs = []
 
         self.texture =  rl.load_render_texture(game.width, game.height)
         rl.set_texture_filter(self.texture.texture, rl.TextureFilter.TEXTURE_FILTER_BILINEAR)
@@ -91,8 +94,10 @@ class TwoDGameDisplay(BaseDisplay):
         self.camera.begin_mode()
         for friend in self.player.friends:
             friend.render()
-            friend.update()
+        for e in self.enemies:
+            e.render()
         self.player.render()
+
         self.camera.end_mode()
         rl.end_texture_mode()
 
@@ -127,15 +132,13 @@ class TwoDGameDisplay(BaseDisplay):
         rl.set_shader_value(self.bloom_shader, self.shader_time_location, t,
                             rl.ShaderUniformDataType.SHADER_UNIFORM_FLOAT)
 
-
+        for fellow in self.player.friends:
+            fellow.update()
+        for enemy in self.enemies:
+            enemy.update()
         self.player.update()
 
         if rl.is_key_pressed(rl.KeyboardKey.KEY_C) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_UP):
             if self.game.crafting==False:
                 self.game.crafting = True
-                self.game.current_display = self.game.crafting_display
-
-
-
-
-
+                self.game.current_display = self.game.crafting_displa
