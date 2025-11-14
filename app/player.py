@@ -5,7 +5,13 @@ from app import assets
 class Player:
     def __init__(self, game):
         self.game = game
-        self.img = assets.images["Jeff"]
+        self.img = assets.images["movingblob"]
+        self.num_of_frames = int(self.img.height / self.img.width)
+        self.frame_width = int(self.img.width)
+        self.frame_height = int(self.img.height / self.num_of_frames)
+        self.current_frame = 0
+        self.frame_timer = 0.0
+        self.frame_duration = 0.08
         self.radius = 40
         self.x = 100
         self.y = 100
@@ -16,7 +22,7 @@ class Player:
         self.clicked = False
         self.velUp = 0
         self.velRight = 0
-        self.maxSpeed = 0.12
+        self.maxSpeed = 0.012
         self.acceleration = 0.0002
         self.gameHeight = self.game.height
         self.gameWidth = self.game.width
@@ -102,8 +108,33 @@ class Player:
             self.right = self.game.left_joystick_x > self.game.gamepad_deadzone
         self.movement()
 
-    def render(self):
-        scale = 20 / float(self.img.width)
+        dt = rl.get_frame_time()
+        moving = any((self.up, self.down, self.left, self.right)) or abs(self.velUp) > 1e-6 or abs(self.velRight) > 1e-6
 
-        rl.draw_texture_ex(self.img, rl.Vector2(float(self.x), float(self.y)), 0.0,
-                           scale, rl.WHITE)
+        if moving:
+            self.frame_timer += dt
+            while self.frame_timer >= self.frame_duration:
+                self.frame_timer -= self.frame_duration
+                self.current_frame = (self.current_frame + 1) % self.num_of_frames
+        else:
+            # reset to first frame when idle
+            self.current_frame = 0
+            self.frame_timer = 0.0
+
+    def render(self):
+        # scale so sprite width becomes ~20 pixels (same as before)
+        scale = 20.0 / float(self.frame_width)
+
+        # source rectangle for current frame (frames stacked vertically)
+        src = rl.Rectangle(0.0, float(self.frame_height * self.current_frame),
+                           float(self.frame_width), float(self.frame_height))
+
+        # destination rectangle (positioned top-left so sprite is centered at (x,y))
+        dst_w = float(self.frame_width) * scale
+        dst_h = float(self.frame_height) * scale
+        dst_x = float(self.x) - dst_w / 2.0
+        dst_y = float(self.y) - dst_h / 2.0
+        dst = rl.Rectangle(dst_x, dst_y, dst_w, dst_h)
+
+        origin = rl.Vector2(0.0, 0.0)
+        rl.draw_texture_pro(self.img, src, dst, origin, 0.0, rl.WHITE)

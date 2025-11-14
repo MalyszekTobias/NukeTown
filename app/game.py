@@ -7,12 +7,13 @@ from app import player
 
 class Game:
     def __init__(self):
-        self.width, self.height = 800, 600
+        self.width, self.height = 1600, 900
         rl.init_window(self.width, self.height, "raylib template?")
         rl.set_exit_key(rl.KeyboardKey.KEY_NULL)
         assets.load()
         self.bloom_shader = assets.shaders["bloom"]
         self.base_display = startscreen.StartDisplay(self)
+        self.crafting_display = crafting.Crafting_Menu(self)
         self.player = player.Player(self)
         self.twodgame = twodgame.TwoDGameDisplay(self, self.player)
         self.current_display = self.base_display
@@ -39,9 +40,9 @@ class Game:
         if rl.is_key_pressed(rl.KeyboardKey.KEY_C):
             if self.crafting==False:
                 self.crafting = True
-                self.current_display = crafting.Crafting_Menu(self)
+                self.current_display = self.crafting_display
             else:
-                self.current_display = twodgame.TwoDGameDisplay(self)
+                self.current_display = self.twodgame
                 self.crafting = False
 
     def render(self):
