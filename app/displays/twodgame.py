@@ -2,6 +2,7 @@ import pyray as rl
 from app.displays.base import BaseDisplay
 from app.cameras import twodcamera
 from app import assets, map, room
+from app.ui import text
 
 
 class TwoDGameDisplay(BaseDisplay):
@@ -108,8 +109,8 @@ class TwoDGameDisplay(BaseDisplay):
         self.draw_minimap()
         rl.draw_fps(10, 10)
         if self.game.gamepad_enabled:
-            rl.draw_text(f"Gamepad X: {self.game.left_joystick_x:.2f}  Y: {self.game.left_joystick_y:.2f}", 10, 130, 20,
-                         rl.YELLOW)
+            text.draw_text(f"Gamepad X: {self.game.left_joystick_x:.2f}  Y: {self.game.left_joystick_y:.2f}", 10, 130, 20,
+                         rl.YELLOW, )
 
     def update(self):
         self.delta_time = rl.get_frame_time()

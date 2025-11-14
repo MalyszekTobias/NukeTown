@@ -3,6 +3,7 @@ import pyray as rl
 from app.displays import startscreen, twodgame,crafting
 from app import assets
 from app import player
+from app.ui import text
 
 
 class Game:
