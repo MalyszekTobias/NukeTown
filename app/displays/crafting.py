@@ -277,10 +277,10 @@ class Table():
         self.h = h
         self.protons=0
         self.atoms=[]
-        self.rect=Rect(display,x,y,w,h)
+        self.rect=Rect(display,x,y,w-1,h-1)
         self.font=90
         self.fuse_text=TextObject(display,'Fuse',x+w-int(2.5*self.font),y+h-self.font,self.font,rl.WHITE)
-        self.fuse_ram=Rect(self.display,x+w-int(2.5*self.font),y+h-self.font,x+w,y+h)
+        self.fuse_ram=Rect(self.display,x+w-int(2.5*self.font),y+h-self.font,int(2.5*self.font)-1,self.font-1)
     def do_fusion(self):
         print(';fusion')
 
