@@ -1,4 +1,4 @@
-from email.mime import image
+
 from app.ui import text
 
 import pyray as rl
@@ -20,13 +20,9 @@ class Crafting_Menu(BaseDisplay):
 
 
 
-        self.bloom_shader = self.game.bloom_shader
-        self.shader_resolution_location = rl.get_shader_location(self.bloom_shader, "resolution")
-        self.shader_time_location = rl.get_shader_location(self.bloom_shader, "time")
+
         self.crafting = False
-        res = rl.ffi.new("float[2]", [float(self.game.width), float(self.game.height)])
-        rl.set_shader_value(self.bloom_shader, self.shader_resolution_location, res,
-                            rl.ShaderUniformDataType.SHADER_UNIFORM_VEC2)
+
         self.objects = []
         # a=GameObject(self,assets.images["Jeff"],0,0,10,10)
         # t1=TextObject(self,'aaa',0,0,100,rl.WHITE)
@@ -55,9 +51,6 @@ class Crafting_Menu(BaseDisplay):
     def update(self):
         self.delta_time = rl.get_frame_time()
 
-        t = rl.ffi.new("float *", float(rl.get_time()))
-        rl.set_shader_value(self.bloom_shader, self.shader_time_location, t,
-                            rl.ShaderUniformDataType.SHADER_UNIFORM_FLOAT)
 
         if rl.is_key_pressed(rl.KeyboardKey.KEY_C) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_UP):
             self.game.current_display = self.game.twodgame
