@@ -65,6 +65,10 @@ class Crafting_Menu(BaseDisplay):
         rl.set_shader_value(self.bloom_shader, self.shader_time_location, t,
                             rl.ShaderUniformDataType.SHADER_UNIFORM_FLOAT)
 
+        if rl.is_key_pressed(rl.KeyboardKey.KEY_C):
+            self.game.current_display = self.game.twodgame
+            self.game.crafting = False
+
         # if not self.game.gamepad_enabled:
         #     if rl.is_key_down(rl.KeyboardKey.KEY_W):
         #         self.square_pos[1] -= self.speed * self.delta_time

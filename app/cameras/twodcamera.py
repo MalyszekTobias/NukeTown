@@ -1,7 +1,7 @@
 import pyray
 
 class Camera:
-    def __init__(self, width, height, target_x, target_y, smooth_factor, initial_zoom=2.0):
+    def __init__(self, width, height, target_x, target_y, smooth_factor, initial_zoom=10.0):
         self.camera = pyray.Camera2D()
         self.camera.target = pyray.Vector2(target_x, target_y)
         self.camera.offset = pyray.Vector2(width / 2, height / 2)
