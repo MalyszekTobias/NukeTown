@@ -40,7 +40,7 @@ class Game:
         rl.begin_drawing()
         self.current_display.render()
         #debug thingy
-        rl.draw_text(str(self.current_display), 10, 100, 20, rl.WHITE)
+        # rl.draw_text(str(self.current_display), 10, 100, 20, rl.WHITE)
         rl.end_drawing()
 
     def update(self):

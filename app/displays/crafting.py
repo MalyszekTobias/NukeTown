@@ -27,9 +27,9 @@ class Crafting_Menu(BaseDisplay):
         self.objects = []
         # a=GameObject(self,assets.images["Jeff"],0,0,10,10)
         # t1=TextObject(self,'aaa',0,0,100,rl.WHITE)
-        self.inventory=Inventory({"oxygen":2,"hydrogen":2},self,0,0,30,200)
+        self.inventory=Inventory({"oxygen":2,"hydrogen":2},self,0,0,50,200)
+        self.oxygen1=Atom(self,assets.images["Oxygen_Standby"] ,1000,100,100,100,"O",8,40)
     def render(self):
-        rl.begin_texture_mode(self.texture)
         print(self.square_pos)
         super().render()
 
@@ -41,19 +41,8 @@ class Crafting_Menu(BaseDisplay):
             obj.draw()
 
 
-
-        rl.end_texture_mode()
-
         # shader stuff
-        rl.begin_shader_mode(self.bloom_shader)
 
-        src = rl.Rectangle(0.0, 0.0,
-                           float(self.texture.texture.width),
-                           -float(self.texture.texture.height))
-        dst = rl.Rectangle(0.0, 0.0, float(self.game.width), float(self.game.height))
-        rl.draw_texture_pro(self.texture.texture, src, dst, rl.Vector2(0.0, 0.0), 0.0, rl.WHITE)
-
-        rl.end_shader_mode()
         if self.game.gamepad_enabled:
             rl.draw_text(f"Gamepad X: {self.game.left_joystick_x:.2f}  Y: {self.game.left_joystick_y:.2f}", 10, 130, 20,
                          rl.YELLOW)
@@ -82,13 +71,15 @@ class Crafting_Menu(BaseDisplay):
         #     self.square_pos[0] += self.game.left_joystick_x * self.speed * self.delta_time
         #     self.square_pos[1] += self.game.left_joystick_y * self.speed * self.delta_time
 class GameObject():
-    def __init__(self,display,image,x,y,w,h):
+    def __init__(self,display,image,x,y,w,h,scale):
         self.display = display
-        if image is not None:
-            self.image = image
-        else:
-            self.image = None
-
+        # if image is not None:
+        #     self.image = image
+        #     rl.image_resize(self.image, w, h)
+        # else:
+        #     self.image = None
+        self.image = image
+        self.scale=scale
         self.x = x
         self.y = y
         self.w = w
@@ -97,9 +88,9 @@ class GameObject():
         self.display.objects.append(self)
     def draw(self):
         print('bb')
-        scale = self.w
+
         rl.draw_texture_ex(self.image, rl.Vector2(float(self.square_pos[0]), float(self.square_pos[1])), 0.0,
-                           1, rl.WHITE)
+                           self.w/self.scale, rl.WHITE)
 class TextObject():
     def __init__(self,display,text,x,y,w,color):
         self.display = display
@@ -114,6 +105,19 @@ class TextObject():
     def draw(self):
         print('bb')
         rl.draw_text(self.text,self.x,self.y,self.w,self.color,)
+class Rect():
+    def __init__(self,display,x,y,w,h):
+        self.display = display
+        self.x = x
+        self.y = y
+        self.w = w
+        self.h = h
+        self.display.objects.append(self)
+    def draw(self):
+        print('bb')
+        rl.draw_rectangle_lines(self.x,self.y,self.w,self.h,rl.WHITE,)
+
+
 class Inventory():
     def __init__(self,inv,display,x,y,w,h):
         self.display = display
@@ -135,4 +139,20 @@ class Inventory():
         for atom in self.inv:
             i+=1
             rl.draw_text(f"{atom}: {self.inv[atom]}",self.x,self.y+self.w*i,self.w,rl.WHITE)
+class Atom():
+    def __init__(self,display,image,x,y,w,h,name,mass,font_w):
+        self.display = display
+        self.x = x
+        self.y = y
+        self.w = w
+        self.h = h
+        self.font_w=font_w
+        self.image = image
+        self.name = name
+        self.mass = mass
+        self.image_object=GameObject(display,image,x-50,y-60,w,h,512)
+        self.name_text=TextObject(display,self.name,x,y-3,font_w,rl.WHITE)
+        self.mass_text=TextObject(display,str(self.mass),x+self.w-self.font_w//2,y+self.h-self.font_w+9,font_w,rl.WHITE)
+        self.rect=Rect(display,x,y,w,h)
+
 
