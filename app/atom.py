@@ -143,10 +143,10 @@ class Atom:
                 self.down = True
                 self.up = False
 
-            if abs(self.x - self.target_x) < 10:
+            if abs(self.x - self.target_x) < 8:
                 self.left = False
                 self.right = False
-            if abs(self.y - self.target_y) < 10:
+            if abs(self.y - self.target_y) < 8:
                 self.up = False
                 self.down = False
         self.movement()
