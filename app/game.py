@@ -49,7 +49,13 @@ class Game:
         if self.gamepad_enabled:
             self.left_joystick_x = rl.get_gamepad_axis_movement(self.gamepad_id, rl.GamepadAxis.GAMEPAD_AXIS_LEFT_X)
             self.left_joystick_y = rl.get_gamepad_axis_movement(self.gamepad_id, rl.GamepadAxis.GAMEPAD_AXIS_LEFT_Y)
+            self.right_joystick_x = rl.get_gamepad_axis_movement(self.gamepad_id, rl.GamepadAxis.GAMEPAD_AXIS_RIGHT_X)
+            self.right_joystick_y = rl.get_gamepad_axis_movement(self.gamepad_id, rl.GamepadAxis.GAMEPAD_AXIS_RIGHT_Y)
             if abs(self.left_joystick_x) < self.gamepad_deadzone:
                 self.left_joystick_x = 0.0
             if abs(self.left_joystick_y) < self.gamepad_deadzone:
                 self.left_joystick_y = 0.0
+            if abs(self.right_joystick_x) < self.gamepad_deadzone:
+                self.right_joystick_x = 0.0
+            if abs(self.right_joystick_y) < self.gamepad_deadzone:
+                self.right_joystick_y = 0.0
