@@ -147,10 +147,11 @@ class TwoDGameDisplay(BaseDisplay):
             fellow.update()
         for enemy in self.enemies:
             enemy.update()
-        self.player.update()
+
+        self.player.update(self.map.rooms)
 
         for friend in self.player.friends:
-            friend.update()
+            friend.update(self.map.rooms)
 
         for object in self.game_objects:
             object.update()
