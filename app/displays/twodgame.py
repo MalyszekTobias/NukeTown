@@ -45,7 +45,7 @@ class TwoDGameDisplay(BaseDisplay):
         rl.draw_fps(10, 10)
 
         self.map.draw()
-
+        self.player.render()
         # rl.draw_rectangle(int(self.square_pos[0]), int(self.square_pos[1]), 20, 20, rl.RED)
         self.camera.end_mode()
         rl.end_texture_mode()
@@ -62,12 +62,12 @@ class TwoDGameDisplay(BaseDisplay):
         rl.end_shader_mode()
         if self.game.gamepad_enabled:
             rl.draw_text(f"Gamepad X: {self.game.left_joystick_x:.2f}  Y: {self.game.left_joystick_y:.2f}", 10, 130, 20, rl.YELLOW)
-        self.player.render()
+
 
 
     def update(self):
         self.delta_time = rl.get_frame_time()
-        self.camera.update_target(self.square_pos[0], self.square_pos[1], self.delta_time)
+        self.camera.update_target(self.player.x, self.player.y, self.delta_time)
 
         t = rl.ffi.new("float *", float(rl.get_time()))
         rl.set_shader_value(self.bloom_shader, self.shader_time_location, t,
