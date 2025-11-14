@@ -1,6 +1,7 @@
 import math
 import pyray as rl
 from app import assets
+from app import bullet
 
 class EnemyBlob:
     def __init__(self, game, x, y, health, weight):
@@ -8,7 +9,7 @@ class EnemyBlob:
         self.health = health
         self.game = game
         self.x, self.y = x, y
-        self.speed = 0.4
+        self.speed = 0.55
         self.detection_radius = 100
         self.img = self.get_sprite()
         self.shooting_range = 26
@@ -17,6 +18,10 @@ class EnemyBlob:
         self.frame_width = int(self.img.width)
         self.frame_height = int(self.img.height / self.num_of_frames)
         self.current_frame = 0
+        self.frame_timer = 0.0
+        self.frame_duration = 0.08
+        self.cooldown_timer = 0
+
 
     def get_sprite(self):
         if self.weight in [0, 92]:
@@ -44,7 +49,9 @@ class EnemyBlob:
         dx = px - self.x
         dy = py - self.y
         dist = math.hypot(dx, dy)
-
+        self.cooldown_timer -= 1
+        if self.cooldown_timer <= 0 and dist <= self.shooting_range:
+            self.shoot()
         if dist == 0:
             return
 
@@ -54,13 +61,34 @@ class EnemyBlob:
             self.x += nx * self.speed
             self.y += ny * self.speed
 
+            self.frame_timer += rl.get_frame_time()
+            while self.frame_timer >= self.frame_duration:
+                self.frame_timer -= self.frame_duration
+                self.current_frame = (self.current_frame + 1) % self.num_of_frames
+        else:
+            if self.current_frame != 0:
+                self.frame_timer += rl.get_frame_time()
+                while self.frame_timer >= self.frame_duration:
+                    self.frame_timer -= self.frame_duration
+                    self.current_frame = (self.current_frame + 1) % self.num_of_frames
+                    if self.current_frame == 0:
+                        self.frame_timer = 0.0
+                        break
+            else:
+                self.current_frame = 0
+                self.frame_timer = 0.0
+
+    def shoot(self):
+        b = bullet.Bullet(self.game, self.x, self.y, 0, 0, "player")
+        self.game.enemy_bullets.append(b)
+        self.cooldown_timer = 375
 
     def take_damage(self, damage):
         self.health -= damage
         if self.health <= 0:
             self.die()
     def render(self):
-        scale = 14.0 / float(self.frame_width)
+        scale = 10 / float(self.frame_width)
         src = rl.Rectangle(0.0, float(self.frame_height * self.current_frame),
                            float(self.frame_width), float(self.frame_height))
         dst_w = float(self.frame_width) * scale
