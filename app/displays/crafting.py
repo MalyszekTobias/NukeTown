@@ -30,8 +30,8 @@ class Crafting_Menu(BaseDisplay):
         # t1=TextObject(self,'aaa',0,0,100,rl.WHITE)
         self.inventory=Inventory({"oxygen":2,"hydrogen":2,"zinc":3,"sodium":0,"krypton":10,"barium":11},self,0,0,120,200)
         # self.oxygen1=Atom(self,assets.images["Oxygen_Standby"] ,1000,100,100,100,"O",8,40)
-        self.atom_bar=Atom_Bar(self,500,0,1000,100)
-        self.table=Table(self,500,500,500,500)
+        self.atom_bar=Atom_Bar(self,self.game.width//2,0,self.game.width//2,100)
+        self.table=Table(self,self.game.width//2,0,self.game.width//2,self.game.height)
     def render(self):
         # print(self.square_pos)
         super().render()
@@ -261,8 +261,9 @@ class Atom_Bar():
         i=0
         for a in self.inv.keys():
             # print(a)
-            self.atom_images[a]=Atom(self.display, atom_properites[a][2], x + self.w-i*100, y, 100, 100, atom_properites[a][0], atom_properites[a][1], 40)
             i += 1
+            self.atom_images[a]=Atom(self.display, atom_properites[a][2], x + self.w-i*100, y, 100, 100, atom_properites[a][0], atom_properites[a][1], 40)
+
 
 
 
