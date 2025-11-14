@@ -1,0 +1,78 @@
+import math
+import pyray as rl
+from app import assets
+
+class EnemyBlob:
+    def __init__(self, game, x, y, health, weight):
+        self.weight = weight
+        self.health = health
+        self.game = game
+        self.x, self.y = x, y
+        self.speed = 0.4
+        self.detection_radius = 100
+        self.img = self.get_sprite()
+        self.shooting_range = 26
+
+        self.num_of_frames = int(self.img.height / self.img.width)
+        self.frame_width = int(self.img.width)
+        self.frame_height = int(self.img.height / self.num_of_frames)
+        self.current_frame = 0
+
+    def get_sprite(self):
+        if self.weight in [0, 92]:
+            return assets.images["movingblob"]
+        elif self.weight == 1:
+            return assets.images["Hydrogen"]
+        elif self.weight == 2:
+            return assets.images["Helium"]
+        elif self.weight == 8:
+            return assets.images["Oxygen"]
+        elif self.weight == 16:
+            return assets.images["Sulphur"]
+        elif self.weight == 11:
+            return assets.images["Sodium"]
+        elif self.weight == 26:
+            return assets.images["Iron"]
+        elif self.weight == 30:
+            return assets.images["Zinc"]
+        elif self.weight == 56:
+            return assets.images["Barium"]
+        elif self.weight == 36:
+            return assets.images["Krypton"]
+    def update(self):
+        px, py = self.game.player.x, self.game.player.y
+        dx = px - self.x
+        dy = py - self.y
+        dist = math.hypot(dx, dy)
+
+        if dist == 0:
+            return
+
+        if self.shooting_range < dist <= self.detection_radius:
+            nx = dx / dist
+            ny = dy / dist
+            self.x += nx * self.speed
+            self.y += ny * self.speed
+
+
+    def take_damage(self, damage):
+        self.health -= damage
+        if self.health <= 0:
+            self.die()
+    def render(self):
+        scale = 14.0 / float(self.frame_width)
+        src = rl.Rectangle(0.0, float(self.frame_height * self.current_frame),
+                           float(self.frame_width), float(self.frame_height))
+        dst_w = float(self.frame_width) * scale
+        dst_h = float(self.frame_height) * scale
+        dst_x = float(self.x) - dst_w / 2.0
+        dst_y = float(self.y) - dst_h / 2.0
+        dst = rl.Rectangle(dst_x, dst_y, dst_w, dst_h)
+        origin = rl.Vector2(0.0, 0.0)
+        angle = 0
+        rl.draw_texture_pro(self.img, src, dst, origin, angle, rl.WHITE)
+
+
+    def die(self):
+        self.game.enemy_blobs.remove(self)
+        del self
