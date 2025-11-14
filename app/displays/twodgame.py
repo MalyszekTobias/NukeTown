@@ -8,10 +8,8 @@ class TwoDGameDisplay(BaseDisplay):
     def __init__(self, game, player):
         self.player = player
         super().__init__(game)
-        self.square_pos = [200, 200]
-        self.speed = 200
         self.delta_time = rl.get_frame_time()
-        self.camera = twodcamera.Camera(self.game.width, self.game.height, self.square_pos[0], self.square_pos[1], 3)
+        self.camera = twodcamera.Camera(self.game.width, self.game.height, 0, 0, 3)
 
         self.texture =  rl.load_render_texture(game.width, game.height)
         rl.set_texture_filter(self.texture.texture, rl.TextureFilter.TEXTURE_FILTER_BILINEAR)
@@ -75,37 +73,37 @@ class TwoDGameDisplay(BaseDisplay):
         rl.draw_circle(px, py, 3, rl.GREEN)
 
     def render(self):
-        rl.begin_texture_mode(self.texture)
 
         super().render()
 
         self.camera.begin_mode()
-
-
-
         self.map.draw()
-        self.player.render()
-        # rl.draw_rectangle(int(self.square_pos[0]), int(self.square_pos[1]), 20, 20, rl.RED)
         self.camera.end_mode()
 
+        # 2) Render only the player (and any bloom-only elements) into the render texture
+        rl.begin_texture_mode(self.texture)
+        # clear the render texture to transparent so only player pixels contribute to bloom
+        rl.clear_background((0, 0, 0, 0))
+        self.camera.begin_mode()
+        self.player.render()
+        self.camera.end_mode()
         rl.end_texture_mode()
 
-        #shader stuff
+        # 3) Apply bloom shader to the render texture (this draws the bloomed player on top of the map)
         rl.begin_shader_mode(self.bloom_shader)
-
         src = rl.Rectangle(0.0, 0.0,
                            float(self.texture.texture.width),
                            -float(self.texture.texture.height))
         dst = rl.Rectangle(0.0, 0.0, float(self.game.width), float(self.game.height))
         rl.draw_texture_pro(self.texture.texture, src, dst, rl.Vector2(0.0, 0.0), 0.0, rl.WHITE)
-
         rl.end_shader_mode()
+
+        # 4) UI / minimap (no bloom)
         self.draw_minimap()
         rl.draw_fps(10, 10)
         if self.game.gamepad_enabled:
-            rl.draw_text(f"Gamepad X: {self.game.left_joystick_x:.2f}  Y: {self.game.left_joystick_y:.2f}", 10, 130, 20, rl.YELLOW)
-
-
+            rl.draw_text(f"Gamepad X: {self.game.left_joystick_x:.2f}  Y: {self.game.left_joystick_y:.2f}", 10, 130, 20,
+                         rl.YELLOW)
 
     def update(self):
         self.delta_time = rl.get_frame_time()
