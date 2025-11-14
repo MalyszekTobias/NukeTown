@@ -26,8 +26,8 @@ class Atom:
         self.clicked = False
         self.velUp = 0
         self.velRight = 0
-        self.maxSpeed = 0.09
-        self.acceleration = 0.002
+        self.maxSpeed = 0.5
+        self.acceleration = 0.012
         self.gameHeight = self.game.height
         self.gameWidth = self.game.width
         self.hpHeight = 30
