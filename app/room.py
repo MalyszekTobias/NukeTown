@@ -21,7 +21,7 @@ class Room:
         cy = self.y + self.height // 2
         return (cx, cy)
 
-    def wall_tiles(self) -> Set[Tile]:
+    def wall_tiles(self, exclude_tiles: Optional[Set[Tile]] = None) -> Set[Tile]:
         tiles = set()
         x0, y0, w, h = self.x, self.y, self.width, self.height
         for x in range(x0, x0 + w):
@@ -30,6 +30,11 @@ class Room:
         for y in range(y0, y0 + h):
             tiles.add((x0, y))
             tiles.add((x0 + w - 1, y))
+
+        # Remove tiles that collide with corridor tiles
+        if exclude_tiles:
+            tiles -= exclude_tiles
+
         return tiles
 
     def background_tiles(self) -> Set[Tile]:
@@ -40,29 +45,15 @@ class Room:
                 tiles.add((x, y))
         return tiles
 
-    def collision_rects(self, tile_size: int):
-        """Return wall collision rectangles matching drawn wall thickness."""
-        thickness = max(2, tile_size // 2)  # wall thickness in pixels
-        x0, y0, w, h = self.x, self.y, self.width, self.height
-        px = x0 * tile_size
-        py = y0 * tile_size
-        pw = w * tile_size
-        ph = h * tile_size
+    def collision_rects(self, tile_size: int, corridor_tiles: Optional[Set[Tile]] = None):
+        """Returns collision rectangles for wall tiles as (x, y, width, height) tuples."""
+        wall_tiles = self.wall_tiles(exclude_tiles=corridor_tiles)
         rects = []
-        # top (inside shift)
-        rects.append((px, py + thickness, pw, thickness))
-        # bottom
-        rects.append((px, py + ph - 2 * thickness, pw, thickness))
-        # left
-        rects.append((px + thickness, py, thickness, ph))
-        # right
-        rects.append((px + pw - 2 * thickness, py, thickness, ph))
-        # corner pads (optional small squares to block diagonals)
-        corner_size = thickness
-        rects.append((px + thickness, py + thickness, corner_size, corner_size))  # top-left
-        rects.append((px + pw - 2 * thickness, py + thickness, corner_size, corner_size))  # top-right
-        rects.append((px + thickness, py + ph - 2 * thickness, corner_size, corner_size))  # bottom-left
-        rects.append((px + pw - 2 * thickness, py + ph - 2 * thickness, corner_size, corner_size))  # bottom-right
+        for tx, ty in wall_tiles:
+            # Convert each wall tile to a rectangle (pixel coordinates)
+            rx = tx * tile_size
+            ry = ty * tile_size
+            rects.append((rx, ry, tile_size, tile_size))
         return rects
     def randomize_floors(
         self,
@@ -120,7 +111,7 @@ class Room:
     def is_cracked(self, tile: Tile) -> bool:
         return self._tile_states.get(tile) == "cracked"
 
-    def draw(self, tile_size: int = 16, color: pyray.Color = pyray.RED):
+    def draw(self, tile_size: int = 16, color: pyray.Color = pyray.RED, corridor_tiles: Optional[Set[Tile]] = None):
         if not self._floors_initialized:
             seed = (self.x * 73856093) ^ (self.y * 19349663) ^ (self.width * 83492791)
             self.randomize_floors(seed=seed)
@@ -169,7 +160,8 @@ class Room:
             (x0 + w - 1, y0 + h - 1),
         ]
 
-        for wx, wy in self.wall_tiles():
+        # Get wall tiles, excluding corridor tiles
+        for wx, wy in self.wall_tiles(exclude_tiles=corridor_tiles):
             dest_x = wx * tile_size
             dest_y = wy * tile_size
 
