@@ -48,4 +48,4 @@ class Map:
         for (x, y) in self.corridor_tiles:
             pyray.draw_rectangle(x * tile_size, y * tile_size, tile_size, tile_size, pyray.DARKGRAY)
         for room in self.rooms:
-            room.draw(tile_size=tile_size, color=pyray.RED)
+            room.draw(tile_size=tile_size, color=pyray.RED, corridor_tiles=self.corridor_tiles)

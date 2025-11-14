@@ -158,8 +158,10 @@ class TwoDGameDisplay(BaseDisplay):
             b.update()
         self.player.update(self.map.rooms)
 
+        self.player.update(self.map.rooms, self.map.corridor_tiles)
+
         for friend in self.player.friends:
-            friend.update(self.map.rooms)
+            friend.update(self.map.rooms, self.map.corridor_tiles)
 
         for object in self.game_objects:
             object.update()
