@@ -3,6 +3,8 @@ import pyray as rl
 from app.displays import startscreen, twodgame,crafting
 from app import assets
 from app import player
+from app.ui import text
+from app import music
 
 
 class Game:
@@ -11,10 +13,14 @@ class Game:
         rl.init_window(self.width, self.height, "raylib template?")
         rl.toggle_fullscreen()
         rl.set_exit_key(rl.KeyboardKey.KEY_NULL)
+        rl.set_target_fps(75)
         assets.load()
         self.bloom_shader = assets.shaders["bloom"]
         self.base_display = startscreen.StartDisplay(self)
         self.crafting_display = crafting.Crafting_Menu(self)
+
+        # initialize music manager and start default music
+        self.music_manager = music.MusicManager()
 
         self.atomic_masses = [1, 2, 8, 11, 16, 26, 30, 36, 56]
         self.player = player.Player(self)
@@ -52,6 +58,11 @@ class Game:
     def update(self):
         self.update_gamepad_status()
         self.update_joystick()
+        # update music streaming
+        try:
+            self.music_manager.update()
+        except Exception:
+            pass
         self.current_display.update()
 
     def update_joystick(self):

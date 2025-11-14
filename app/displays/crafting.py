@@ -1,5 +1,7 @@
 from email.mime import image
 import copy
+from app.ui import text
+
 import pyray as rl
 from app.displays.base import BaseDisplay
 from app.cameras import twodcamera
@@ -19,20 +21,16 @@ class Crafting_Menu(BaseDisplay):
         self.mouse_down = True
         self.current_atom=None
 
-        self.bloom_shader = self.game.bloom_shader
-        self.shader_resolution_location = rl.get_shader_location(self.bloom_shader, "resolution")
-        self.shader_time_location = rl.get_shader_location(self.bloom_shader, "time")
+
         self.crafting = False
-        res = rl.ffi.new("float[2]", [float(self.game.width), float(self.game.height)])
-        rl.set_shader_value(self.bloom_shader, self.shader_resolution_location, res,
-                            rl.ShaderUniformDataType.SHADER_UNIFORM_VEC2)
+
         self.objects = []
         # a=GameObject(self,assets.images["Jeff"],0,0,10,10)
         # t1=TextObject(self,'aaa',0,0,100,rl.WHITE)
         self.inventory=Inventory({"oxygen":2,"hydrogen":2,"zinc":3,"sodium":0,"krypton":10,"barium":11},self,0,0,120,200)
         # self.oxygen1=Atom(self,assets.images["Oxygen_Standby"] ,1000,100,100,100,"O",8,40)
-        self.atom_bar=Atom_Bar(self,self.game.width-500,0,500,100)
-        self.table=Table(self,self.game.width//2,0,self.game.width//2-1,self.game.height-1)
+        self.atom_bar=Atom_Bar(self,500,0,1000,100)
+        self.table=Table(self,500,500,500,500)
     def render(self):
         # print(self.square_pos)
         super().render()
@@ -48,19 +46,17 @@ class Crafting_Menu(BaseDisplay):
         # shader stuff
 
         if self.game.gamepad_enabled:
-            rl.draw_text(f"Gamepad X: {self.game.left_joystick_x:.2f}  Y: {self.game.left_joystick_y:.2f}", 10, 130, 20,
+            text.draw_text(f"Gamepad X: {self.game.left_joystick_x:.2f}  Y: {self.game.left_joystick_y:.2f}", 10, 130, 20,
                          rl.YELLOW)
 
     def update(self):
         self.delta_time = rl.get_frame_time()
 
-        t = rl.ffi.new("float *", float(rl.get_time()))
-        rl.set_shader_value(self.bloom_shader, self.shader_time_location, t,
-                            rl.ShaderUniformDataType.SHADER_UNIFORM_FLOAT)
 
         if rl.is_key_pressed(rl.KeyboardKey.KEY_C) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_UP):
             self.game.current_display = self.game.twodgame
             self.game.crafting = False
+
         if rl.is_mouse_button_pressed(0):
             self.mouse_down=True
             self.mouse=rl.get_mouse_position()
@@ -172,7 +168,7 @@ class TextObject():
 
     def draw(self):
         # print('bb')
-        rl.draw_text(self.text,self.x,self.y,self.w,self.color,)
+        text.draw_text(self.text,self.x,self.y,self.w,self.color,)
     def delete(self):
         self.display.objects.remove(self)
     def __str__(self):
@@ -212,11 +208,11 @@ class Inventory():
         else:
             self.inv[atom] = amount
     def draw(self):
-        rl.draw_text("Inventory", self.x, self.y, self.w, rl.WHITE, )
+        text.draw_text("Inventory", self.x, self.y, self.w, rl.WHITE, )
         i=0
         for atom in self.inv:
             i+=1
-            rl.draw_text(f"{atom}: {self.inv[atom]}",self.x,self.y+self.w*i,self.w,rl.WHITE)
+            text.draw_text(f"{atom}: {self.inv[atom]}",self.x,self.y+self.w*i,self.w,rl.WHITE)
 
 class Atom():
     def __init__(self,display,image,x,y,w,h,name,mass,font_w):

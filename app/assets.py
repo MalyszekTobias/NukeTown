@@ -3,8 +3,10 @@ import pyray as rl
 shaders = {}
 models = {}
 images = {}
+font = None
 
 def load():
+    global font
     shaders["bloom"] = rl.load_shader("", "app/assets/shaders/bloom.fs")
     images["Jeff"] = rl.load_texture("app/assets/images/Jeff.png")
     images["movingblob"] = rl.load_texture("app/assets/Spritesheets/Uranek_jump.png")
@@ -36,3 +38,5 @@ def load():
     images["Iron_Standby"] = rl.load_texture("app/assets/images/Iron_Standby.png")
     images["Krypton_Standby"] = rl.load_texture("app/assets/images/Cobalt_Stand.png")
     images["Wall_corner"] = rl.load_texture("app/assets/images/Corner.png")
+
+    font = rl.load_font('app/assets/Fonts/Chernobyl.otf')
