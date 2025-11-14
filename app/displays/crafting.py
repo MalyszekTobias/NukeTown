@@ -28,7 +28,7 @@ class Crafting_Menu(BaseDisplay):
         self.objects = []
         # a=GameObject(self,assets.images["Jeff"],0,0,10,10)
         # t1=TextObject(self,'aaa',0,0,100,rl.WHITE)
-        self.inventory=Inventory({"oxygen":2,"hydrogen":2,"zinc":3,"sodium":0,"krypton":10,"barium":11,"sulphur":67},self,0,0,120,200)
+        self.inventory=Inventory({"oxygen":2,"hydrogen":2,"zinc":3,"sodium":0,"krypton":10,"barium":11,"sulphur":67,"iron":11,"helium":1000},self,0,0,100,200)
         # self.oxygen1=Atom(self,assets.images["Oxygen_Standby"] ,1000,100,100,100,"O",8,40)
         self.atom_bar=Atom_Bar(self,self.game.width//2,0,self.game.width//2,100)
         self.table=Table(self,self.game.width//2,0,self.game.width//2,self.game.height)
@@ -287,16 +287,43 @@ class Table():
                                     rl.WHITE)
         self.clear_ram = Rect(self.display, x , y + h - self.font, int(3 * self.font) - 1,
                              self.font - 1)
+        self.atom_properites = {"hydrogen": ['H', 1, assets.images["Hydrogen_Standby"]],
+                           "helium": ['He', 2, assets.images["Helium_Standby"]],
+                           "oxygen": ['O', 8, assets.images["Oxygen_Standby"]],
+                           "sodium": ['Na', 11, assets.images["Sodium_Standby"]],
+                           "iron": ['Fe', 26, assets.images["Iron_Standby"]],
+                           "zinc": ['Zn', 30, assets.images["Zinc_Standby"]],
+                           "barium": ['Ba', 56, assets.images["Barium_Standby"]],
+                           "krypton": ['Kr', 36, assets.images["Krypton_Standby"]],
+                           "sulphur": ['S', 16, assets.images["Sulphur_Standby"]]}
         self.translator={"H":"hydrogen","He":"helium","O":"oxygen","Na":"sodium","Ba":"barium","Kr":"krypton","Zn":"zinc","S":"sulphur","Fe":"iron"}
-        self.values=[[1,"hydrogen"],[2,"helium"],[8,"oxygen"],[11,"sodium"],[16,"sulphur"],[26,"iron"],[30,"zinc"],[36,"krypton"],[56,"barium"]]
+        self.values=[[1,"hydrogen"],[2,"helium"],[8,"oxygen"],[11,"sodium"],[16,"sulphur"],[26,"iron"],[30,"zinc"],[36,"krypton"],[56,"barium"],[92,"uranium"]]
     def do_fusion(self):
         if self.protons>92:
             print('nope')
-        self.clear()
+        else:
+            a=True
+            i=len(self.values)-1
+            print()
+            while a:
+                if self.protons>=self.values[i][0]:
+                    self.clear_before_fusion()
+                    self.atoms.append(Atom(self.display, self.atom_properites[self.values[i][1]][2], self.x+self.w//2 , self.y+self.h//2, 100, 100, self.atom_properites[self.values[i][1]][0], self.atom_properites[self.values[i][1]][1], 40))
+                    self.protons =self.atom_properites[self.values[i][1]][1]
+                    break
+                i-=1
+
+        # self.clear()
     def clear(self):
         for atom in self.atoms:
             print(atom.name)
             self.display.inventory.inv[self.translator[atom.name]]+=1
+            atom.delete()
+        self.atoms=[]
+        self.protons=0
+    def clear_before_fusion(self):
+        for atom in self.atoms:
+            print(atom.name)
             atom.delete()
         self.atoms=[]
         self.protons=0
