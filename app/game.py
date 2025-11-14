@@ -15,6 +15,7 @@ class Game:
         self.base_display = startscreen.StartDisplay(self)
         self.crafting_display = crafting.Crafting_Menu(self)
         self.player = player.Player(self)
+        self.player.spawn_friend(1)
         self.twodgame = twodgame.TwoDGameDisplay(self, self.player)
         self.current_display = self.base_display
         self.crafting = False
