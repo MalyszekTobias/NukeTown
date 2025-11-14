@@ -1,6 +1,6 @@
 import pyray as rl
 
-from app.displays import startscreen, twodgame
+from app.displays import startscreen, twodgame,crafting
 from app import assets
 
 
@@ -14,7 +14,7 @@ class Game:
         self.base_display = startscreen.StartDisplay(self)
         self.twodgame = twodgame.TwoDGameDisplay(self)
         self.current_display = self.base_display
-
+        self.crafting = False
         # controller
         self.gamepad_id = 0
         self.gamepad_deadzone = 0.25
@@ -30,7 +30,17 @@ class Game:
     def loop(self):
         while not rl.window_should_close():
             self.update()
+            self.controls()
             self.render()
+
+    def controls(self):
+        if rl.is_key_pressed(rl.KeyboardKey.KEY_C):
+            if self.crafting==False:
+                self.crafting = True
+                self.current_display = crafting.Crafting_Menu(self)
+            else:
+                self.current_display = twodgame.TwoDGameDisplay(self)
+                self.crafting = False
 
     def render(self):
         rl.begin_drawing()
