@@ -4,8 +4,11 @@ from app.REACTOR import Reactor
 from app.displays.base import BaseDisplay
 from app.cameras import twodcamera
 from app import assets, map, room, player, enemy_blob, atom
+from app.enemy_blob import EnemyBlob
 from app.ui import text
 import random
+import random
+
 
 
 class MainDisplay2(BaseDisplay):
@@ -17,10 +20,9 @@ class MainDisplay2(BaseDisplay):
         self.delta_time = rl.get_frame_time()
         self.camera = twodcamera.Camera(self.game.width, self.game.height, 0, 0, 3)
         self.enemy_bullets = []
+        self.player_bullets=[]
         self.enemies = []
-        # for _i in range(1, 5):
-        #     enemy = enemy_blob.EnemyBlob(self, _i * 200, _i * 200, 100, 2)
-        #     self.enemies.append(enemy)
+
 
         for mass in self.game.atomic_masses:
             self.player.spawn_friend(mass)
@@ -28,18 +30,81 @@ class MainDisplay2(BaseDisplay):
         self.texture =  rl.load_render_texture(game.width, game.height)
         rl.set_texture_filter(self.texture.texture, rl.TextureFilter.TEXTURE_FILTER_BILINEAR)
 
-        # self.jeff_image = assets.images["Jeff"]
 
-        # Store the reactor so we can check proximity for crafting
-        # self.reactor = Reactor(self)
-
-        # self.map.connect_two_rooms_no_doors(self.rooms[0][0],self.rooms[1][0])
 
         self.crafting=False
         self.map = map.Map(self.game)
-        self.make_map2()
 
-                # factor+=0.1
+
+        DIRS = [(0, 1), (0, -1), (1, 0), (-1, 0)]  # 4-neighborhood grid
+
+        def generate_spanning_tree(n):
+            """Tworzy drzewo rozpinające (spójny graf bez cykli)."""
+            graph = {(x, y): [] for y in range(n) for x in range(n)}
+            visited = set()
+
+            stack = [(0, 0)]
+            visited.add((0, 0))
+
+            while stack:
+                x, y = stack.pop()
+
+                dirs = DIRS[:]
+                random.shuffle(dirs)
+
+                for dx, dy in dirs:
+                    nx, ny = x + dx, y + dy
+                    if 0 <= nx < n and 0 <= ny < n and (nx, ny) not in visited:
+                        visited.add((nx, ny))
+
+                        graph[(x, y)].append((nx, ny))
+                        graph[(nx, ny)].append((x, y))
+                        stack.append((nx, ny))
+
+            return graph
+
+        def add_random_edges(graph, n, probability=0.05):
+
+            for y in range(n):
+                for x in range(n):
+                    for dx, dy in DIRS:
+                        nx, ny = x + dx, y + dy
+                        if 0 <= nx < n and 0 <= ny < n:
+
+                            if (nx, ny) not in graph[(x, y)] and random.random() < probability:
+                                graph[(x, y)].append((nx, ny))
+                                graph[(nx, ny)].append((x, y))
+
+            return graph
+
+        def generate_loopy_connected_grid_graph(n, extra_edge_probability=0.05):
+
+            graph = generate_spanning_tree(n)
+            graph = add_random_edges(graph, n, extra_edge_probability)
+            return graph
+
+
+        l= 15
+        g = generate_loopy_connected_grid_graph(l, extra_edge_probability=0.1)
+        lista=[0 for x in range(l**2)]
+        la=0
+
+
+        self.rooms = [[0 for r in range(l)] for c in range(l)]
+        self.rooms_checked = [[0 for r in range(l)] for c in range(l)]
+        for r in range(l):
+            for c in range(l):
+                self.rooms[r][c] = self.map.add_room(room.Room(c * 10 + 11, r * 10 + 11, 3, 3))
+                lista[la]=[r,c]
+                la+=1
+        for x in g.keys():
+            for y in g[x]:
+                self.map.connect_two_rooms_no_doors(self.rooms[x[0]][x[1]], self.rooms[y[0]][y[1]])
+        samp=random.sample(lista, 225)
+        print(samp)
+        self.enemies2=[]
+        for x in samp:
+            self.enemies2.append(EnemyBlob(self,x[0],x[1],100,92))
 
 
 
