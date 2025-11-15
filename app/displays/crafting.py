@@ -378,6 +378,8 @@ class Table():
 
         if self.protons==92:
             self.display.end_chapter_1=True
+            self.display.game.change_display(self.display.game.cutscene_display)
+            self.display.game.change_display(self.display.game.cutscene_display)
         if self.protons>92:
             print('nope')
         elif len(self.atoms)>1:

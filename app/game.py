@@ -1,6 +1,6 @@
 import pyray as rl
 
-from app.displays import startscreen, main_display,crafting, chapter1, pause, chapter2, main_display2
+from app.displays import startscreen, main_display,crafting, chapter1, pause, chapter2, main_display2, cutscene
 from app import assets
 
 from app.ui import text
@@ -29,6 +29,7 @@ class Game:
         self.crafting_display = crafting.Crafting_Menu(self)
         self.chapter1_display = chapter1.Chapter1(self)
         self.chapter2_display = chapter2.Chapter2(self)
+        self.cutscene_display = cutscene.Cutscene(self)
         self.best_craft = 1
 
         # initialize music manager and start default music
