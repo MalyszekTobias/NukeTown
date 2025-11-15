@@ -203,7 +203,7 @@ class TextObject():
 
     def draw(self):
         # print('bb')
-        text.draw_text(self.text,self.x,self.y,self.w,self.color,)
+        text.draw_text_with_border(self.text,self.x,self.y,self.w,self.color,)
     def delete(self):
         self.display.objects.remove(self)
     def __str__(self):
@@ -247,15 +247,15 @@ class Inventory():
         rl.draw_texture_pro(self.tablica_image, self.src,
                             rl.Rectangle(self.x, self.y + 100 + (i - 1) * 100, self.display.game.width // 2 - 240, 100),
                             (0, 0), 0, rl.WHITE)
-        text.draw_text("Inventory", self.x+20, self.y+8, self.w, rl.WHITE, )
+        text.draw_text_with_border("Inventory", self.x+20, self.y+8, self.w, rl.WHITE)
 
 
         for atom in self.inv:
             i+=1
 
             rl.draw_texture_pro(self.tablica_image,self.src,rl.Rectangle(self.x,self.y+100+(i-1)*100,self.display.game.width // 2 - 240,100),(0, 0), 0, rl.WHITE)
-            text.draw_text(f"{atom}: {self.inv[atom]}", self.x+20, self.y+8 + self.w * i, self.w, rl.WHITE)
-        for fgwegwe in range(10-len(self.inv)):
+            text.draw_text_with_border(f"{atom}: {self.inv[atom]}", self.x+20, self.y+8 + self.w * i, self.w, rl.WHITE)
+        for xi in range(10 - len(self.inv)):
             i += 1
             rl.draw_texture_pro(self.tablica_image, self.src,
                                 rl.Rectangle(self.x, self.y + 100 + (i - 1) * 100, self.display.game.width // 2 - 240,
@@ -438,8 +438,3 @@ class Table():
 
         self.atoms=[]
         self.protons=0
-
-
-
-
-

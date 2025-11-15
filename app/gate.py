@@ -53,18 +53,11 @@ class Gate:
             rotation = 0
 
         # Draw the gate
-        measured_text = rl.measure_text(self.required_atom or "", tile_size)
         if self.required_atom:
             rl.draw_texture_ex(tex, (dest_x, dest_y), rotation, 1 / 4 / tile_size, rl.RED)
             rl.draw_text(self.required_atom, dest_x, dest_y, 10, rl.WHITE)
         else:
             rl.draw_texture_ex(tex, (dest_x, dest_y), rotation, 1 / 4 / tile_size, rl.WHITE)
-        if self.required_atom and not self.is_open:
-            atom_asset_name = self.required_atom.capitalize() + "_Standby"
-            atom_tex = assets.images.get(atom_asset_name)
-            if atom_tex:
-                atom_scale = 0.01
-                rl.draw_texture_ex(atom_tex, (dest_x-(measured_text*0.3), dest_y), 0, atom_scale, rl.WHITE)
 
     def collision_rect(self):
         gate_thickness = 4  # pixels
