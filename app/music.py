@@ -37,7 +37,7 @@ class MusicManager:
         self._m2 = None
         self.current = None
         # volume in range 0.0 - 1.0
-        self.volume = 0.2
+        self.volume = 1
 
         # load streams if possible
         try:
