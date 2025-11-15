@@ -43,8 +43,17 @@ class Bullet:
                 self.y += self.speed
             elif self.y > y:
                 self.y -= self.speed
-            if self.lifespan <= 0:
-                self.game.enemy_bullets.remove(self)
+            if self.lifespan == 10:
+                self.img = assets.images["Bullet_Bad_Explode"]
+                self.num_of_frames = int(self.img.height / self.img.width)
+                self.frame_width = int(self.img.width)
+                self.frame_height = int(self.img.height / self.num_of_frames)
+                self.current_frame = 0
+                self.frame_timer = 0.0
+                self.frame_duration = 0.02
+            if self.frame_duration == 0.02 and self.current_frame == self.num_of_frames - 1:
+                self.display.enemy_bullets.remove(self)
+                print(1232)
                 del  self
                 return
 
