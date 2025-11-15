@@ -104,11 +104,12 @@ class MainDisplay2(BaseDisplay):
         for x in g.keys():
             for y in g[x]:
                 self.map.connect_two_rooms_no_doors(self.rooms[x[0]][x[1]], self.rooms[y[0]][y[1]])
-        samp=random.sample(lista, 10)
+        samp=random.sample(lista, 50)
         print(samp)
         self.enemies2=[]
         for x in samp:
-            e=EnemyBlob(self,200, 200,100,92)
+            e=EnemyBlob(self,200+x[0]*160,200+x[1]*160,100,92)
+            e.speed=0
             self.enemies.append(e)
 
         # Spawn 8 Russians in random rooms far from player
@@ -162,72 +163,6 @@ class MainDisplay2(BaseDisplay):
         self.ambient_loc = rl.get_shader_location(self.light_shader, "ambient")
         rl.set_shader_value(self.light_shader, self.ambient_loc, rl.ffi.new("float *", 0.0),
                             rl.ShaderUniformDataType.SHADER_UNIFORM_FLOAT)
-    def make_map(self):
-        l = 15
-
-        self.rooms = [[0 for r in range(l)] for c in range(l)]
-        self.rooms_checked = [[0 for r in range(l)] for c in range(l)]
-        for r in range(l):
-            for c in range(l):
-                self.rooms[r][c] = self.map.add_room(room.Room(c * 10 + 11, r * 10 + 11, 3, 3))
-        queue = [0 for x in range(l ** 2)]
-        queue[0] = [0, 0]
-        start = 0
-        end = 1
-        factor = 5
-        while start < end:
-            current = queue[start]
-            print('current', current)
-            self.rooms_checked[queue[start][0]][queue[start][1]] = 1
-            neighbours = [[current[0] - 1, current[1]], [current[0] + 1, current[1]], [current[0], current[1] - 1],
-                          [current[0], current[1] + 1]]
-
-            for n in neighbours:
-                print(n)
-                if random.uniform(1, 10) > factor:
-                    if n[0] >= 0 and n[0] < l and n[1] >= 0 and n[1] < l:
-                        self.map.connect_two_rooms_no_doors(self.rooms[current[0]][current[1]], self.rooms[n[0]][n[1]])
-
-                        if self.rooms_checked[n[0]][n[1]] == 0:
-                            queue[end] = n
-                            end += 1
-                            self.rooms_checked[n[0]][n[1]] = 1
-            start += 1
-            print(queue[0:end + 1], start, end)
-        if end<20:
-            self.make_map()
-    def make_map2(self):
-        l = 15
-
-        self.rooms = [[0 for r in range(l)] for c in range(l)]
-        self.rooms_checked = [[0 for r in range(l)] for c in range(l)]
-        for r in range(l):
-            for c in range(l):
-                self.rooms[r][c] = self.map.add_room(room.Room(c * 10 + 11, r * 10 + 11, 3, 3))
-        queue = [0 for x in range(l ** 2)]
-        queue[0] = [0, 0]
-        start = 0
-        end = 1
-        factor =0
-        while start < end:
-            current = queue[start]
-            print('current', current)
-            self.rooms_checked[queue[start][0]][queue[start][1]] = 1
-            neighbours = [[current[0] - 1, current[1]], [current[0] + 1, current[1]], [current[0], current[1] - 1],
-                          [current[0], current[1] + 1]]
-
-            for n in neighbours:
-                print(n)
-                if random.uniform(1, 10) > factor:
-                    if n[0] >= 0 and n[0] < l and n[1] >= 0 and n[1] < l:
-                        self.map.connect_two_rooms_no_doors(self.rooms[current[0]][current[1]], self.rooms[n[0]][n[1]])
-
-                        if self.rooms_checked[n[0]][n[1]] == 0:
-                            queue[end] = n
-                            end += 1
-                            self.rooms_checked[n[0]][n[1]] = 1
-            start += 1
-            print(queue[0:end + 1], start, end)
     def draw_minimap(self):
         if not getattr(self.map, "rooms", None):
             return
@@ -268,6 +203,7 @@ class MainDisplay2(BaseDisplay):
         tile_size = self.map.tile_size
         player_map_x = float(self.player.x) / float(tile_size)
         player_map_y = float(self.player.y) / float(tile_size)
+        # draw player
         px = x + padding + int((player_map_x - min_x) * scale)
         py = y + padding + int((player_map_y - min_y) * scale)
         rl.draw_circle(px, py, 3, rl.GREEN)
@@ -278,10 +214,12 @@ class MainDisplay2(BaseDisplay):
 
         super().render()
 
+        # Ensure first light follows player (player light)
         if self.map.lights:
             self.map.lights[0]['pos'].x = self.player.x
             self.map.lights[0]['pos'].y = self.player.y
 
+        # Update light shader uniforms (clamp to MAX_LIGHTS from shader)
         MAX_LIGHTS = 100
         visible_lights = self.map.lights[:MAX_LIGHTS]
         num_lights = len(visible_lights)
@@ -289,6 +227,7 @@ class MainDisplay2(BaseDisplay):
         light_color_data = []
         for light in visible_lights:
             cam_pos = rl.get_world_to_screen_2d(light['pos'], self.camera.camera)
+            # Invert Y-coordinate for shader
             light_pos_data.extend([cam_pos.x, self.game.height - cam_pos.y, light['radius']])
             c = light['color']
             light_color_data.extend([c.r / 255.0, c.g / 255.0, c.b / 255.0, c.a / 255.0])
@@ -301,34 +240,76 @@ class MainDisplay2(BaseDisplay):
             rl.set_shader_value_v(self.light_shader, self.lights_color_loc, rl.ffi.new("float[]", light_color_data),
                                  rl.ShaderUniformDataType.SHADER_UNIFORM_VEC4, num_lights)
 
+        # 1) Draw the main scene (map + objects) to a texture
         rl.begin_texture_mode(self.texture)
         rl.clear_background(rl.BLACK)
         self.camera.begin_mode()
         self.map.draw()
         for obj in self.game_objects:
             obj.render()
+        for b in self.player_bullets:
+            b.render()
         for b in self.enemy_bullets:
             b.render()
 
         self.camera.end_mode()
         rl.end_texture_mode()
 
+        # 2) Draw the scene texture to the screen using the light shader
         rl.begin_shader_mode(self.light_shader)
         src = rl.Rectangle(0.0, 0.0, float(self.texture.texture.width), -float(self.texture.texture.height))
         dst = rl.Rectangle(0.0, 0.0, float(self.game.width), float(self.game.height))
         rl.draw_texture_pro(self.texture.texture, src, dst, rl.Vector2(0.0, 0.0), 0.0, rl.WHITE)
         rl.end_shader_mode()
 
+        # 3) UI / minimap (no shaders)
         self.draw_minimap()
         rl.draw_fps(10, 10)
         if self.game.gamepad_enabled:
             text.draw_text(f"Gamepad X: {self.game.left_joystick_x:.2f}  Y: {self.game.left_joystick_y:.2f}", 10, 130, 20,
                          rl.YELLOW, )
+        # Interaction hint when colliding with the reactor
         try:
             if self.reactor and self.reactor.can_interact(self.player):
                 text.draw_text("Press C to craft", 10, 40, 24, rl.WHITE)
         except Exception:
             pass
+        if (rl.is_key_pressed(rl.KeyboardKey.KEY_C) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_UP)):
+
+            if self.game.crafting==False:
+                if self.game.stop:
+                    self.game.stop=False
+                else:
+                    self.game.crafting = True
+                    self.game.stop = True
+                    self.game.crafting_display.table.update()
+                    self.game.current_display = self.game.crafting_display
+                    self.trans = {8: "oxygen", 1: "hydrogen", 30: "zinc", 11: "sodium", 36: "krypton", 56: "barium",
+                                  16: "sulphur", 26: "iron", 2: "helium", 92: "uranium"}
+                    self.game.crafting_display.inventory.inv = {}
+                    for x in self.game.atomic_masses:
+                        try:
+                            self.game.crafting_display.inventory.inv[self.trans[x]] += 1
+                        except:
+                            self.game.crafting_display.inventory.inv[self.trans[x]] = 1
+                    self.game.crafting_display.atom_bar.update()
+
+        elif rl.is_key_pressed(rl.KeyboardKey.KEY_ESCAPE):
+            rl.draw_rectangle(self.game.width - 300 - 10, 10, 300, 300, rl.BLACK)
+            rl.draw_rectangle(0, 0, 400, 200, rl.BLACK)
+            self.game.change_display(self.game.pause_menu)
+
+        if rl.is_key_pressed(rl.KeyboardKey.KEY_E) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_LEFT):
+            if self.book_message is not None:
+                self.book_message = None
+            else:
+                try:
+                    for bk in self.books:
+                        if bk.can_interact(self.player):
+                            self.book_message = bk.book_id
+                            break
+                except Exception:
+                    pass
 
     def update(self):
         if self.game.music_manager.current is None:
@@ -337,23 +318,29 @@ class MainDisplay2(BaseDisplay):
 
         if self.intro:
             self.camera.zoom_intro(self.delta_time)
+            # stop the intro once the camera zoom reaches (close enough to) the target
             if abs(self.camera.camera.zoom - self.camera.target_zoom) < 0.01:
                 self.intro = False
 
         self.camera.update_target(self.player.x, self.player.y, self.delta_time)
 
+        for b in self.player_bullets:
+            b.update()
         for b in self.enemy_bullets:
             b.update()
 
 
         for object in self.game_objects:
             if issubclass(type(object), atom.Atom):
+                # Keep corridor tiles intact, but closed gates will be treated as walls via collision rects
                 object.update(self.map.rooms, self.map.corridor_tiles)
             elif isinstance(object, enemy_blob.EnemyBlob):
+                # Enemy blobs also need rooms and corridor_tiles for gate/wall collision
                 object.update(self.map.rooms, self.map.corridor_tiles)
             else:
                 object.update()
 
+        # Open crafting only when near the reactor
         can_open_crafting = False
         try:
             if self.reactor and hasattr(self.reactor, 'can_interact'):

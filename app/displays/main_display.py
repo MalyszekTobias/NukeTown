@@ -3,8 +3,18 @@ import pyray as rl
 from app.REACTOR import Reactor
 from app.displays.base import BaseDisplay
 from app.cameras import twodcamera
-from app import assets, map, room, player, enemy_blob, atom, book
+from app import assets, map, room, player, enemy_blob, atom, book, sprite
 from app.ui import text
+
+class Cutscene(sprite.Sprite):
+    def __init__(self, display, scaleXframewidth=60):
+            self.img = assets.images["Cutscene1"]
+            self.x = 0
+            self.y = 0
+            super().__init__(display, scaleXframewidth)
+            self.num_of_frames = 42
+
+
 
 
 class MainDisplay(BaseDisplay):
@@ -259,6 +269,7 @@ class MainDisplay(BaseDisplay):
         except Exception:
             pass
 
+        self.player.render_bar()
         if self.book_message is not None:
             book_text = f"Hello World {self.book_message}"
             try:
@@ -339,18 +350,21 @@ class MainDisplay(BaseDisplay):
             can_open_crafting = False
 
         if (rl.is_key_pressed(rl.KeyboardKey.KEY_C) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_UP)) and can_open_crafting:
-            if self.game.crafting==False:
-                self.game.crafting = True
-                self.game.current_display = self.game.crafting_display
-                self.trans = {8:"oxygen" ,  1:"hydrogen", 30:"zinc", 11:"sodium",36: "krypton", 56:"barium",
-                              16:"sulphur", 26:"iron", 2:"helium", 92:"uranium"}
-                self.game.crafting_display.inventory.inv={}
-                for x in self.game.atomic_masses:
-                    try:
-                        self.game.crafting_display.inventory.inv[self.trans[x]]+=1
-                    except:
-                        self.game.crafting_display.inventory.inv[self.trans[x]]=1
-                self.game.crafting_display.atom_bar.update()
+            if self.game.stop:
+                self.game.stop=False
+            else:
+                if self.game.crafting == False:
+                    self.game.crafting = True
+                    self.game.current_display = self.game.crafting_display
+                    self.trans = {8: "oxygen", 1: "hydrogen", 30: "zinc", 11: "sodium", 36: "krypton", 56: "barium",
+                                  16: "sulphur", 26: "iron", 2: "helium", 92: "uranium"}
+                    self.game.crafting_display.inventory.inv = {}
+                    for x in self.game.atomic_masses:
+                        try:
+                            self.game.crafting_display.inventory.inv[self.trans[x]] += 1
+                        except:
+                            self.game.crafting_display.inventory.inv[self.trans[x]] = 1
+                    self.game.crafting_display.atom_bar.update()
 
 
 

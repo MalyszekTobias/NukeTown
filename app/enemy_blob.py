@@ -5,6 +5,7 @@ import app.atom
 from app import assets
 from app import bullet, sprite
 
+
 class EnemyBlob(sprite.Sprite):
     def __init__(self, display, x, y, health, weight, scaleXframe=10, room=None):
 
@@ -14,8 +15,6 @@ class EnemyBlob(sprite.Sprite):
         self.scaleXframe = scaleXframe
         self.img = self.get_sprite()
         self.room = room
-        print(self.img.width, self.img.height)
-        print(self.img)
         super().__init__(display, self.scaleXframe)
         self.x, self.y = x, y
         self.speed = 0.55
@@ -93,7 +92,6 @@ class EnemyBlob(sprite.Sprite):
                 self.current_frame = (self.current_frame + 1) % self.num_of_frames
 
         if self.shootin:
-            print(self.current_frame)
             if self.current_frame == self.num_of_frames - 9:
                 self.game.music_manager.play_sound(assets.sounds["Plum"])
             if self.current_frame == self.num_of_frames - 1:
@@ -163,7 +161,6 @@ class EnemyBlob(sprite.Sprite):
         if self.health <= 0:
             self.die()
     def render(self):
-        print('rendering enemy', self.x, self.y)
         scale = 10 / float(self.frame_width)
         src = rl.Rectangle(0.0, float(self.frame_height * self.current_frame),
                            float(self.frame_width), float(self.frame_height))
@@ -181,6 +178,9 @@ class EnemyBlob(sprite.Sprite):
         a = app.atom.Atom(self.display, self.weight, self.display.player, self.x * 16, self.y * 16)
         if not self.room == None:
             self.room.busy = 2
+        if self.display.player.hp != self.display.player.max_hp:
+            self.display.player.hp += 10
+            self.display.player.current_HP_frame = int(self.display.player.hp / self.display.player.max_hp * 10) - 1
         self.display.player.friends.append(a)
         self.game.atomic_masses.append(self.weight)
         try:
