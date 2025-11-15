@@ -205,6 +205,9 @@ class MainDisplay(BaseDisplay):
         for b in self.enemy_bullets:
             b.render()
 
+        for e in self.enemies:
+            e.render()
+
         self.camera.end_mode()
         rl.end_texture_mode()
 
@@ -244,6 +247,9 @@ class MainDisplay(BaseDisplay):
             b.update()
         for b in self.enemy_bullets:
             b.update()
+
+        for e in self.enemies:
+            e.update()
 
 
         for object in self.game_objects:

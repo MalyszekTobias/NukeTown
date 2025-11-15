@@ -11,6 +11,8 @@ class EnemyBlob(sprite.Sprite):
 
         self.scaleXframe = scaleXframe
         self.img = self.get_sprite()
+        print(self.img.width, self.img.height)
+        print(self.img)
         super().__init__(display, self.scaleXframe)
         self.x, self.y = x, y
         self.speed = 0.55
@@ -48,6 +50,7 @@ class EnemyBlob(sprite.Sprite):
             return assets.images["Barium"]
         elif self.weight == 36:
             return assets.images["Krypton"]
+        return assets.images["movingblob"]
     def update(self, rooms=None, corridor_tiles=None):
         # update rect for collision checks
         self.rect = rl.Rectangle(self.x - self.radius / 2, self.y - self.radius / 2,
@@ -156,12 +159,24 @@ class EnemyBlob(sprite.Sprite):
         self.health -= damage
         if self.health <= 0:
             self.die()
-
+    def render(self):
+        print('rendering enemy', self.x, self.y)
+        scale = 10 / float(self.frame_width)
+        src = rl.Rectangle(0.0, float(self.frame_height * self.current_frame),
+                           float(self.frame_width), float(self.frame_height))
+        dst_w = float(self.frame_width) * scale
+        dst_h = float(self.frame_height) * scale
+        dst_x = float(self.x) - dst_w / 2.0
+        dst_y = float(self.y) - dst_h / 2.0
+        dst = rl.Rectangle(dst_x, dst_y, dst_w, dst_h)
+        origin = rl.Vector2(0.0, 0.0)
+        angle = 0
+        rl.draw_texture_pro(self.img, src, dst, origin, angle, rl.WHITE)
 
 
     def die(self):
-        self.display.enemy_blobs.remove(self)
-        self.display.objects.remove(self)
+        self.display.enemies.remove(self)
+        self.display.game_objects.remove(self)
         del self
 
     def _resolve_wall_collisions(self, rooms, tile_size, corridor_tiles=None):
