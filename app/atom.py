@@ -1,4 +1,6 @@
 # app/atom.py
+import math
+
 import pyray as rl
 import app
 from app import assets, sprite
@@ -30,6 +32,8 @@ class Atom(sprite.Sprite):
         self.run_tilt = 4
         self.target_x = None
         self.target_y = None
+
+        self.cooldown = 0
 
 
 
@@ -108,6 +112,11 @@ class Atom(sprite.Sprite):
                 self.down = self.game.left_joystick_y > self.game.gamepad_deadzone
                 self.left = self.game.left_joystick_x < -self.game.gamepad_deadzone
                 self.right = self.game.left_joystick_x > self.game.gamepad_deadzone
+        self.cooldown -= 1
+        if rl.is_mouse_button_pressed(0):
+            if self.cooldown <= 0:
+                self.shoot(rl.get_mouse_x(), rl.get_mouse_y())
+                self.cooldown = 50
         elif self.target_x != None and self.target_y != None:
             if self.x < self.target_x:
                 self.right = True
@@ -240,6 +249,21 @@ class Atom(sprite.Sprite):
                     friend.set_destination(15)
         rl.draw_texture_pro(self.img, src, dst, origin, angle, rl.WHITE)
         rl.draw_rectangle_lines(int(self.rect.x), int(self.rect.y), int(self.rect.width), int(self.rect.height), rl.RED)
+
+    def shoot(self, x, y):
+        mouse_pos = rl.get_mouse_position()
+        world_pos = rl.get_screen_to_world_2d(mouse_pos, self.display.camera.camera)
+        mouse_x, mouse_y = world_pos.x, world_pos.y
+        dx = mouse_x - self.x
+        dy = mouse_y - self.y
+        dist = math.hypot(dx, dy)
+        if dist == 0:
+            return
+        vel_right = (dx / dist)
+        vel_up = (dy / dist)
+        bullet = app.bullet.Bullet(self.display, self.x, self.y, vel_right, vel_up, "enemy")
+        self.display.player_bullets.append(bullet)
+        self.game.music_manager.play_sound(assets.sounds["Plum"])
 
     def set_destination(self, radius):
         x = rl.get_random_value(- radius, radius)

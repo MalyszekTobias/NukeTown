@@ -81,6 +81,7 @@ class EnemyBlob(sprite.Sprite):
         b = bullet.Bullet(self.display, self.x, self.y, 0, 0, "player")
         self.display.enemy_bullets.append(b)
         self.cooldown_timer = 375
+        self.game.music_manager.play_sound(assets.sounds["Plum"])
 
     def take_damage(self, damage):
         self.health -= damage
