@@ -6,7 +6,7 @@ from app import assets
 Tile = Tuple[int, int]
 
 class Gate:
-    def __init__(self, game_map, tile: Tile, room_ref=None, is_open: bool = False, interaction_radius: float = 24.0):
+    def __init__(self, game_map, tile: Tile, room_ref=None, is_open: bool = False, interaction_radius: float = 24.0, required_atom: Optional[str] = None):
         self.map = game_map
         self.tile = tile
         self.tile_size = getattr(game_map, 'tile_size', 16)
@@ -15,6 +15,7 @@ class Gate:
         self.room = room_ref
         self.is_open = is_open
         self.interaction_radius = interaction_radius
+        self.required_atom = required_atom  # e.g., "hydrogen", "helium", "oxygen", etc.
         # Determine orientation based on room if available
         # use concrete keys that draw() expects ('horizontal0','horizontal1','vertical0','vertical1')
         self.orientation = 'horizontal0'
@@ -29,6 +30,9 @@ class Gate:
                 self.orientation = 'horizontal0'
             elif ty == y0 + h - 1:
                 self.orientation = 'horizontal1'
+
+    def __str__(self):
+        return f"Gate(tile={self.tile}, is_open={self.is_open}, orientation={self.orientation}, required_atom={self.required_atom})"
 
     def draw(self, tile_size: Optional[int] = None):
         tile_size = tile_size or self.tile_size
@@ -53,8 +57,12 @@ class Gate:
         elif self.orientation == 'horizontal0':
             rotation = 0
         # Slight offsets to better align with room walls (copied style from room.draw)
-
-        rl.draw_texture_ex(tex, (dest_x, dest_y), rotation, 1 / 4 / tile_size, rl.WHITE)
+        if self.required_atom:
+            # Draw with a tint to indicate locked status
+            rl.draw_texture_ex(tex, (dest_x, dest_y), rotation, 1 / 4 / tile_size, rl.RED)
+            rl.draw_text(self.required_atom, dest_x, dest_y, 10, rl.WHITE)
+        else:
+            rl.draw_texture_ex(tex, (dest_x, dest_y), rotation, 1 / 4 / tile_size, rl.WHITE)
 
     def collision_rect(self):
         """Returns a rectangle (x,y,w,h) in world pixels representing the blocking area when closed."""
@@ -113,5 +121,19 @@ class Gate:
             self.open()
 
     def interact(self, player):
-        # default interaction: toggle open/closed
-        self.toggle()
+        # Check if gate requires an atom
+        if self.required_atom and not self.is_open:
+            # Try to access player's inventory through the game's crafting display
+            try:
+                inventory = self.map.game.crafting_display.inventory.inv
+                # Check if player has the required atom
+                if self.required_atom in inventory and inventory[self.required_atom] > 0:
+                    self.open()
+                else:
+                    return
+            except Exception as e:
+                print(f"Could not access inventory: {e}")
+                return
+        else:
+            # No atom required or gate is already open, just toggle
+            self.toggle()

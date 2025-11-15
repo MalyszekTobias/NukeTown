@@ -3,10 +3,11 @@ import math
 import pyray as rl
 from app import assets
 class Bullet:
-    def __init__(self, display, x, y, velRight, velUp, target):
+    def __init__(self, display, x, y, velRight, velUp, damage, target):
         self.display = display
         self.game = display.game
         self.x, self.y = x, y
+        self.damage = damage
         self.speed = 0.4
         self.radius = 1
         self.velRight = velRight
@@ -25,7 +26,6 @@ class Bullet:
         self.frame_duration = 0.08
 
     def _aim_at_player(self):
-        # pobierz pozycję gracza (weź pod uwagę kamerę, jeśli istnieje)
         player_x = self.display.player.x
         player_y = self.display.player.y
         dx = player_x - self.x
