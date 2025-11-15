@@ -29,7 +29,8 @@ class MainDisplay(BaseDisplay):
 
         self.jeff_image = assets.images["Jeff"]
 
-        Reactor(self)
+        # Store the reactor so we can check proximity for crafting
+        self.reactor = Reactor(self)
 
 
         self.map = map.Map(self.game)
@@ -168,6 +169,12 @@ class MainDisplay(BaseDisplay):
         if self.game.gamepad_enabled:
             text.draw_text(f"Gamepad X: {self.game.left_joystick_x:.2f}  Y: {self.game.left_joystick_y:.2f}", 10, 130, 20,
                          rl.YELLOW, )
+        # Interaction hint when colliding with the reactor
+        try:
+            if self.reactor and self.reactor.can_interact(self.player):
+                text.draw_text("Press C to craft", 10, 40, 24, rl.WHITE)
+        except Exception:
+            pass
 
     def update(self):
         if self.game.music_manager.current is None:
@@ -198,7 +205,15 @@ class MainDisplay(BaseDisplay):
             else:
                 object.update()
 
-        if rl.is_key_pressed(rl.KeyboardKey.KEY_C) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_UP):
+        # Open crafting only when near the reactor
+        can_open_crafting = False
+        try:
+            if self.reactor and hasattr(self.reactor, 'can_interact'):
+                can_open_crafting = self.reactor.can_interact(self.player)
+        except Exception:
+            can_open_crafting = False
+
+        if (rl.is_key_pressed(rl.KeyboardKey.KEY_C) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_UP)) and can_open_crafting:
             if self.game.crafting==False:
                 self.game.crafting = True
                 self.game.current_display = self.game.crafting_display

@@ -15,6 +15,7 @@ class Sprite:
         self.frame_duration = 0.08
         self.x = 0
         self.y = 0
+        self.rect = rl.Rectangle(self.x, self.y, self.frame_width, self.frame_height)
         self.gameHeight = self.game.height
         self.gameWidth = self.game.width
 
