@@ -39,7 +39,7 @@ class Map:
         for y in range(y_start, y_end + 1):
             tiles.add((bx, y))
         return tiles
-    def connect_two_rooms(self,room1,room2):
+    def connect_two_rooms(self,room1,room2, required_atom=None):
         # self.corridor_tiles.clear()
         if len(self.rooms) < 2:
             return
@@ -62,7 +62,9 @@ class Map:
                 removed = all_walls - visible_walls
                 for tile in removed:
                     if tile not in self.gates:
-                        self.gates[tile] = Gate(self, tile, room_ref=room, is_open=False)
+                        # Use the required_atom for gates of room2 (the target room)
+                        atom_for_gate = required_atom if room == room2 else None
+                        self.gates[tile] = Gate(self, tile, room_ref=room, is_open=False, required_atom=atom_for_gate)
     def connect_rooms(self):
         self.corridor_tiles.clear()
         if len(self.rooms) < 2:
