@@ -75,12 +75,12 @@ class Crafting_Menu(BaseDisplay):
             for mass in self.game.atomic_masses:
                 self.game.twodgame.player.spawn_friend(mass)
             if self.end_chapter_1:
-                print("End Chapter 1")
+
                 self.end_chapter_1=False
-                self.game.current_display=self.game.display2
                 self.game.twodgame=self.game.display2
                 self.game.chapter2=True
                 self.game.stop=True
+                self.game.change_display(self.game.chapter2_display)
 
         if rl.is_mouse_button_pressed(0):
             self.mouse_down=True
@@ -218,7 +218,8 @@ class Rect():
         self.display.objects.append(self)
     def draw(self):
         # print('bb')
-        rl.draw_rectangle_lines(self.x,self.y,self.w,self.h,rl.WHITE,)
+        # rl.draw_rectangle_lines(self.x,self.y,self.w,self.h,rl.WHITE,)
+        pass
     def delete(self):
         self.display.objects.remove(self)
     def __str__(self):
@@ -382,9 +383,15 @@ class Table():
         if self.display.end_chapter_1==False:
                 if self.display.inventory.inv['uranium']>=9:
                     self.fuse_text.text="Start the chain reaction"
+                    self.fuse_text.w = 70
+                    measure=rl.measure_text(self.fuse_text.text,self.fuse_text.w)
+                    self.fuse_text.x=self.x+self.w-measure-15
                 else:
 
                     self.fuse_text.text="Not enough uranium"
+                    self.fuse_text.w = 70
+                    measure=rl.measure_text(self.fuse_text.text,self.fuse_text.w)
+                    self.fuse_text.x=self.x+self.w-measure-15
     def do_fusion(self):
         if type(self.display.game.twodgame)==MainDisplay:
             if self.display.end_chapter_1 == False:
