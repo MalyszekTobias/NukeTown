@@ -58,7 +58,6 @@ class Bullet:
                 self.frame_duration = 0.02
             if self.frame_duration == 0.02 and self.current_frame == self.num_of_frames - 1:
                 self.display.enemy_bullets.remove(self)
-                print(1232)
                 del  self
                 return
 
