@@ -1,6 +1,6 @@
 import pyray as rl
 
-from app.displays import startscreen, main_display,crafting, chatper1
+from app.displays import startscreen, main_display,crafting, chatper1, pause
 from app import assets
 
 from app.ui import text
@@ -18,7 +18,7 @@ class Game:
         rl.set_target_fps(rl.get_monitor_refresh_rate(rl.get_current_monitor()))
 
         # Draw a loading screen immediately so the window isn't white while heavy init runs
-        self.draw_loading_screen("Made in RutraOS")
+        self.draw_loading_screen("Topopisy Inc. Presents")
 
         # Perform heavier initialization after showing the loading screen
         self.music_manager = music.MusicManager()
@@ -35,6 +35,7 @@ class Game:
                               1,1,1]
         self.twodgame = main_display.MainDisplay(self)
         self.current_display = self.base_display
+        self.pause_menu = pause.Menu(self)
         self.crafting = False
         # controller
         self.gamepad_id = 0

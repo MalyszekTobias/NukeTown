@@ -245,3 +245,10 @@ class MainDisplay(BaseDisplay):
                 self.game.crafting_display.atom_bar.update()
                 if self.game.music_manager.current != 1:
                     self.game.music_manager.play_music1()
+
+
+        elif rl.is_key_pressed(rl.KeyboardKey.KEY_ESCAPE):
+            rl.draw_rectangle(self.game.width - 300 - 10, 10, 300, 300, rl.BLACK)
+            rl.draw_rectangle(0, 0, 400, 200, rl.BLACK)
+            self.game.change_display(self.game.pause_menu)
+
