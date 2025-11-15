@@ -59,6 +59,7 @@ class Gate:
         # Slight offsets to better align with room walls (copied style from room.draw)
 
         # Draw the gate
+        measured_text = rl.measure_text(self.required_atom or "", tile_size)
         if self.required_atom:
             # Draw with a tint to indicate locked status
             rl.draw_texture_ex(tex, (dest_x, dest_y), rotation, 1 / 4 / tile_size, rl.RED)
@@ -71,7 +72,7 @@ class Gate:
             atom_tex = assets.images.get(atom_asset_name)
             if atom_tex:
                 atom_scale = 0.01  # Adjust this to scale the atom icon appropriately
-                rl.draw_texture_ex(atom_tex, (dest_x, dest_y-atom_tex.width*atom_scale), 0, atom_scale, rl.WHITE)
+                rl.draw_texture_ex(atom_tex, (dest_x-(measured_text*0.3), dest_y), 0, atom_scale, rl.WHITE)
 
     def collision_rect(self):
         """Returns a rectangle (x,y,w,h) in world pixels representing the blocking area when closed."""
