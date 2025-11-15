@@ -6,6 +6,7 @@ from app.cameras import twodcamera
 from app import assets, map, room, player, enemy_blob, atom
 from app.enemy_blob import EnemyBlob
 from app.ui import text
+from app.russian import RussianWalker
 import random
 import random
 
@@ -17,6 +18,8 @@ class MainDisplay2(BaseDisplay):
         super().__init__(game)
         self.game = game
         self.player = player.Player(self)
+        # Set spawn point to initial player position
+        self.player.spawn_point = (self.player.x, self.player.y)
         self.delta_time = rl.get_frame_time()
         self.camera = twodcamera.Camera(self.game.width, self.game.height, 0, 0, 3)
         self.enemy_bullets = []
@@ -26,6 +29,7 @@ class MainDisplay2(BaseDisplay):
 
         for mass in self.game.atomic_masses:
             self.player.spawn_friend(mass)
+
 
         self.texture =  rl.load_render_texture(game.width, game.height)
         rl.set_texture_filter(self.texture.texture, rl.TextureFilter.TEXTURE_FILTER_BILINEAR)
@@ -108,7 +112,39 @@ class MainDisplay2(BaseDisplay):
             e.speed=0
             self.enemies.append(e)
 
-
+        # Spawn 8 Russians in random rooms far from player
+        self.russians = []
+        try:
+            px, py = self.player.x, self.player.y
+            tile_size = getattr(self.map, 'tile_size', 16)
+            centers = []
+            for rm in self.map.rooms:
+                cx = (rm.x + rm.width / 2.0) * tile_size
+                cy = (rm.y + rm.height / 2.0) * tile_size
+                centers.append((cx, cy))
+            with_dist = [((cx, cy), (cx - px) ** 2 + (cy - py) ** 2) for (cx, cy) in centers]
+            with_dist.sort(key=lambda t: t[1], reverse=True)
+            far_threshold = 400.0
+            far_sq = far_threshold * far_threshold
+            far_centers = [pos for (pos, d2) in with_dist if d2 >= far_sq]
+            if len(far_centers) >= 8:
+                picks = random.sample(far_centers, 8)
+            else:
+                picks = far_centers[:]
+                for (pos, _) in with_dist:
+                    if len(picks) >= 8:
+                        break
+                    if pos not in picks:
+                        picks.append(pos)
+                while len(picks) < 8:
+                    picks.append((px + random.uniform(-64, 64), py + random.uniform(-64, 64)))
+            for (sx, sy) in picks:
+                self.russians.append(RussianWalker(self, sx, sy, scaleXframewidth=10))
+        except Exception:
+            for _ in range(8):
+                sx = self.player.x + random.uniform(-64, 64)
+                sy = self.player.y + random.uniform(-64, 64)
+                self.russians.append(RussianWalker(self, sx, sy, scaleXframewidth=10))
 
         self.start_zoom = self.camera.camera.zoom
         self.intro = True
@@ -117,8 +153,8 @@ class MainDisplay2(BaseDisplay):
 
 
         self.map.add_light(self.player.x, self.player.y, 420.0, rl.Color(255, 255, 255, 255))
-        self.map.add_light(200, 200, 150.0, rl.Color(255, 0, 0, 255))
-        self.map.add_light(400, 67, 670.0, rl.Color(200, 150, 5, 255))
+        # self.map.add_light(200, 200, 150.0, rl.Color(255, 0, 0, 255))
+        # self.map.add_light(400, 67, 670.0, rl.Color(200, 150, 5, 255))
 
         self.light_shader = self.game.light_shader
         self.lights_pos_loc = rl.get_shader_location(self.light_shader, "lights")
@@ -171,6 +207,8 @@ class MainDisplay2(BaseDisplay):
         px = x + padding + int((player_map_x - min_x) * scale)
         py = y + padding + int((player_map_y - min_y) * scale)
         rl.draw_circle(px, py, 3, rl.GREEN)
+
+
 
     def render(self):
 
@@ -309,5 +347,3 @@ class MainDisplay2(BaseDisplay):
                 can_open_crafting = self.reactor.can_interact(self.player)
         except Exception:
             can_open_crafting = False
-
-

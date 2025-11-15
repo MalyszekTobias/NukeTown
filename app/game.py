@@ -1,6 +1,6 @@
 import pyray as rl
 
-from app.displays import startscreen, main_display,crafting, chapter1, pause, chapter2, main_display2, cutscene
+from app.displays import startscreen, main_display,crafting, chapter1, pause, chapter2, main_display2, cutscene, cutscene2, gameover
 from app import assets
 
 from app import music
@@ -28,9 +28,11 @@ class Game:
         self.chapter1_display = chapter1.Chapter1(self)
         self.chapter2_display = chapter2.Chapter2(self)
         self.cutscene_display = cutscene.Cutscene(self)
+        self.ending = cutscene2.Cutscene(self)
+        self.game_over_screen = gameover.GameOver(self)
         self.best_craft = 1
 
-        self.atomic_masses = [1,1,1,1,36,56]
+        self.atomic_masses = [1,1,1,1]
         self.twodgame = main_display.MainDisplay(self)
         self.display2 = main_display2.MainDisplay2(self)
         self.chapter2=False
