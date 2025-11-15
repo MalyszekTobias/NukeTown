@@ -11,6 +11,7 @@ class Game:
     def __init__(self):
         self.width, self.height = 1920, 1080
         rl.set_config_flags(rl.ConfigFlags.FLAG_VSYNC_HINT)
+        rl.set_config_flags(rl.ConfigFlags.FLAG_MSAA_4X_HINT)
         rl.init_window(self.width, self.height, "raylib template?")
         rl.toggle_fullscreen()
         rl.set_exit_key(rl.KeyboardKey.KEY_NULL)
