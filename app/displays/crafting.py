@@ -41,7 +41,6 @@ class Crafting_Menu(BaseDisplay):
         super().render()
         # self.table.update()
 
-        rl.draw_fps(10, 10)
         # rl.draw_rectangle(int(self.square_pos[0]), int(self.square_pos[1]), 20, 20, rl.RED)
         for obj in self.objects:
             # print('aa')

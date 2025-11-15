@@ -1,6 +1,6 @@
 import pyray as rl
 
-from app.displays import startscreen, main_display,crafting
+from app.displays import startscreen, main_display,crafting, chatper1
 from app import assets
 
 from app.ui import text
@@ -16,16 +16,23 @@ class Game:
         rl.toggle_fullscreen()
         rl.set_exit_key(rl.KeyboardKey.KEY_NULL)
         rl.set_target_fps(rl.get_monitor_refresh_rate(rl.get_current_monitor()))
+
+        # Draw a loading screen immediately so the window isn't white while heavy init runs
+        self.draw_loading_screen("Made in RutraOS")
+
+        # Perform heavier initialization after showing the loading screen
         self.music_manager = music.MusicManager()
         assets.load()
-        self.bloom_shader = assets.shaders["bloom"]
+
         self.light_shader = assets.shaders["lights"]
         self.base_display = startscreen.StartDisplay(self)
         self.crafting_display = crafting.Crafting_Menu(self)
+        self.chatpter1_display = chatper1.Chapter1(self)
 
         # initialize music manager and start default music
 
-        self.atomic_masses = [1, 2, 8, 11, 16, 26, 30, 36, 56]
+        self.atomic_masses = [1,
+                              1,1,1]
         self.twodgame = main_display.MainDisplay(self)
         self.current_display = self.base_display
         self.crafting = False
@@ -33,6 +40,17 @@ class Game:
         self.gamepad_id = 0
         self.gamepad_deadzone = 0.25
         self.gamepad_enabled = False
+
+    def draw_loading_screen(self, message: str = "Loading…"):
+        # Render a simple loading frame to avoid white screen during startup
+        rl.begin_drawing()
+        rl.clear_background(rl.BLACK)
+        font_size = 40
+        text_width = rl.measure_text(message, font_size)
+        x = (self.width - text_width) // 2
+        y = self.height // 2 - font_size // 2
+        rl.draw_text(message, x, y, font_size, rl.RAYWHITE)
+        rl.end_drawing()
 
     def update_gamepad_status(self):
         # Detect availability each frame (hot-plug support)

@@ -29,24 +29,38 @@ class MainDisplay(BaseDisplay):
 
         self.jeff_image = assets.images["Jeff"]
 
-        Reactor(self)
+        # Store the reactor so we can check proximity for crafting
+        self.reactor = Reactor(self)
 
-        self.bloom_shader = self.game.bloom_shader
-        self.shader_resolution_location = rl.get_shader_location(self.bloom_shader, "resolution")
-        self.shader_time_location = rl.get_shader_location(self.bloom_shader, "time")
 
-        self.map = map.Map()
-        self.map.add_room(room.Room(10, 10, 5, 5))
-        self.map.add_room(room.Room(20, 15, 17, 20))
-        self.map.add_room(room.Room(20, -1, 10, 10))
-        self.map.add_room(room.Room(30, -1, 10, 10))
-        self.map.add_room(room.Room(20, 10, 5, 5))
-        self.map.connect_rooms()
+        self.map = map.Map(self.game)
+        r1=self.map.add_room(room.Room(10, 10, 7, 7))
+        r2He=self.map.add_room(room.Room(20, 2, 17, 21))
+        self.map.connect_two_rooms(r1, r2He)
+        r3=self.map.add_room(room.Room(40, 7, 13, 11))
+        self.map.connect_two_rooms(r3, r2He)
+        r4=self.map.add_room(room.Room(24, -10, 9, 7))
+        self.map.connect_two_rooms(r4, r2He)
+        r5O = self.map.add_room(room.Room(3, -10, 9, 13))
+        self.map.connect_two_rooms(r4, r5O)
+
+        r6Zn = self.map.add_room(room.Room(40, -5, 11, 7))
+        self.map.connect_two_rooms(r4, r6Zn)
+        r7Fe = self.map.add_room(room.Room(20, 30, 13, 13))
+        self.map.connect_two_rooms(r2He, r7Fe)
+        r8 = self.map.add_room(room.Room(50, 45, 11, 7))
+        self.map.connect_two_rooms(r8, r7Fe)
+        r9Kr = self.map.add_room(room.Room(45, 25, 15, 7))
+        self.map.connect_two_rooms(r7Fe,r9Kr)
+        r10Ba = self.map.add_room(room.Room(0, 20, 13, 7))
+        self.map.connect_two_rooms(r7Fe, r10Ba)
+        # self.map.add_room(room.Room(20, -1, 10, 10))
+        # self.map.add_room(room.Room(30, -1, 10, 10))
+        # self.map.add_room(room.Room(20, 10, 5, 5))
+        # self.map.connect_rooms()
 
         self.crafting=False
-        res = rl.ffi.new("float[2]", [float(self.game.width), float(self.game.height)])
-        rl.set_shader_value(self.bloom_shader, self.shader_resolution_location, res,
-                            rl.ShaderUniformDataType.SHADER_UNIFORM_VEC2)
+
         self.start_zoom = self.camera.camera.zoom
         self.intro = True
         self._intro_tolerance = 0.01
@@ -169,10 +183,15 @@ class MainDisplay(BaseDisplay):
 
         # 3) UI / minimap (no shaders)
         self.draw_minimap()
-        rl.draw_fps(10, 10)
         if self.game.gamepad_enabled:
             text.draw_text(f"Gamepad X: {self.game.left_joystick_x:.2f}  Y: {self.game.left_joystick_y:.2f}", 10, 130, 20,
                          rl.YELLOW, )
+        # Interaction hint when colliding with the reactor
+        try:
+            if self.reactor and self.reactor.can_interact(self.player):
+                text.draw_text("Press C to craft", 10, 40, 24, rl.WHITE)
+        except Exception:
+            pass
 
     def update(self):
         if self.game.music_manager.current is None:
@@ -187,10 +206,6 @@ class MainDisplay(BaseDisplay):
 
         self.camera.update_target(self.player.x, self.player.y, self.delta_time)
 
-        t = rl.ffi.new("float *", float(rl.get_time()))
-        rl.set_shader_value(self.bloom_shader, self.shader_time_location, t,
-                            rl.ShaderUniformDataType.SHADER_UNIFORM_FLOAT)
-
         for b in self.player_bullets:
             b.update()
         for b in self.enemy_bullets:
@@ -199,12 +214,23 @@ class MainDisplay(BaseDisplay):
 
         for object in self.game_objects:
             if issubclass(type(object), atom.Atom):
+                # Keep corridor tiles intact, but closed gates will be treated as walls via collision rects
+                object.update(self.map.rooms, self.map.corridor_tiles)
+            elif isinstance(object, enemy_blob.EnemyBlob):
+                # Enemy blobs also need rooms and corridor_tiles for gate/wall collision
                 object.update(self.map.rooms, self.map.corridor_tiles)
             else:
-
                 object.update()
 
-        if rl.is_key_pressed(rl.KeyboardKey.KEY_C) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_UP):
+        # Open crafting only when near the reactor
+        can_open_crafting = False
+        try:
+            if self.reactor and hasattr(self.reactor, 'can_interact'):
+                can_open_crafting = self.reactor.can_interact(self.player)
+        except Exception:
+            can_open_crafting = False
+
+        if (rl.is_key_pressed(rl.KeyboardKey.KEY_C) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_UP)) and can_open_crafting:
             if self.game.crafting==False:
                 self.game.crafting = True
                 self.game.current_display = self.game.crafting_display

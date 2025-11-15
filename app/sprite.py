@@ -15,6 +15,7 @@ class Sprite:
         self.frame_duration = 0.08
         self.x = 0
         self.y = 0
+        self.rect = rl.Rectangle(self.x, self.y, self.frame_width, self.frame_height)
         self.gameHeight = self.game.height
         self.gameWidth = self.game.width
 
@@ -51,12 +52,14 @@ class Sprite:
 
 class Jumping_sprite_test(Sprite):
     def __init__(self, display, scaleXframewidth=600):
-        self.img = assets.images['movingblob']
+        self.img = rl.load_texture('app/assets/Spritesheets/Sigma_salto_2.png')
 
         super().__init__(display, scaleXframewidth)
         self.x = self.game.width/1.3
         self.y = self.game.height//2
         self.tint = (0, 0, 0)
+
+        self.speed = 5
 
     def render(self):
         scale = self.scaleXframewidth / float(self.frame_width)
@@ -70,6 +73,8 @@ class Jumping_sprite_test(Sprite):
         origin = rl.Vector2(0.0, 0.0)
         angle = 0
 
-
         rl.draw_texture_pro(self.img, src, dst, origin, angle, self.tint)
+
+    def move_out(self, speed):
+        self.x += speed
 
