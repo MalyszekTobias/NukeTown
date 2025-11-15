@@ -299,17 +299,7 @@ class MainDisplay2(BaseDisplay):
             rl.draw_rectangle(0, 0, 400, 200, rl.BLACK)
             self.game.change_display(self.game.pause_menu)
 
-        if rl.is_key_pressed(rl.KeyboardKey.KEY_E) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_LEFT):
-            if self.book_message is not None:
-                self.book_message = None
-            else:
-                try:
-                    for bk in self.books:
-                        if bk.can_interact(self.player):
-                            self.book_message = bk.book_id
-                            break
-                except Exception:
-                    pass
+
 
     def update(self):
         if self.game.music_manager.current is None:

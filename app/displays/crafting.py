@@ -82,6 +82,7 @@ class Crafting_Menu(BaseDisplay):
                 self.game.stop=True
                 self.game.change_display(self.game.chapter2_display)
 
+
         if rl.is_mouse_button_pressed(0):
             self.mouse_down=True
             self.mouse=rl.get_mouse_position()
@@ -415,7 +416,7 @@ class Table():
         else:
             print('xxx')
             if self.display.inventory.inv['uranium'] >= 9:
-                print('you_win')
+                self.display.game.change_display(self.display.game.ending)
 
         # self.clear()
     def clear(self):
