@@ -54,6 +54,7 @@ class MainDisplay(BaseDisplay):
         # Seed a static example light; player light will be first element and updated per-frame
         self.map.add_light(self.player.x, self.player.y, 220.0, rl.Color(255, 255, 255, 255))
         self.map.add_light(200, 200, 150.0, rl.Color(255, 0, 0, 255))
+        self.map.add_light(400, 67, 670.0, rl.Color(0, 0, 255, 255))
 
         self.light_shader = self.game.light_shader
         self.lights_pos_loc = rl.get_shader_location(self.light_shader, "lights")
