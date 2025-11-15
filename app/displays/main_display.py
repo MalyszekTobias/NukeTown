@@ -199,9 +199,9 @@ class MainDisplay(BaseDisplay):
 
         for object in self.game_objects:
             if issubclass(type(object), atom.Atom):
+                # Keep corridor tiles intact, but closed gates will be treated as walls via collision rects
                 object.update(self.map.rooms, self.map.corridor_tiles)
             else:
-
                 object.update()
 
         if rl.is_key_pressed(rl.KeyboardKey.KEY_C) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_UP):
