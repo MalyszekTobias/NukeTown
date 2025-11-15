@@ -341,7 +341,6 @@ class Table():
         # self.clear()
     def clear(self):
         for atom in self.atoms:
-            print(atom.name)
             try:
                 self.display.inventory.inv[self.translator[atom.name]]+=1
             except:
@@ -356,7 +355,6 @@ class Table():
         self.protons=0
     def clear_before_fusion(self):
         for atom in self.atoms:
-            print(atom.name)
             try:
                 atom.delete()
             except:

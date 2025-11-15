@@ -168,7 +168,6 @@ class MainDisplay(BaseDisplay):
                 self.game.current_display = self.game.crafting_display
                 self.game.current_display = self.game.crafting_display
                 if self.game.music_manager.current != 1:
-                    print(self.game.music_manager.current)
                     self.game.music_manager.play_music1()
 
 
