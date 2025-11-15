@@ -104,7 +104,7 @@ class MainDisplay2(BaseDisplay):
         print(samp)
         self.enemies2=[]
         for x in samp:
-            self.enemies2.append(EnemyBlob(self,x[0],x[1],100,92))
+            self.enemies2.append(EnemyBlob(self,x[1] * 10 + 11, x[0] * 10 + 11,100,92))
 
 
 
