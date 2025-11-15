@@ -14,13 +14,14 @@ class Game:
         rl.toggle_fullscreen()
         rl.set_exit_key(rl.KeyboardKey.KEY_NULL)
         rl.set_target_fps(rl.get_monitor_refresh_rate(rl.get_current_monitor()))
+        rl.set_target_fps(75)
+        self.music_manager = music.MusicManager()
         assets.load()
         self.bloom_shader = assets.shaders["bloom"]
         self.base_display = startscreen.StartDisplay(self)
         self.crafting_display = crafting.Crafting_Menu(self)
 
         # initialize music manager and start default music
-        self.music_manager = music.MusicManager()
 
         self.atomic_masses = [1, 2, 8, 11, 16, 26, 30, 36, 56]
         self.enemy_bullets = []
