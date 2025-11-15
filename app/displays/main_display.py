@@ -256,8 +256,7 @@ class MainDisplay(BaseDisplay):
                     except:
                         self.game.crafting_display.inventory.inv[self.trans[x]]=1
                 self.game.crafting_display.atom_bar.update()
-                if self.game.music_manager.current != 1:
-                    self.game.music_manager.play_music1()
+
 
 
         elif rl.is_key_pressed(rl.KeyboardKey.KEY_ESCAPE):
