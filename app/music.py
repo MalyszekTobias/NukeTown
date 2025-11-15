@@ -4,18 +4,11 @@ import pyray as rl
 
 
 class MusicManager:
-    """Simple music manager that loads two music tracks and can switch between them.
-
-    Behavior:
-    - Initializes audio device on construction.
-    - Attempts to load two known music files from app/assets/Sounds; falls back to finding first two .mp3 files.
-    - Starts with nothing playing; call play_music1() to start the default track.
-    - Call update() each frame to keep streaming and to auto-restart tracks for looping.
-    """
 
     # default expected paths (may be overridden by discovery)
     MUSIC1_DEFAULT = "app/assets/Sounds/Doom Eternal OST - The Only Thing They Fear Is You (Mick Gordon) [Doom Eternal Theme].mp3"
     MUSIC2_DEFAULT = "app/assets/Sounds/Terraria Music - Day.mp3"
+    #https://pixabay.com/music/upbeat-game-minecraft-gaming-background-music-402451/
 
     def __init__(self):
         # initialize audio device if available
