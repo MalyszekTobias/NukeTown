@@ -78,8 +78,8 @@ class EnemyBlob(sprite.Sprite):
                 self.frame_timer = 0.0
 
     def shoot(self):
-        b = bullet.Bullet(self.game, self.x, self.y, 0, 0, "player")
-        self.game.enemy_bullets.append(b)
+        b = bullet.Bullet(self.display, self.x, self.y, 0, 0, "player")
+        self.display.enemy_bullets.append(b)
         self.cooldown_timer = 375
 
     def take_damage(self, damage):

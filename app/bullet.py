@@ -1,8 +1,9 @@
 import pyray as rl
 from app import assets
 class Bullet:
-    def __init__(self, game, x, y, velRight, velUp, target):
-        self.game = game
+    def __init__(self, display, x, y, velRight, velUp, target):
+        self.display = display
+        self.game = display.game
         self.x, self.y = x, y
         self.speed = 0.5
         self.radius = 1
@@ -33,7 +34,7 @@ class Bullet:
             self.y += self.velUp
         else:
             self.lifespan -= 1
-            x, y = self.game.player.x, self.game.player.y
+            x, y = self.display.player.x, self.display.player.y
             if self.x < x:
                 self.x += self.speed
             elif self.x > x:
