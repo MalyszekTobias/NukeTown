@@ -7,11 +7,11 @@ from app import bullet, sprite
 
 
 class EnemyBlob(sprite.Sprite):
-    def __init__(self, display, x, y, health, weight, scaleXframe=10, room=None):
+    def __init__(self, display, x, y, health, weight, scaleXframe=10, room=None, passive=False):
 
         self.weight = weight
         self.health = health
-
+        self.passive = passive
         self.scaleXframe = scaleXframe
         self.img = self.get_sprite()
         self.room = room
@@ -65,7 +65,7 @@ class EnemyBlob(sprite.Sprite):
         dy = py - self.y
         dist = math.hypot(dx, dy)
         self.cooldown_timer -= 1
-        if self.cooldown_timer <= 0 and dist <= self.shooting_range + 5:
+        if self.cooldown_timer <= 0 and dist <= self.shooting_range + 5 and not self.passive:
             self.shootin = True
             self.img = assets.images["Bullet_Bad_Create"]
             self.num_of_frames = int(self.img.height / self.img.width)
@@ -82,7 +82,7 @@ class EnemyBlob(sprite.Sprite):
         # remember previous position so we can prevent leaving corridors
         old_x, old_y = self.x, self.y
 
-        if self.shooting_range < dist <= self.detection_radius:
+        if self.shooting_range < dist <= self.detection_radius and not self.passive:
             nx = dx / dist
             ny = dy / dist
             self.x += nx * self.speed

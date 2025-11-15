@@ -50,8 +50,8 @@ class Player(Atom):
                 self.hp -= enemy_bullet.damage
                 print(self.hp)
                 self.current_HP_frame = int (self.hp / self.max_hp * 10) - 1
-                if self.hp <= 0:
-                    print("you lose")
+                if self.hp <= 11:
+                    self.display.game.change_display(self.display.game.game_over_screen)
                 self.display.enemy_bullets.remove(enemy_bullet)
                 self.game.music_manager.play_sound(assets.sounds["shot"])
         try:
