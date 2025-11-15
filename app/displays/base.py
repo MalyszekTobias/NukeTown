@@ -9,6 +9,7 @@ class BaseDisplay:
 
     def render(self):
         rl.clear_background(rl.BLACK)
+        # rl.draw_fps(10, 50)
 
         for object in self.game_objects:
             object.render()

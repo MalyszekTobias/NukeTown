@@ -183,7 +183,6 @@ class MainDisplay(BaseDisplay):
 
         # 3) UI / minimap (no shaders)
         self.draw_minimap()
-        rl.draw_fps(10, 10)
         if self.game.gamepad_enabled:
             text.draw_text(f"Gamepad X: {self.game.left_joystick_x:.2f}  Y: {self.game.left_joystick_y:.2f}", 10, 130, 20,
                          rl.YELLOW, )

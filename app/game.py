@@ -1,6 +1,6 @@
 import pyray as rl
 
-from app.displays import startscreen, main_display,crafting
+from app.displays import startscreen, main_display,crafting, chatper1
 from app import assets
 
 from app.ui import text
@@ -27,6 +27,7 @@ class Game:
         self.light_shader = assets.shaders["lights"]
         self.base_display = startscreen.StartDisplay(self)
         self.crafting_display = crafting.Crafting_Menu(self)
+        self.chatpter1_display = chatper1.Chapter1(self)
 
         # initialize music manager and start default music
 

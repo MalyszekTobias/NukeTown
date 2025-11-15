@@ -43,3 +43,7 @@ class Button:
         text_x = (self.rect.x + self.rect.width//2) - text_width//2 + 10
         text_y = (self.rect.y + self.rect.height//2) - self.text_size//2 + 5
         text.draw_text(self.text, int(text_x), int(text_y), self.text_size, text_color)
+
+
+    def move_out(self, speed):
+        self.rect.x -= speed

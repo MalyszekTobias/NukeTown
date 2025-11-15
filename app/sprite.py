@@ -59,6 +59,8 @@ class Jumping_sprite_test(Sprite):
         self.y = self.game.height//2
         self.tint = (0, 0, 0)
 
+        self.speed = 5
+
     def render(self):
         scale = self.scaleXframewidth / float(self.frame_width)
         src = rl.Rectangle(0.0, float(self.frame_height * self.current_frame),
@@ -71,6 +73,8 @@ class Jumping_sprite_test(Sprite):
         origin = rl.Vector2(0.0, 0.0)
         angle = 0
 
-
         rl.draw_texture_pro(self.img, src, dst, origin, angle, self.tint)
+
+    def move_out(self, speed):
+        self.x += speed
 
