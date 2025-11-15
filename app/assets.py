@@ -3,6 +3,7 @@ import pyray as rl
 shaders = {}
 models = {}
 images = {}
+sounds = {}
 font = None
 
 def load():
@@ -50,3 +51,5 @@ def load():
     images["Taskbar"] = rl.load_texture("app/assets/images/Taskbar.png")
 
     font = rl.load_font('app/assets/Fonts/Chernobyl.otf')
+
+    sounds["shot"] = rl.load_sound("app/assets/Sounds/roblox-death-sound-effect.mp3")

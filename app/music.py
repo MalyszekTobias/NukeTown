@@ -93,6 +93,10 @@ class MusicManager:
             # some pyray builds might not expose these helpers; just ignore failures
             pass
 
+    def play_sound(self, sound):
+        """Play a one-off sound effect from the given file path."""
+        rl.play_sound(sound)
+
     def stop(self):
         """Stop any currently playing music."""
         try:
