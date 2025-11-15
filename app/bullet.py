@@ -1,3 +1,5 @@
+import math
+
 import pyray as rl
 from app import assets
 class Bullet:
@@ -5,7 +7,7 @@ class Bullet:
         self.display = display
         self.game = display.game
         self.x, self.y = x, y
-        self.speed = 0.5
+        self.speed = 0.4
         self.radius = 1
         self.velRight = velRight
         self.velUp = velUp
@@ -22,6 +24,15 @@ class Bullet:
         self.frame_timer = 0.0
         self.frame_duration = 0.08
 
+    def _aim_at_player(self):
+        # pobierz pozycję gracza (weź pod uwagę kamerę, jeśli istnieje)
+        player_x = self.display.player.x
+        player_y = self.display.player.y
+        dx = player_x - self.x
+        dy = player_y - self.y
+        angle = math.atan2(dy, dx)
+        self.velRight = math.cos(angle) * self.speed
+        self.velUp = math.sin(angle) * self.speed
 
     def update(self):
         dt = rl.get_frame_time()
@@ -29,20 +40,14 @@ class Bullet:
         while self.frame_timer >= self.frame_duration:
             self.frame_timer -= self.frame_duration
             self.current_frame = (self.current_frame + 1) % self.num_of_frames
-        if self.target == "enemy":
-            self.x += self.velRight
-            self.y += self.velUp
-        else:
+
+        self.x += self.velRight
+        self.y += self.velUp
+        if self.target == "player":
+            self._aim_at_player()
             self.lifespan -= 1
             x, y = self.display.player.x, self.display.player.y
-            if self.x < x:
-                self.x += self.speed
-            elif self.x > x:
-                self.x -= self.speed
-            if self.y < y:
-                self.y += self.speed
-            elif self.y > y:
-                self.y -= self.speed
+
             if self.lifespan == 10:
                 self.img = assets.images["Bullet_Bad_Explode"]
                 self.num_of_frames = int(self.img.height / self.img.width)
