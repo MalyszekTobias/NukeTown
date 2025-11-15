@@ -19,7 +19,6 @@ class StartDisplay(BaseDisplay):
         self.start = False
         self.speed = 25
         self.counter = 0
-
         self.text_x = 100
 
     def render(self):
@@ -32,7 +31,7 @@ class StartDisplay(BaseDisplay):
             self.text_x -= self.speed
 
         if self.counter >= 77:
-            self.game.change_display(self.game.chatpter1_display)
+            self.game.change_display(self.game.chapter1_display)
 
 
 

@@ -1,8 +1,6 @@
 import pyray as rl
 
-from app.displays import startscreen, main_display,crafting,main_display2
-from app.displays import startscreen, main_display,crafting, chatper1
-from app.displays import startscreen, main_display,crafting, chatper1, pause
+from app.displays import startscreen, main_display,crafting, chapter1, pause, chapter2, main_display2
 from app import assets
 
 from app.ui import text
@@ -29,12 +27,15 @@ class Game:
         self.light_shader = assets.shaders["lights"]
         self.base_display = startscreen.StartDisplay(self)
         self.crafting_display = crafting.Crafting_Menu(self)
-        self.chatpter1_display = chatper1.Chapter1(self)
+        self.chapter1_display = chapter1.Chapter1(self)
+        self.chapter2_display = chapter2.Chapter2(self)
 
         # initialize music manager and start default music
 
-        self.atomic_masses = [1,1,1,1]
+        self.atomic_masses = [1,1,1,1,36,56]
         self.twodgame = main_display.MainDisplay(self)
+        self.display2 = main_display2.MainDisplay2(self)
+        self.chapter2=False
         self.current_display = self.base_display
         self.pause_menu = pause.Menu(self)
         self.crafting = False

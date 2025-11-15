@@ -10,11 +10,12 @@ from app.cameras import twodcamera
 from app import assets
 
 class Crafting_Menu(BaseDisplay):
+
     def __init__(self, game):
 
         super().__init__(game)
         self.square_pos = [0, 0]
-
+        self.end_chapter_1=False
         self.speed = 200
         self.delta_time = rl.get_frame_time()
 
@@ -31,8 +32,8 @@ class Crafting_Menu(BaseDisplay):
         # a=GameObject(self,assets.images["Jeff"],0,0,10,10)
         # t1=TextObject(self,'aaa',0,0,100,rl.WHITE)
         self.table = Table(self, self.game.width // 2, 0, self.game.width // 2, self.game.height)
-        # self.inventory=Inventory({"oxygen":2,"hydrogen":2,"zinc":3,"sodium":2,"krypton":10,"barium":11,"sulphur":67,"iron":11,"helium":1000},self,0,0,100,200)
-        self.inventory=Inventory({},self,0,0,100,200)
+        self.inventory=Inventory({"oxygen":2,"hydrogen":2,"zinc":3,"sodium":2,"krypton":10,"barium":11,"sulphur":67,"iron":11,"helium":1000},self,0,0,100,200)
+        # self.inventory=Inventory({},self,0,0,100,200)
         # self.oxygen1=Atom(self,assets.images["Oxygen_Standby"] ,1000,100,100,100,"O",8,40)
         self.atom_bar=Atom_Bar(self,self.game.width//2,0,self.game.width//2,100)
 
@@ -57,7 +58,7 @@ class Crafting_Menu(BaseDisplay):
         self.delta_time = rl.get_frame_time()
 
 
-        if rl.is_key_pressed(rl.KeyboardKey.KEY_C) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_UP):
+        if rl.is_key_pressed(rl.KeyboardKey.KEY_C) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_UP) or rl.is_key_pressed(rl.KeyboardKey.KEY_ESCAPE):
             self.table.clear()
             self.game.current_display = self.game.twodgame
             self.game.crafting = False
@@ -71,7 +72,11 @@ class Crafting_Menu(BaseDisplay):
                     self.game.atomic_masses.append(self.trans[x])
             for mass in self.game.atomic_masses:
                 self.game.twodgame.player.spawn_friend(mass)
-
+            if self.end_chapter_1:
+                print("End Chapter 1")
+                self.end_chapter_1=False
+                self.game.current_display=self.game.display2
+                self.game.chapter2=True
 
         if rl.is_mouse_button_pressed(0):
             self.mouse_down=True
@@ -374,6 +379,9 @@ class Table():
     def update(self):
         self.clear_text.text=str(" ".join([atom.name for atom in self.atoms]))+str(self.display.current_atom)
     def do_fusion(self):
+
+        if self.protons==92:
+            self.display.end_chapter_1=True
         if self.protons>92:
             print('nope')
         elif len(self.atoms)>1:
