@@ -1,5 +1,7 @@
 import pyray as rl
 
+from app.displays import startscreen, main_display,crafting,main_display2
+from app.displays import startscreen, main_display,crafting, chatper1
 from app.displays import startscreen, main_display,crafting, chatper1, pause
 from app import assets
 
@@ -31,9 +33,8 @@ class Game:
 
         # initialize music manager and start default music
 
-        self.atomic_masses = [1,
-                              1,1,1]
-        self.twodgame = main_display.MainDisplay(self)
+        self.atomic_masses = [1,1,1,1]
+        self.twodgame = main_display2.MainDisplay2(self)
         self.current_display = self.base_display
         self.pause_menu = pause.Menu(self)
         self.crafting = False
@@ -41,6 +42,7 @@ class Game:
         self.gamepad_id = 0
         self.gamepad_deadzone = 0.25
         self.gamepad_enabled = False
+
 
     def draw_loading_screen(self, message: str = "Loading…"):
         # Render a simple loading frame to avoid white screen during startup
