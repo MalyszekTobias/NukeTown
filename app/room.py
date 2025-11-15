@@ -16,6 +16,9 @@ class Room:
         self._tile_states: Dict[Tile, str] = {}
         self._floors_initialized = False
 
+    def __repr__(self):
+        return f"Room(x={self.x}, y={self.y}, width={self.width}, height={self.height})"
+
     def center(self) -> Tile:
         cx = self.x + self.width // 2
         cy = self.y + self.height // 2
@@ -55,6 +58,20 @@ class Room:
             ry = ty * tile_size
             rects.append((rx, ry, tile_size, tile_size))
         return rects
+
+    def one_collision_rect(self, tile_size: int, corridor_tiles: Optional[Set[Tile]] = None):
+        """Returns one big collision rectangle for the whole room (excluding corridors)."""
+        wall_tiles = self.wall_tiles(exclude_tiles=corridor_tiles)
+        if not wall_tiles:
+            return None
+        x_coords = [tx for tx, ty in wall_tiles]
+        y_coords = [ty for tx, ty in wall_tiles]
+        min_x = min(x_coords) * tile_size
+        max_x = (max(x_coords) + 1) * tile_size
+        min_y = min(y_coords) * tile_size
+        max_y = (max(y_coords) + 1) * tile_size
+        return (min_x, min_y, max_x - min_x, max_y - min_y)
+
     def randomize_floors(
         self,
         cracked_chance: float = 0.02,
