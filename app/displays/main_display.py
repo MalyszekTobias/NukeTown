@@ -66,8 +66,29 @@ class MainDisplay(BaseDisplay):
 
         # Seed a static example light; player light will be first element and updated per-frame
         self.map.add_light(self.player.x, self.player.y, 420.0, rl.Color(150, 150, 150, 255))
-        self.map.add_light(220, 223, 300.0, rl.Color(255, 0, 0, 255))
-        self.map.add_light(110, -60, 670.0, rl.Color(200, 5, 5, 255))
+
+        # Add a light in the center of each room
+        tile_size = self.map.tile_size
+        # r1
+        self.map.add_light(220, 223, 600.0, rl.Color(255, 0, 0, 255))
+        # r2He
+        self.map.add_light((20 + 17/2) * tile_size, (2 + 21/2) * tile_size, 1500.0, rl.Color(190, 150, 200, 255))
+        # r3
+        self.map.add_light((40 + 13/2) * tile_size, (7 + 11/2) * tile_size, 700.0, rl.Color(200, 200, 180, 255))
+        # r4
+        self.map.add_light((24 + 9/2) * tile_size, (-10 + 7/2) * tile_size, 700.0, rl.Color(200, 200, 180, 255))
+        # r5O
+        self.map.add_light((3 + 9/2) * tile_size, (-10 + 13/2) * tile_size, 750.0, rl.Color(200, 100, 100, 255))
+        # r6Zn
+        self.map.add_light((40 + 11/2) * tile_size, (-5 + 7/2) * tile_size, 800.0, rl.Color(85, 160, 160, 255))
+        # r7Fe
+        self.map.add_light((20 + 13/2) * tile_size, (30 + 13/2) * tile_size, 850.0, rl.Color(190, 135, 80, 255))
+        # r8
+        self.map.add_light((50 + 11/2) * tile_size, (45 + 7/2) * tile_size, 700.0, rl.Color(200, 200, 180, 255))
+        # r9Kr
+        self.map.add_light((45 + 15/2) * tile_size, (25 + 7/2) * tile_size, 750.0, rl.Color(60, 90, 115, 255))
+        # r10Ba
+        self.map.add_light((0 + 13/2) * tile_size, (20 + 7/2) * tile_size, 700.0, rl.Color(190, 130, 91, 255))
 
 
         self.light_shader = self.game.light_shader

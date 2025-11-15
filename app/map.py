@@ -65,7 +65,6 @@ class Map:
                         # Use the required_atom for gates of room2 (the target room)
                         atom_for_gate = required_atom if room == room2 else None
                         self.gates[tile] = Gate(self, tile, room_ref=room, is_open=False, required_atom=atom_for_gate)
-                        self.gates[tile] = Gate(self, tile, room_ref=room, is_open=False)
     def connect_two_rooms_no_doors(self,room1,room2):
         # self.corridor_tiles.clear()
         if len(self.rooms) < 2:
