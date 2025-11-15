@@ -88,6 +88,21 @@ class Map:
                     if tile not in self.gates:
                         self.gates[tile] = Gate(self, tile, room_ref=room, is_open=False)
 
+    def check_collision_point(self, x: float, y: float) -> bool:
+        """Check if a point collides with walls or closed gates. Returns True if collision detected."""
+        for room in self.rooms:
+            for (wx, wy, ww, wh) in room.collision_rects(self.tile_size, self.corridor_tiles):
+                if wx <= x <= wx + ww and wy <= y <= wy + wh:
+                    return True
+
+        for gate in self.gates.values():
+            if not gate.is_open:
+                gx, gy, gw, gh = gate.collision_rect()
+                if gx <= x <= gx + gw and gy <= y <= gy + gh:
+                    return True
+
+        return False
+
     def draw(self):
         tile_size = self.tile_size
         # draw rooms (walls) and corridors

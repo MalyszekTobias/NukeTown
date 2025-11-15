@@ -43,6 +43,14 @@ class Bullet:
 
         self.x += self.velRight
         self.y += self.velUp
+
+        if hasattr(self.display, 'map') and self.display.map.check_collision_point(self.x, self.y):
+            if self.target == "player" and self in self.display.enemy_bullets:
+                self.display.enemy_bullets.remove(self)
+            elif self.target == "enemy" and self in self.display.player_bullets:
+                self.display.player_bullets.remove(self)
+            return
+
         if self.target == "player":
             self._aim_at_player()
             self.lifespan -= 1
