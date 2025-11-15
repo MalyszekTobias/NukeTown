@@ -10,11 +10,11 @@ from app import music
 class Game:
     def __init__(self):
         self.width, self.height = 1920, 1080
+        rl.set_config_flags(rl.ConfigFlags.FLAG_VSYNC_HINT)
         rl.init_window(self.width, self.height, "raylib template?")
         rl.toggle_fullscreen()
         rl.set_exit_key(rl.KeyboardKey.KEY_NULL)
         rl.set_target_fps(rl.get_monitor_refresh_rate(rl.get_current_monitor()))
-        rl.set_target_fps(75)
         self.music_manager = music.MusicManager()
         assets.load()
         self.bloom_shader = assets.shaders["bloom"]
