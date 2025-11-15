@@ -58,3 +58,4 @@ def load():
     font = rl.load_font('app/assets/Fonts/Chernobyl.otf')
 
     sounds["shot"] = rl.load_sound("app/assets/Sounds/roblox-death-sound-effect.mp3")
+    sounds["Plum"] = rl.load_sound("app/assets/Sounds/Slime_join.mp3")
