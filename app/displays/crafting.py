@@ -383,16 +383,20 @@ class Table():
     def update(self):
         if self.display.end_chapter_1==False:
                 if self.display.inventory.inv['uranium']>=9:
-                    self.fuse_text.text="Start the chain reaction"
+                    self.fuse_text.text = "Start the chain reaction"
                     self.fuse_text.w = 70
+                    self.fuse_ram.w = 70
                     measure=rl.measure_text(self.fuse_text.text,self.fuse_text.w)
                     self.fuse_text.x=self.x+self.w-measure-15
+                    self.fuse_ram.x=self.x+self.w-measure-15
                 else:
 
                     self.fuse_text.text="Not enough uranium"
                     self.fuse_text.w = 70
+                    self.fuse_ram.w = 70
                     measure=rl.measure_text(self.fuse_text.text,self.fuse_text.w)
                     self.fuse_text.x=self.x+self.w-measure-15
+                    self.fuse_ram.x=self.x+self.w-measure-15
     def do_fusion(self):
         if type(self.display.game.twodgame)==MainDisplay:
             if self.display.end_chapter_1 == False:
