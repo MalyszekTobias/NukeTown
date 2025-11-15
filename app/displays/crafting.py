@@ -86,7 +86,6 @@ class Crafting_Menu(BaseDisplay):
                     if self.inventory.inv[x]>=1:
                         self.current_atom_name=x
                         self.current_atom=Atom(self,obj.image,0,0,obj.w,obj.h,obj.name,obj.mass,obj.font_w)
-                        print('ccccc')
                         a=True
                         self.from_bar=True
 
@@ -94,7 +93,6 @@ class Crafting_Menu(BaseDisplay):
                 b=False
                 self.from_bar=False
                 for obj in self.table.atoms:
-                    print('dddddddd')
                     if self.collision(obj,self.mouse):
 
                         self.current_atom = obj

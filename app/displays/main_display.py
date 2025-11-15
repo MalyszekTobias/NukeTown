@@ -222,6 +222,7 @@ class MainDisplay(BaseDisplay):
         for e in self.enemies:
             e.render()
 
+
         self.camera.end_mode()
         rl.end_texture_mode()
 
@@ -250,7 +251,7 @@ class MainDisplay(BaseDisplay):
                     break
         except Exception:
             pass
-
+        self.player.render_bar()
         if self.book_message is not None:
             book_text = f"Hello World {self.book_message}"
             try:
