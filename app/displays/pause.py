@@ -7,14 +7,19 @@ from app.displays import startscreen
 class Menu(BaseDisplay):
     def __init__(self, game):
         super().__init__(game)
-        self.resume_button = button.Button(self.game, self.game.width/2 - rl.measure_text('RESUME', 60) /2, self.game.height/5, rl.measure_text('RESUME', 60) -24, 60, 'resume', 60, rl.BLACK, (rl.GRAY[0], rl.GRAY[1],rl.GRAY[2], 0), rl.RED, rl.RED)
+        # Calculate button spacing for centered layout
+        button_spacing = 100
+        total_height = 60 * 3 + button_spacing * 2  # 3 buttons + 2 gaps
+        start_y = (self.game.height - total_height) / 2
+
+        self.resume_button = button.Button(self.game, self.game.width/2 - rl.measure_text('RESUME', 60) /2, start_y, rl.measure_text('RESUME', 60) -24, 60, 'RESUME', 60, rl.BLACK, (rl.GRAY[0], rl.GRAY[1],rl.GRAY[2], 0), rl.RED, rl.RED)
 
         self.quit_button = button.Button(self.game, self.game.width / 2 - rl.measure_text('QUIT', 60) / 2,
-                                       self.game.height / 3.5, rl.measure_text('QUIT', 60) - 24, 60, 'QUIT', 60,
+                                       start_y + 60 + button_spacing, rl.measure_text('QUIT', 60) - 24, 60, 'QUIT', 60,
                                        rl.BLACK, (rl.GRAY[0], rl.GRAY[1], rl.GRAY[2], 0), rl.RED, rl.RED)
 
         self.rage_quit_button = button.Button(self.game, self.game.width / 2 - rl.measure_text('RAGE QUIT', 60) / 2,
-                                         self.game.height / 1.5, rl.measure_text('RAGE QUIT', 60) - 24, 60, 'RAGE QUIT', 60,
+                                         start_y + (60 + button_spacing) * 2, rl.measure_text('RAGE QUIT', 60) - 24, 60, 'RAGE QUIT', 60,
                                          rl.BLACK, (rl.GRAY[0], rl.GRAY[1], rl.GRAY[2], 0), rl.RED, rl.RED)
 
     def render(self):
