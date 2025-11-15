@@ -37,8 +37,10 @@ class MainDisplay(BaseDisplay):
 
         self.map = map.Map()
         self.map.add_room(room.Room(10, 10, 5, 5))
-        self.map.add_room(room.Room(20, 15, 17, 100))
+        self.map.add_room(room.Room(20, 15, 17, 20))
         self.map.add_room(room.Room(20, -1, 10, 10))
+        self.map.add_room(room.Room(30, -1, 10, 10))
+        self.map.add_room(room.Room(20, 10, 5, 5))
         self.map.connect_rooms()
 
         self.crafting=False
@@ -52,7 +54,7 @@ class MainDisplay(BaseDisplay):
 
 
         # Seed a static example light; player light will be first element and updated per-frame
-        self.map.add_light(self.player.x, self.player.y, 220.0, rl.Color(255, 255, 255, 255))
+        self.map.add_light(self.player.x, self.player.y, 420.0, rl.Color(255, 255, 255, 255))
         self.map.add_light(200, 200, 150.0, rl.Color(255, 0, 0, 255))
         self.map.add_light(400, 67, 670.0, rl.Color(200, 150, 5, 255))
 

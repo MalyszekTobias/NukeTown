@@ -160,8 +160,12 @@ class Room:
             (x0 + w - 1, y0 + h - 1),
         ]
 
-        # Get wall tiles, excluding corridor tiles
-        for wx, wy in self.wall_tiles(exclude_tiles=corridor_tiles):
+        # Compute wall sets
+        all_wall_tiles = self.wall_tiles()  # without exclusions
+        visible_wall_tiles = self.wall_tiles(exclude_tiles=corridor_tiles)
+
+        # Draw remaining walls
+        for wx, wy in visible_wall_tiles:
             dest_x = wx * tile_size
             dest_y = wy * tile_size
 
@@ -181,3 +185,28 @@ class Room:
                 pyray.draw_texture_ex(wall_v_tex, (dest_x + tile_size/3, dest_y), 0, 1 / 4 / tile_size, pyray.WHITE)
             elif wx == x0 + w - 1:
                 pyray.draw_texture_ex(wall_v_tex, (dest_x - tile_size/3, dest_y), 0, 1 / 4 / tile_size, pyray.WHITE)
+
+        # Draw gates at removed wall tiles (where corridors cut through walls)
+        if corridor_tiles:
+            gate_open_tex = assets.images.get("GateOpen")
+            if gate_open_tex:
+                removed_wall_tiles = all_wall_tiles - visible_wall_tiles
+                for gx, gy in removed_wall_tiles:
+                    dest_x = gx * tile_size
+                    dest_y = gy * tile_size
+                    # Determine orientation by which wall edge this tile belonged to
+                    if gy == y0 or gy == y0 + h - 1:
+                        rotation = 0  # horizontal top/bottom edges
+                    elif gx == x0 or gx == x0 + w - 1:
+                        rotation = 90  # vertical left/right edges
+                    else:
+                        rotation = 0  # default fallback
+                    if gy == y0:
+                        dest_y += tile_size /3
+                    elif gy == y0 + h - 1:
+                        dest_y -= tile_size /3
+                    elif gx == x0:
+                        dest_x += tile_size + (tile_size /3)
+                    elif gx == x0 + w - 1:
+                        dest_x += tile_size - (tile_size /3)
+                    pyray.draw_texture_ex(gate_open_tex, (dest_x, dest_y), rotation, 1 / 4 / tile_size, pyray.WHITE)
