@@ -31,8 +31,8 @@ class Crafting_Menu(BaseDisplay):
         # a=GameObject(self,assets.images["Jeff"],0,0,10,10)
         # t1=TextObject(self,'aaa',0,0,100,rl.WHITE)
         self.table = Table(self, self.game.width // 2, 0, self.game.width // 2, self.game.height)
-        self.inventory=Inventory({"oxygen":2,"hydrogen":2,"zinc":3,"sodium":2,"krypton":10,"barium":11,"sulphur":67,"iron":11,"helium":1000},self,0,0,100,200)
-        # self.inventory=Inventory({"hydrogen":1000},self,0,0,100,200)
+        # self.inventory=Inventory({"oxygen":2,"hydrogen":2,"zinc":3,"sodium":2,"krypton":10,"barium":11,"sulphur":67,"iron":11,"helium":1000},self,0,0,100,200)
+        self.inventory=Inventory({},self,0,0,100,200)
         # self.oxygen1=Atom(self,assets.images["Oxygen_Standby"] ,1000,100,100,100,"O",8,40)
         self.atom_bar=Atom_Bar(self,self.game.width//2,0,self.game.width//2,100)
 
@@ -62,6 +62,16 @@ class Crafting_Menu(BaseDisplay):
             self.table.clear()
             self.game.current_display = self.game.twodgame
             self.game.crafting = False
+            self.game.atomic_masses=[]
+            self.trans={"oxygen":8,"hydrogen":1,"zinc":30,"sodium":11,"krypton":36,"barium":56,"sulphur":16,"iron":26,"helium":2,"uranium":92}
+            self.game.twodgame.player.friends=[]
+            for x in self.inventory.inv.keys():
+                for y in range(self.inventory.inv[x]):
+                    self.game.atomic_masses.append(self.trans[x])
+            print(self.game.atomic_masses)
+            for mass in self.game.atomic_masses:
+                self.game.twodgame.player.spawn_friend(mass)
+
 
         if rl.is_mouse_button_pressed(0):
             self.mouse_down=True
