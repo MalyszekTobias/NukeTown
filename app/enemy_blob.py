@@ -139,8 +139,16 @@ class EnemyBlob(sprite.Sprite):
         # resolve wall/gate collisions like Atom
         self._resolve_wall_collisions(rooms, 16, corridor_tiles)
 
+        for player_bullet in self.display.player_bullets:
+            if rl.check_collision_circles(rl.Vector2(self.x, self.y), self.radius / 2,
+                                          rl.Vector2(player_bullet.x, player_bullet.y), player_bullet.radius / 2):
+                self.take_damage(player_bullet.damage)
+                self.display.player_bullets.remove(player_bullet)
+                self.game.music_manager.play_sound(assets.sounds["shot"])
+
+
     def shoot(self):
-        b = bullet.Bullet(self.display, self.x, self.y - 5, 0, 0, "player")
+        b = bullet.Bullet(self.display, self.x, self.y - 5, 0, 0, 10, "player")
         self.display.enemy_bullets.append(b)
         self.cooldown_timer = 375
 
