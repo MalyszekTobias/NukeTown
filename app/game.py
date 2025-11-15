@@ -55,6 +55,7 @@ class Game:
         rl.end_drawing()
 
     def update(self):
+        self.current_display.update()
         self.update_gamepad_status()
         self.update_joystick()
         # update music streaming
@@ -62,7 +63,7 @@ class Game:
             self.music_manager.update()
         except Exception:
             pass
-        self.current_display.update()
+
 
     def update_joystick(self):
         if self.gamepad_enabled:
