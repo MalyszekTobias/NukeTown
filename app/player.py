@@ -11,7 +11,7 @@ class Player(Atom):
 
 
     def spawn_friend(self, weight):
-        friend = Atom(self.game, weight, self)
+        friend = Atom(self.display, weight, self)
         friend.x = self.x + rl.get_random_value(-5, 5)
         friend.y = self.y + rl.get_random_value(-5, 5)
         self.friends.append(friend)

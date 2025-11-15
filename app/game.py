@@ -2,8 +2,7 @@ import pyray as rl
 
 from app.displays import startscreen, main_display,crafting
 from app import assets
-from app import player
-from app import enemy_blob
+
 from app.ui import text
 from app import music
 
@@ -14,7 +13,7 @@ class Game:
         rl.init_window(self.width, self.height, "raylib template?")
         rl.toggle_fullscreen()
         rl.set_exit_key(rl.KeyboardKey.KEY_NULL)
-        rl.set_target_fps(75)
+        rl.set_target_fps(rl.get_monitor_refresh_rate(rl.get_current_monitor()))
         assets.load()
         self.bloom_shader = assets.shaders["bloom"]
         self.base_display = startscreen.StartDisplay(self)
@@ -24,17 +23,8 @@ class Game:
         self.music_manager = music.MusicManager()
 
         self.atomic_masses = [1, 2, 8, 11, 16, 26, 30, 36, 56]
-        self.player = player.Player(self)
-        self.enemies = []
         self.enemy_bullets = []
-        self.player_bullets = []
-        for _i in range(1,5):
-            enemy = enemy_blob.EnemyBlob(self, _i*200, _i*200, 100, 2)
-            self.enemies.append(enemy)
-
-        for mass in self.atomic_masses:
-            self.player.spawn_friend(mass)
-        self.twodgame = main_display.MainDisplay(self, self.player, self.enemies)
+        self.twodgame = main_display.MainDisplay(self)
         self.current_display = self.base_display
         self.crafting = False
         # controller
