@@ -27,16 +27,11 @@ class Atom(sprite.Sprite):
         self.velRight = 0
         self.maxSpeed = 0.5
         self.acceleration = 0.012
-
-        self.hpHeight = 30
         self.run_tilt = 4
         self.target_x = None
         self.target_y = None
-
         self.cooldown = 0
         self.shittin = False
-
-
 
     def get_sprite(self):
         if self.weight in [0, 92]:
@@ -319,7 +314,7 @@ class Atom(sprite.Sprite):
             return
         vel_right = (dx / dist)
         vel_up = (dy / dist)
-        bullet = app.bullet.Bullet(self.display, self.x, self.y - 5, vel_right, vel_up, "enemy")
+        bullet = app.bullet.Bullet(self.display, self.x, self.y - 5, vel_right, vel_up, self.weight, "enemy")
         self.display.player_bullets.append(bullet)
 
 
