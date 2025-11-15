@@ -91,13 +91,21 @@ class MainDisplay(BaseDisplay):
         rl.draw_rectangle(x-5, y-5, size+10, size+10, rl.DARKGRAY)
         rl.draw_rectangle(x, y, size, size, rl.BLACK)
 
+        # draw corridors
+        for (tile_x, tile_y) in self.map.corridor_tiles:
+            cx = x + padding + int((tile_x - min_x) * scale)
+            cy = y + padding + int((tile_y - min_y) * scale)
+            cw = max(1, int(scale))
+            ch = max(1, int(scale))
+            rl.draw_rectangle(cx, cy, cw, ch, rl.DARKGRAY)
+
         # draw rooms
         for rm in self.map.rooms:
             rx = x + padding + int((rm.x - min_x) * scale)
             ry = y + padding + int((rm.y - min_y) * scale)
             rw = max(1, int(rm.width * scale))
             rh = max(1, int(rm.height * scale))
-            rl.draw_rectangle(rx, ry, rw, rh, rl.WHITE)
+            rl.draw_rectangle(int(rx+scale), int(ry+scale), int(rw-(2*scale)), int(rh-(2*scale)), rl.WHITE)
             rl.draw_rectangle_lines(rx, ry, rw, rh, rl.GRAY)
         tile_size = self.map.tile_size
         player_map_x = float(self.player.x) / float(tile_size)
