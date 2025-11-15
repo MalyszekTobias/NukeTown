@@ -201,6 +201,9 @@ class MainDisplay(BaseDisplay):
             if issubclass(type(object), atom.Atom):
                 # Keep corridor tiles intact, but closed gates will be treated as walls via collision rects
                 object.update(self.map.rooms, self.map.corridor_tiles)
+            elif isinstance(object, enemy_blob.EnemyBlob):
+                # Enemy blobs also need rooms and corridor_tiles for gate/wall collision
+                object.update(self.map.rooms, self.map.corridor_tiles)
             else:
                 object.update()
 
