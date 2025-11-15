@@ -29,13 +29,17 @@ class Button:
     def draw(self):
         if self.is_clicked:
             color = self.click_color
-        elif self.is_hovered:
-            color = self.hover_color
+
         else:
             color = self.button_color
 
+        if self.is_hovered:
+            text_color = self.hover_color
+        else:
+            text_color = self.text_color
+
         pyray.draw_rectangle_rec(self.rect, color)
         text_width = pyray.measure_text(self.text, self.text_size)
-        text_x = self.rect.x + (self.rect.width - text_width) / 2
-        text_y = self.rect.y + (self.rect.height - self.text_size) / 2
-        text.draw_text(self.text, int(text_x), int(text_y), self.text_size, self.text_color)
+        text_x = (self.rect.x + self.rect.width//2) - text_width//2 + 10
+        text_y = (self.rect.y + self.rect.height//2) - self.text_size//2 + 5
+        text.draw_text(self.text, int(text_x), int(text_y), self.text_size, text_color)
