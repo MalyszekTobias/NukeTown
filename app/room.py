@@ -170,13 +170,13 @@ class Room:
             dest_y = wy * tile_size
 
             if (wx, wy) == corners[0]:
-                pyray.draw_texture_ex(wall_corner_tex, (dest_x + tile_size/3, dest_y + int(tile_size/3)+2/3), 0, 1 / 4 / tile_size, pyray.WHITE)
+                pyray.draw_texture_ex(wall_corner_tex, (dest_x + tile_size/3, dest_y + tile_size/3+2/3), 0, 1 / 4 / tile_size, pyray.WHITE)
             elif (wx, wy) == corners[1]:
-                pyray.draw_texture_ex(wall_corner_tex, (dest_x - tile_size/3, dest_y + int(tile_size/3)+2/3), 0, 1 / 4 / tile_size, pyray.WHITE)
+                pyray.draw_texture_ex(wall_corner_tex, (dest_x - tile_size/3, dest_y + tile_size/3+2/3), 0, 1 / 4 / tile_size, pyray.WHITE)
             elif (wx, wy) == corners[2]:
-                pyray.draw_texture_ex(wall_corner_tex, (dest_x + tile_size/3, dest_y - int(tile_size/3)), 0, 1 / 4 / tile_size, pyray.WHITE)
+                pyray.draw_texture_ex(wall_corner_tex, (dest_x + tile_size/3, dest_y - tile_size/3), 0, 1 / 4 / tile_size, pyray.WHITE)
             elif (wx, wy) == corners[3]:
-                pyray.draw_texture_ex(wall_corner_tex, (dest_x - tile_size/3, dest_y - int(tile_size/3)), 0, 1 / 4 / tile_size, pyray.WHITE)
+                pyray.draw_texture_ex(wall_corner_tex, (dest_x - tile_size/3, dest_y - tile_size/3), 0, 1 / 4 / tile_size, pyray.WHITE)
             elif wy == y0:
                 pyray.draw_texture_ex(wall_h_tex, (dest_x, dest_y + tile_size/3), 0, 1 / 4 / tile_size, pyray.WHITE)
             elif wy == y0 + h - 1:

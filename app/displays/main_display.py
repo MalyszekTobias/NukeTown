@@ -125,7 +125,7 @@ class MainDisplay(BaseDisplay):
             self.map.lights[0]['pos'].y = self.player.y
 
         # Update light shader uniforms (clamp to MAX_LIGHTS from shader)
-        MAX_LIGHTS = 10
+        MAX_LIGHTS = 100
         visible_lights = self.map.lights[:MAX_LIGHTS]
         num_lights = len(visible_lights)
         light_pos_data = []
