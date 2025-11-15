@@ -34,6 +34,7 @@ def load():
     images["Bullet_Good_Create"] = rl.load_texture("app/assets/Spritesheets/Bullet_Good_Create.png")
     images["Picture"] = rl.load_texture("app/assets/Spritesheets/Pojawiajacy_sie_obrazek.png")
     images["Ex"] = rl.load_texture("app/assets/Spritesheets/iks.png")
+    images["Arrow"] = rl.load_texture("app/assets/Spritesheets/Szczałka.png")
     # images["Elektrownia"] = rl.load_texture("app/assets/Spritesheets/Komin.png")
     images["Wall_horizontal"] = rl.load_texture("app/assets/images/Wall_1.png")
     images["Wall_vertical"] = rl.load_texture("app/assets/images/Wall_2.png")
