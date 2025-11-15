@@ -3,7 +3,6 @@ import pyray as rl
 from app.displays import startscreen, main_display,crafting, chapter1, pause, chapter2, main_display2
 from app import assets
 
-from app.ui import text
 from app import music
 
 
@@ -17,10 +16,8 @@ class Game:
         rl.set_exit_key(rl.KeyboardKey.KEY_NULL)
         rl.set_target_fps(rl.get_monitor_refresh_rate(rl.get_current_monitor()))
 
-        # Draw a loading screen immediately so the window isn't white while heavy init runs
         self.draw_loading_screen("Topopisy Inc. Presents")
 
-        # Perform heavier initialization after showing the loading screen
         self.music_manager = music.MusicManager()
         assets.load()
 
@@ -31,8 +28,6 @@ class Game:
         self.chapter2_display = chapter2.Chapter2(self)
         self.best_craft = 1
 
-        # initialize music manager and start default music
-
         self.atomic_masses = [1,1,1,1,36,56]
         self.twodgame = main_display.MainDisplay(self)
         self.display2 = main_display2.MainDisplay2(self)
@@ -40,14 +35,12 @@ class Game:
         self.current_display = self.base_display
         self.pause_menu = pause.Menu(self)
         self.crafting = False
-        # controller
         self.gamepad_id = 0
         self.gamepad_deadzone = 0.25
         self.gamepad_enabled = False
 
 
     def draw_loading_screen(self, message: str = "Loading…"):
-        # Render a simple loading frame to avoid white screen during startup
         rl.begin_drawing()
         rl.clear_background(rl.BLACK)
         font_size = 40
@@ -58,7 +51,6 @@ class Game:
         rl.end_drawing()
 
     def update_gamepad_status(self):
-        # Detect availability each frame (hot-plug support)
         self.gamepad_enabled = rl.is_gamepad_available(self.gamepad_id)
 
     def change_display(self, display):
@@ -73,8 +65,6 @@ class Game:
     def render(self):
         rl.begin_drawing()
         self.current_display.render()
-        #debug thingy
-        # rl.draw_text(str(self.current_display), 10, 100, 20, rl.WHITE)
         rl.end_drawing()
 
     def update(self):
