@@ -73,12 +73,12 @@ class Crafting_Menu(BaseDisplay):
             for mass in self.game.atomic_masses:
                 self.game.twodgame.player.spawn_friend(mass)
             if self.end_chapter_1:
-                print("End Chapter 1")
+
                 self.end_chapter_1=False
-                self.game.current_display=self.game.display2
                 self.game.twodgame=self.game.display2
                 self.game.chapter2=True
                 self.game.stop=True
+                self.game.change_display(self.game.chapter2_display)
 
         if rl.is_mouse_button_pressed(0):
             self.mouse_down=True
