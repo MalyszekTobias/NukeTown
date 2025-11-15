@@ -12,6 +12,10 @@ class Map:
     def __init__(self, game):
         self.game = game
         self.rooms: List[Room] = []
+        self.enemy_spawn_points: List[Tile] = []
+        for i in self.rooms:
+            i.busy = 0
+        self.busy_rooms = [0 for _ in range(len(self.rooms))]  # Example: 10 rooms, all unoccupied
         self.corridor_tiles: Set[Tile] = set()
         self.tile_size: int = 16
         # gates keyed by tile coordinate -> Gate instance

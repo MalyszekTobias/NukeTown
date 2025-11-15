@@ -34,7 +34,7 @@ class Game:
         # initialize music manager and start default music
 
         self.atomic_masses = [1,1,1,1]
-        self.twodgame = main_display2.MainDisplay2(self)
+        self.twodgame = main_display.MainDisplay(self)
         self.current_display = self.base_display
         self.pause_menu = pause.Menu(self)
         self.crafting = False

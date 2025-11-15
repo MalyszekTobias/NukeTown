@@ -15,6 +15,7 @@ class Room:
         # maps tile -> state string, e.g. "cracked", "floor_flower_1", ...
         self._tile_states: Dict[Tile, str] = {}
         self._floors_initialized = False
+        self.busy = 0
 
     def __repr__(self):
         return f"Room(x={self.x}, y={self.y}, width={self.width}, height={self.height})"
