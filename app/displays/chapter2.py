@@ -13,6 +13,8 @@ class Chapter2(BaseDisplay):
         self.move = True
         self.text_y = self.game.height / 2 - 60
 
+        self.drawn = False
+
         self.xleft = -328
         self.xright = 1946
 
@@ -28,10 +30,15 @@ class Chapter2(BaseDisplay):
 
             if self.xleft == 672 or self.xright == 946:
                 self.move = False
+        elif not self.move and self.drawn:
+            time.sleep(2)
+            self.game.change_display(self.game.display2)
 
         else:
             text.draw_text('Chap', self.xleft, self.text_y, 120, rl.GREEN)
             text.draw_text('ter 2', self.xright, self.text_y, 120, rl.GREEN)
+            self.drawn = True
+
 
         # rl.draw_rectangle(0, 0, self.game.width, self.game.height, (0, 0, 0, self.opacity_speed))
 
