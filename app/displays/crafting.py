@@ -1,9 +1,9 @@
 from email.mime import image
 import copy
 # from zipimport import alt_path_sep
-
+import time
 from app.ui import text
-
+from app import sprite
 import pyray as rl
 from app.displays.base import BaseDisplay
 from app.cameras import twodcamera
@@ -385,6 +385,11 @@ class Table():
 
         if self.protons==92:
             self.display.end_chapter_1=True
+            Cutscene(self.display)
+
+
+
+
         if self.protons>92:
             print('nope')
         elif len(self.atoms)>1:
@@ -421,3 +426,11 @@ class Table():
 
         self.atoms=[]
         self.protons=0
+class Cutscene(sprite.Sprite):
+    def __init__(self, display, scaleXframewidth=60):
+            self.img = assets.images["Cutscene1"]
+            self.x = 0
+            self.y = 0
+            super().__init__(display, scaleXframewidth)
+            self.num_of_frames = 42
+
