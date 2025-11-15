@@ -178,6 +178,9 @@ class EnemyBlob(sprite.Sprite):
         a = app.atom.Atom(self.display, self.weight, self.display.player, self.x * 16, self.y * 16)
         if not self.room == None:
             self.room.busy = 2
+        if self.display.player.hp != self.display.player.max_hp:
+            self.display.player.hp += 10
+            self.display.player.current_HP_frame = int(self.display.player.hp / self.display.player.max_hp * 10) - 1
         self.display.player.friends.append(a)
         self.game.atomic_masses.append(self.weight)
         try:
