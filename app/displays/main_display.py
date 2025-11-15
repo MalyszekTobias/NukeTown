@@ -65,9 +65,10 @@ class MainDisplay(BaseDisplay):
 
 
         # Seed a static example light; player light will be first element and updated per-frame
-        self.map.add_light(self.player.x, self.player.y, 420.0, rl.Color(255, 255, 255, 255))
-        self.map.add_light(200, 200, 150.0, rl.Color(255, 0, 0, 255))
-        self.map.add_light(400, 67, 670.0, rl.Color(200, 150, 5, 255))
+        self.map.add_light(self.player.x, self.player.y, 420.0, rl.Color(150, 150, 150, 255))
+        self.map.add_light(220, 223, 300.0, rl.Color(255, 0, 0, 255))
+        self.map.add_light(110, -60, 670.0, rl.Color(200, 5, 5, 255))
+
 
         self.light_shader = self.game.light_shader
         self.lights_pos_loc = rl.get_shader_location(self.light_shader, "lights")
@@ -122,6 +123,18 @@ class MainDisplay(BaseDisplay):
             rl.draw_rectangle(int(rx+scale), int(ry+scale), int(rw-(2*scale)), int(rh-(2*scale)), rl.WHITE)
             rl.draw_rectangle_lines(rx, ry, rw, rh, rl.GRAY)
         tile_size = self.map.tile_size
+
+#debug stuff: draw lights on minimap
+        for light in getattr(self.map, "lights", [])[:100]:
+                lx_tiles = float(light['pos'].x) / float(tile_size)
+                ly_tiles = float(light['pos'].y) / float(tile_size)
+                mx = x + padding + int((lx_tiles - min_x) * scale)
+                my = y + padding + int((ly_tiles - min_y) * scale)
+                # small marker; don't scale with light radius to avoid clutter
+                marker_r = max(1, int(max(1.5, scale)))
+                rl.draw_circle(mx, my, marker_r, light['color'])
+
+
         player_map_x = float(self.player.x) / float(tile_size)
         player_map_y = float(self.player.y) / float(tile_size)
         # draw player
