@@ -37,8 +37,10 @@ class MainDisplay(BaseDisplay):
 
         self.map = map.Map()
         self.map.add_room(room.Room(10, 10, 5, 5))
-        self.map.add_room(room.Room(20, 15, 17, 100))
+        self.map.add_room(room.Room(20, 15, 17, 20))
         self.map.add_room(room.Room(20, -1, 10, 10))
+        self.map.add_room(room.Room(30, -1, 10, 10))
+        self.map.add_room(room.Room(20, 10, 5, 5))
         self.map.connect_rooms()
 
         self.crafting=False
@@ -52,7 +54,7 @@ class MainDisplay(BaseDisplay):
 
 
         # Seed a static example light; player light will be first element and updated per-frame
-        self.map.add_light(self.player.x, self.player.y, 220.0, rl.Color(255, 255, 255, 255))
+        self.map.add_light(self.player.x, self.player.y, 420.0, rl.Color(255, 255, 255, 255))
         self.map.add_light(200, 200, 150.0, rl.Color(255, 0, 0, 255))
         self.map.add_light(400, 67, 670.0, rl.Color(200, 150, 5, 255))
 
@@ -89,13 +91,21 @@ class MainDisplay(BaseDisplay):
         rl.draw_rectangle(x-5, y-5, size+10, size+10, rl.DARKGRAY)
         rl.draw_rectangle(x, y, size, size, rl.BLACK)
 
+        # draw corridors
+        for (tile_x, tile_y) in self.map.corridor_tiles:
+            cx = x + padding + int((tile_x - min_x) * scale)
+            cy = y + padding + int((tile_y - min_y) * scale)
+            cw = max(1, int(scale))
+            ch = max(1, int(scale))
+            rl.draw_rectangle(cx, cy, cw, ch, rl.DARKGRAY)
+
         # draw rooms
         for rm in self.map.rooms:
             rx = x + padding + int((rm.x - min_x) * scale)
             ry = y + padding + int((rm.y - min_y) * scale)
             rw = max(1, int(rm.width * scale))
             rh = max(1, int(rm.height * scale))
-            rl.draw_rectangle(rx, ry, rw, rh, rl.WHITE)
+            rl.draw_rectangle(int(rx+scale), int(ry+scale), int(rw-(2*scale)), int(rh-(2*scale)), rl.WHITE)
             rl.draw_rectangle_lines(rx, ry, rw, rh, rl.GRAY)
         tile_size = self.map.tile_size
         player_map_x = float(self.player.x) / float(tile_size)

@@ -35,6 +35,7 @@ def load():
     images["Picture"] = rl.load_texture("app/assets/Spritesheets/Pojawiajacy_sie_obrazek.png")
     images["Ex"] = rl.load_texture("app/assets/Spritesheets/iks.png")
     images["Arrow"] = rl.load_texture("app/assets/Spritesheets/Szczałka.png")
+    images["Salto"] = rl.load_texture("app/assets/Spritesheets/Sigma_salto.png")
     # images["Elektrownia"] = rl.load_texture("app/assets/Spritesheets/Komin.png")
     images["Wall_horizontal"] = rl.load_texture("app/assets/images/Wall_1.png")
     images["Wall_vertical"] = rl.load_texture("app/assets/images/Wall_2.png")
@@ -55,8 +56,11 @@ def load():
     images["Taskbar"] = rl.load_texture("app/assets/images/Taskbar.png")
     images["Lampa"] = rl.load_texture("app/assets/images/Lampa.png")
 
+    images["GateClosed"] = rl.load_texture("app/assets/images/Gate_Closed.png")
+    images["GateOpen"] = rl.load_texture("app/assets/images/Gate_Open.png")
+
     images["Uranium_Standby"]=rl.load_texture("app/assets/images/MC_Standby.png")
-    font = rl.load_font('app/assets/Fonts/Chernobyl.otf')
+    font = rl.load_font_ex('app/assets/Fonts/Chernobyl.otf', 1024, None, 0)
 
     sounds["shot"] = rl.load_sound("app/assets/Sounds/roblox-death-sound-effect.mp3")
     sounds["Plum"] = rl.load_sound("app/assets/Sounds/Slime_join.mp3")
