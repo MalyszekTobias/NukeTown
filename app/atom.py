@@ -6,9 +6,10 @@ import app
 from app import assets, sprite
 
 class Atom(sprite.Sprite):
-    def __init__(self, display, weight, leader, scaleXframewidth=6):
+    def __init__(self, display, weight, leader, x, y, scaleXframewidth=6):
 
-
+        self.x = x
+        self.y = y
         self.weight = weight
         self.leader = leader
         self.img = self.get_sprite()
@@ -16,8 +17,6 @@ class Atom(sprite.Sprite):
         super().__init__(display, scaleXframewidth)
         self.rect = rl.Rectangle(0, 0, self.radius, self.radius)
 
-        self.x = 100
-        self.y = 100
         self.up = False
         self.down = False
         self.left = False
@@ -278,6 +277,10 @@ class Atom(sprite.Sprite):
             pass
 
     def render(self):
+
+        if self.x == 0 and self.y == 0:
+            self.x = self.display.player.x
+            self.y = self.display.player.y
         if self.leader == None:
             scale = (self.scaleXframewidth + 8) / float(self.frame_width)
         else:

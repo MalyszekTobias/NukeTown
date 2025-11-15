@@ -3,7 +3,7 @@ import pyray as rl
 from app.REACTOR import Reactor
 from app.displays.base import BaseDisplay
 from app.cameras import twodcamera
-from app import assets, map, room, player, enemy_blob, atom
+from app import assets, map, room, player, enemy_blob, atom, book
 from app.ui import text
 
 
@@ -56,7 +56,28 @@ class MainDisplay(BaseDisplay):
         # self.map.add_room(room.Room(20, 10, 5, 5))
         # self.map.connect_rooms()
 
+        # Create 8 books scattered around different rooms
+        tile_size = self.map.tile_size
+        self.books = []
+        # Book 1 - in r1 (starting room)
+        self.books.append(book.Book(self, (12 + 3) * tile_size, (12 + 3) * tile_size, 1))
+        # Book 2 - in r2He (large helium room)
+        self.books.append(book.Book(self, (25 + 8) * tile_size, (10 + 10) * tile_size, 2))
+        # Book 3 - in r3
+        self.books.append(book.Book(self, (45 + 6) * tile_size, (10 + 5) * tile_size, 3))
+        # Book 4 - in r4
+        self.books.append(book.Book(self, (27 + 4) * tile_size, (-7 + 3) * tile_size, 4))
+        # Book 5 - in r5O (oxygen room)
+        self.books.append(book.Book(self, (6 + 4) * tile_size, (-6 + 6) * tile_size, 5))
+        # Book 6 - in r6Zn (zinc room)
+        self.books.append(book.Book(self, (44 + 5) * tile_size, (-2 + 3) * tile_size, 6))
+        # Book 7 - in r7Fe (iron room)
+        self.books.append(book.Book(self, (25 + 6) * tile_size, (35 + 6) * tile_size, 7))
+        # Book 8 - in r9Kr (krypton room)
+        self.books.append(book.Book(self, (50 + 7) * tile_size, (27 + 3) * tile_size, 8))
+
         self.crafting=False
+        self.book_message = None  # Will store the book_id when showing a message
 
         self.start_zoom = self.camera.camera.zoom
         self.intro = True
@@ -230,6 +251,67 @@ class MainDisplay(BaseDisplay):
         except Exception:
             pass
 
+        # Interaction hint when near any book
+        try:
+            for bk in self.books:
+                if bk.can_interact(self.player):
+                    text.draw_text("Press E to read", 10, 70, 24, rl.WHITE)
+                    break
+        except Exception:
+            pass
+
+        # Display book message if one is active
+        if self.book_message is not None:
+            # Find the book object to get its flavour text
+            book_text = f"Hello World {self.book_message}"  # Fallback
+            try:
+                for bk in self.books:
+                    if bk.book_id == self.book_message:
+                        book_text = bk.flavour_text
+                        break
+            except Exception:
+                pass
+
+            # Draw a semi-transparent overlay
+            rl.draw_rectangle(0, 0, self.game.width, self.game.height, rl.Color(0, 0, 0, 180))
+            # Draw the message box (larger for longer texts)
+            box_width = 800
+            box_height = 300
+            box_x = (self.game.width - box_width) // 2
+            box_y = (self.game.height - box_height) // 2
+            rl.draw_rectangle(box_x, box_y, box_width, box_height, rl.Color(50, 50, 50, 255))
+            rl.draw_rectangle_lines(box_x, box_y, box_width, box_height, rl.WHITE)
+
+            # Draw the text with word wrapping
+            text_x = box_x + 30
+            text_y = box_y + 30
+            text_width = box_width - 60
+            text_size = 24
+
+            # Simple word wrapping
+            words = book_text.split(' ')
+            current_line = ""
+            y_offset = 0
+            line_height = text_size + 5
+
+            for word in words:
+                test_line = current_line + word + " "
+                # Approximate text width (rough estimate)
+                if len(test_line) * (text_size * 0.8) > text_width:
+                    if current_line:
+                        text.draw_text(current_line.strip(), text_x, text_y + y_offset, text_size, rl.WHITE)
+                        y_offset += line_height
+                        current_line = word + " "
+                else:
+                    current_line = test_line
+
+            # Draw the last line
+            if current_line:
+                text.draw_text(current_line.strip(), text_x, text_y + y_offset, text_size, rl.WHITE)
+
+            # Draw close instruction at bottom
+            text.draw_text("Press E to close", box_x + 30, box_y + box_height - 50, 20, rl.GRAY)
+
     def update(self):
         if self.game.music_manager.current is None:
             self.game.music_manager.play_music2()
@@ -290,4 +372,19 @@ class MainDisplay(BaseDisplay):
             rl.draw_rectangle(self.game.width - 300 - 10, 10, 300, 300, rl.BLACK)
             rl.draw_rectangle(0, 0, 400, 200, rl.BLACK)
             self.game.change_display(self.game.pause_menu)
+
+        # Check for E key press near books
+        if rl.is_key_pressed(rl.KeyboardKey.KEY_E) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_LEFT):
+            # If a book message is showing, close it
+            if self.book_message is not None:
+                self.book_message = None
+            else:
+                # Check if player is near any book
+                try:
+                    for bk in self.books:
+                        if bk.can_interact(self.player):
+                            self.book_message = bk.book_id
+                            break
+                except Exception:
+                    pass
 

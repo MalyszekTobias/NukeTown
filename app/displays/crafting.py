@@ -58,7 +58,7 @@ class Crafting_Menu(BaseDisplay):
         self.delta_time = rl.get_frame_time()
 
 
-        if rl.is_key_pressed(rl.KeyboardKey.KEY_C) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_UP):
+        if rl.is_key_pressed(rl.KeyboardKey.KEY_C) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_UP) or rl.is_key_pressed(rl.KeyboardKey.KEY_ESCAPE):
             self.table.clear()
             self.game.current_display = self.game.twodgame
             self.game.crafting = False
@@ -70,7 +70,6 @@ class Crafting_Menu(BaseDisplay):
             for x in self.inventory.inv.keys():
                 for y in range(self.inventory.inv[x]):
                     self.game.atomic_masses.append(self.trans[x])
-            print(self.game.atomic_masses)
             for mass in self.game.atomic_masses:
                 self.game.twodgame.player.spawn_friend(mass)
             if self.end_chapter_1:
@@ -140,13 +139,11 @@ class Crafting_Menu(BaseDisplay):
                             except:
                                 self.inventory.inv[self.translator[self.current_atom_name]] = 1
                             self.atom_bar.update()
-                            print(self.inventory.inv)
                         break
                 if not a:
                     if self.from_bar:
                         self.inventory.inv[self.current_atom_name] -= 1
                         self.table.protons+=self.current_atom.mass
-                        print(self.table.protons)
                     a = False
                     if self.from_bar:
                         self.table.atoms.append(self.current_atom)

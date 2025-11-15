@@ -1,10 +1,12 @@
 import math
 import pyray as rl
+
+import app.atom
 from app import assets
 from app import bullet, sprite
 
 class EnemyBlob(sprite.Sprite):
-    def __init__(self, display, x, y, health, weight, scaleXframe=10):
+    def __init__(self, display, x, y, health, weight, scaleXframe=10, ):
 
         self.weight = weight
         self.health = health
@@ -175,6 +177,9 @@ class EnemyBlob(sprite.Sprite):
 
 
     def die(self):
+        a = app.atom.Atom(self.display, self.weight, self.display.player, self.x * 16, self.y * 16)
+        print(self.x, self.y)
+        self.display.player.friends.append(a)
         self.display.enemies.remove(self)
         self.display.game_objects.remove(self)
         del self
