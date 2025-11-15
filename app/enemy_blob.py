@@ -22,6 +22,10 @@ class EnemyBlob(sprite.Sprite):
 
         self.cooldown_timer = 0
 
+        # collision/radius used by atom; add here so enemy blobs also collide with walls/gates
+        self.radius = 10
+        self.rect = rl.Rectangle(0, 0, self.radius, self.radius)
+
 
     def get_sprite(self):
         if self.weight in [0, 92]:
@@ -44,8 +48,11 @@ class EnemyBlob(sprite.Sprite):
             return assets.images["Barium"]
         elif self.weight == 36:
             return assets.images["Krypton"]
+    def update(self, rooms=None, corridor_tiles=None):
+        # update rect for collision checks
+        self.rect = rl.Rectangle(self.x - self.radius / 2, self.y - self.radius / 2,
+                                self.radius, self.radius)
 
-    def update(self):
         px, py = self.display.player.x, self.display.player.y
         dx = px - self.x
         dy = py - self.y
@@ -65,7 +72,10 @@ class EnemyBlob(sprite.Sprite):
         if dist == 0:
             return
 
-        if self.shooting_range < dist <= self.detection_radius and not self.shittin:
+        # remember previous position so we can prevent leaving corridors
+        old_x, old_y = self.x, self.y
+
+        if self.shooting_range < dist <= self.detection_radius:
             nx = dx / dist
             ny = dy / dist
             self.x += nx * self.speed
@@ -104,6 +114,31 @@ class EnemyBlob(sprite.Sprite):
             self.current_frame = 0
             self.frame_timer = 0.0
 
+        # tile logic: prevent leaving corridor tiles unless entering a room
+        tile_size = 16
+        if corridor_tiles is not None:
+
+            old_tile = (int(old_x) // tile_size, int(old_y) // tile_size)
+            new_tile = (int(self.x) // tile_size, int(self.y) // tile_size)
+
+            was_in_corridor = old_tile in corridor_tiles if old_tile is not None else False
+            now_in_corridor = new_tile in corridor_tiles if new_tile is not None else False
+
+            entering_room = False
+            if rooms and new_tile is not None:
+                for room in rooms:
+                    # allow entering room background tiles
+                    if new_tile in room.background_tiles():
+                        entering_room = True
+                        break
+
+            # if we started in corridor and tried to move to a non-corridor tile that is not a room, revert
+            if was_in_corridor and (not now_in_corridor) and (not entering_room):
+                self.x, self.y = old_x, old_y
+
+        # resolve wall/gate collisions like Atom
+        self._resolve_wall_collisions(rooms, 16, corridor_tiles)
+
     def shoot(self):
         b = bullet.Bullet(self.display, self.x, self.y - 5, 0, 0, "player")
         self.display.enemy_bullets.append(b)
@@ -114,7 +149,72 @@ class EnemyBlob(sprite.Sprite):
         if self.health <= 0:
             self.die()
 
+
+
     def die(self):
         self.display.enemy_blobs.remove(self)
         self.display.objects.remove(self)
         del self
+
+    def _resolve_wall_collisions(self, rooms, tile_size, corridor_tiles=None):
+        """Rect vs rect: push enemy blob out of first colliding wall rect."""
+        if not rooms:
+            return
+        ax, ay, aw, ah = self.rect.x, self.rect.y, self.rect.width, self.rect.height
+
+        # Check room wall collisions
+        for room in rooms:
+            for (wx, wy, ww, wh) in room.collision_rects(tile_size, corridor_tiles):
+                # AABB overlap test
+                if ax < wx + ww and ax + aw > wx and ay < wy + wh and ay + ah > wy:
+                    # compute penetration depths on each side
+                    pen_left = (ax + aw) - wx
+                    pen_right = (wx + ww) - ax
+                    pen_top = (ay + ah) - wy
+                    pen_bottom = (wy + wh) - ay
+                    # choose smallest penetration axis
+                    min_pen = min(pen_left, pen_right, pen_top, pen_bottom)
+                    if min_pen == pen_left:
+                        # push blob left
+                        ax -= pen_left
+                    elif min_pen == pen_right:
+                        ax += pen_right
+                    elif min_pen == pen_top:
+                        ay -= pen_top
+                    else:  # pen_bottom
+                        ay += pen_bottom
+                    # write back center from rect
+                    self.x = ax + aw / 2
+                    self.y = ay + ah / 2
+                    return
+
+        # Check closed gate collisions
+        try:
+            mp = getattr(self.display, 'map', None)
+            if mp and getattr(mp, 'gates', None):
+                for gate in mp.gates.values():
+                    if not gate.is_open:
+                        wx, wy, ww, wh = gate.collision_rect()
+                        # AABB overlap test
+                        if ax < wx + ww and ax + aw > wx and ay < wy + wh and ay + ah > wy:
+                            # compute penetration depths on each side
+                            pen_left = (ax + aw) - wx
+                            pen_right = (wx + ww) - ax
+                            pen_top = (ay + ah) - wy
+                            pen_bottom = (wy + wh) - ay
+                            # choose smallest penetration axis
+                            min_pen = min(pen_left, pen_right, pen_top, pen_bottom)
+                            if min_pen == pen_left:
+                                ax -= pen_left
+                            elif min_pen == pen_right:
+                                ax += pen_right
+                            elif min_pen == pen_top:
+                                ay -= pen_top
+                            else:  # pen_bottom
+                                ay += pen_bottom
+                            # write back center from rect
+                            self.x = ax + aw / 2
+                            self.y = ay + ah / 2
+                            return
+        except Exception:
+            pass
