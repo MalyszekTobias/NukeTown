@@ -2,6 +2,8 @@ from email.mime import image
 import copy
 # from zipimport import alt_path_sep
 import time
+from app.displays.main_display import MainDisplay
+from app.displays.main_display2 import MainDisplay2
 from app.ui import text
 from app import sprite
 import pyray as rl
@@ -380,39 +382,41 @@ class Table():
         self.values=[[1,"hydrogen"],[2,"helium"],[8,"oxygen"],[11,"sodium"],[16,"sulphur"],[26,"iron"],[30,"zinc"],[36,"krypton"],[56,"barium"],[92,"uranium"]]
     def update(self):
         if self.display.end_chapter_1==False:
-                if self.display.inventory.inv['uranium']>=2:
+                if self.display.inventory.inv['uranium']>=9:
                     self.fuse_text.text="Start the chain reaction"
                 else:
 
                     self.fuse_text.text="Not enough uranium"
     def do_fusion(self):
-        if self.display.end_chapter_1==False:
-            if self.protons == 92:
-                if self.display.end_chapter_1 == False:
-                    self.display.game.change_display(self.display.game.cutscene_display)
-                    self.display.game.change_display(self.display.game.cutscene_display)
-                self.display.end_chapter_1 = True
+        if type(self.display.game.twodgame)==MainDisplay:
+            if self.display.end_chapter_1 == False:
+                if self.protons == 92:
+                    if self.display.end_chapter_1 == False:
+                        self.display.game.change_display(self.display.game.cutscene_display)
+                        self.display.game.change_display(self.display.game.cutscene_display)
+                    self.display.end_chapter_1 = True
 
-            if self.protons > 92:
-                print('nope')
-            elif len(self.atoms) > 1:
-                a = True
-                i = len(self.values) - 1
-                while a:
+                if self.protons > 92:
+                    print('nope')
+                elif len(self.atoms) > 1:
+                    a = True
+                    i = len(self.values) - 1
+                    while a:
 
-                    if self.protons >= self.values[i][0]:
-                        if self.values[i][0] > self.display.game.best_craft:
-                            self.display.game.best_craft = self.values[i][0]
-                        self.clear_before_fusion()
-                        self.atoms.append(
-                            Atom(self.display, self.atom_properites[self.values[i][1]][2], self.x + self.w // 2,
-                                 self.y + self.h // 2, 100, 100, self.atom_properites[self.values[i][1]][0],
-                                 self.atom_properites[self.values[i][1]][1], 40))
-                        self.protons = self.atom_properites[self.values[i][1]][1]
-                        break
-                    i -= 1
+                        if self.protons >= self.values[i][0]:
+                            if self.values[i][0] > self.display.game.best_craft:
+                                self.display.game.best_craft = self.values[i][0]
+                            self.clear_before_fusion()
+                            self.atoms.append(
+                                Atom(self.display, self.atom_properites[self.values[i][1]][2], self.x + self.w // 2,
+                                     self.y + self.h // 2, 100, 100, self.atom_properites[self.values[i][1]][0],
+                                     self.atom_properites[self.values[i][1]][1], 40))
+                            self.protons = self.atom_properites[self.values[i][1]][1]
+                            break
+                        i -= 1
         else:
-            if self.display.inventory.inv['uranium'] >= 2:
+            print('xxx')
+            if self.display.inventory.inv['uranium'] >= 9:
                 print('you_win')
 
         # self.clear()

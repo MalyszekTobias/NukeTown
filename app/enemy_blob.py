@@ -15,8 +15,8 @@ class EnemyBlob(sprite.Sprite):
         self.scaleXframe = scaleXframe
         self.img = self.get_sprite()
         self.room = room
-        print(self.img.width, self.img.height)
-        print(self.img)
+        # print(self.img.width, self.img.height)
+        # print(self.img)
         super().__init__(display, self.scaleXframe)
         self.x, self.y = x, y
         self.speed = 0.55
@@ -94,7 +94,7 @@ class EnemyBlob(sprite.Sprite):
                 self.current_frame = (self.current_frame + 1) % self.num_of_frames
 
         if self.shootin:
-            print(self.current_frame)
+            # print(self.current_frame)
             if self.current_frame == self.num_of_frames - 9:
                 self.game.music_manager.play_sound(assets.sounds["Plum"])
             if self.current_frame == self.num_of_frames - 1:
@@ -164,7 +164,7 @@ class EnemyBlob(sprite.Sprite):
         if self.health <= 0:
             self.die()
     def render(self):
-        print('rendering enemy', self.x, self.y)
+        # print('rendering enemy', self.x, self.y)
         scale = 10 / float(self.frame_width)
         src = rl.Rectangle(0.0, float(self.frame_height * self.current_frame),
                            float(self.frame_width), float(self.frame_height))
