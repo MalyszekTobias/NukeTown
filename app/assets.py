@@ -45,6 +45,8 @@ def load():
     images["Healthbar_Player"] = rl.load_texture("app/assets/Spritesheets/Healthbar_Player_HD.png")
     images["Healthbar_Heal"] = rl.load_texture("app/assets/Spritesheets/Healthbar_Heal_HD.png")
     images["Healthbar_Player_Heal"] = rl.load_texture("app/assets/Spritesheets/Healthbar_Player_Heal_HD.png")
+    images["Cutscene2"] = rl.load_texture("app/assets/Spritesheets/End.png")
+    images["Cutscene1"] = rl.load_texture("app/assets/Spritesheets/Uranium_Create.png")
     # images["Elektrownia"] = rl.load_texture("app/assets/Spritesheets/Komin.png")
     images["Wall_horizontal"] = rl.load_texture("app/assets/images/Wall_1.png")
     images["Wall_vertical"] = rl.load_texture("app/assets/images/Wall_2.png")
