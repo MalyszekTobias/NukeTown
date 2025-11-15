@@ -47,6 +47,7 @@ def load():
     images["Wall_corner"] = rl.load_texture("app/assets/images/Corner.png")
     images["Table"] = rl.load_texture("app/assets/images/Table.png")
     images["Tablica"] = rl.load_texture("app/assets/images/Tablica.png")
+    images["Tablica_Fatass"] = rl.load_texture("app/assets/images/Tablica_Fatass.png")
 
     font = rl.load_font('app/assets/Fonts/Chernobyl.otf')
 
