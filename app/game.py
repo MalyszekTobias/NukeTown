@@ -1,6 +1,6 @@
 import pyray as rl
 
-from app.displays import startscreen, main_display,crafting, chatper1, pause, chatper2
+from app.displays import startscreen, main_display,crafting, chapter1, pause, chapter2
 from app import assets
 
 from app.ui import text
