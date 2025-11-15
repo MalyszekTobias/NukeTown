@@ -39,6 +39,7 @@ class Game:
         self.gamepad_id = 0
         self.gamepad_deadzone = 0.25
         self.gamepad_enabled = False
+        self.quit = False
 
 
     def draw_loading_screen(self, message: str = "Loading…"):
@@ -58,10 +59,12 @@ class Game:
         self.current_display = display
 
     def loop(self):
-        while not rl.window_should_close():
-            self.update()
-            self.render()
-
+       if not self.quit:
+            while not rl.window_should_close():
+                self.update()
+                self.render()
+       else:
+           rl.close_window()
 
     def render(self):
         rl.begin_drawing()

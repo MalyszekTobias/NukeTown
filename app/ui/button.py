@@ -27,11 +27,13 @@ class Button:
         self.is_clicked = mouse_click or gp_click
 
     def draw(self):
-        if self.is_clicked:
-            color = self.click_color
+        # if self.is_clicked:
+        #     color = self.click_color
+        #
+        # else:
+        #     color = self.button_color
 
-        else:
-            color = self.button_color
+        color = self.button_color
 
         if self.is_hovered:
             text_color = self.hover_color
