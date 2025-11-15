@@ -7,7 +7,7 @@ from app import assets, map, room
 from app.ui import text
 
 
-class TwoDGameDisplay(BaseDisplay):
+class MainDisplay(BaseDisplay):
     def __init__(self, game, player, enemies):
         self.player = player
         super().__init__(game)
