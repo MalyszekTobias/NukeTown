@@ -25,8 +25,8 @@ class Atom(sprite.Sprite):
         self.clicked = False
         self.velUp = 0
         self.velRight = 0
-        self.maxSpeed = 5
-        self.acceleration = 5
+        self.maxSpeed = 0.5
+        self.acceleration = 0.012
         self.run_tilt = 4
         self.target_x = None
         self.target_y = None
@@ -220,31 +220,31 @@ class Atom(sprite.Sprite):
             return
         ax, ay, aw, ah = self.rect.x, self.rect.y, self.rect.width, self.rect.height
 
-        # # Check room wall collisions
-        # for room in rooms:
-        #     for (wx, wy, ww, wh) in room.collision_rects(tile_size, corridor_tiles):
-        #         # AABB overlap test
-        #         if ax < wx + ww and ax + aw > wx and ay < wy + wh and ay + ah > wy:
-        #             # compute penetration depths on each side
-        #             pen_left = (ax + aw) - wx
-        #             pen_right = (wx + ww) - ax
-        #             pen_top = (ay + ah) - wy
-        #             pen_bottom = (wy + wh) - ay
-        #             # choose smallest penetration axis
-        #             min_pen = min(pen_left, pen_right, pen_top, pen_bottom)
-        #             if min_pen == pen_left:
-        #                 # push atom left
-        #                 ax -= pen_left
-        #             elif min_pen == pen_right:
-        #                 ax += pen_right
-        #             elif min_pen == pen_top:
-        #                 ay -= pen_top
-        #             else:  # pen_bottom
-        #                 ay += pen_bottom
-        #             # write back center from rect
-        #             self.x = ax + aw / 2
-        #             self.y = ay + ah / 2
-        #             return
+        # Check room wall collisions
+        for room in rooms:
+            for (wx, wy, ww, wh) in room.collision_rects(tile_size, corridor_tiles):
+                # AABB overlap test
+                if ax < wx + ww and ax + aw > wx and ay < wy + wh and ay + ah > wy:
+                    # compute penetration depths on each side
+                    pen_left = (ax + aw) - wx
+                    pen_right = (wx + ww) - ax
+                    pen_top = (ay + ah) - wy
+                    pen_bottom = (wy + wh) - ay
+                    # choose smallest penetration axis
+                    min_pen = min(pen_left, pen_right, pen_top, pen_bottom)
+                    if min_pen == pen_left:
+                        # push atom left
+                        ax -= pen_left
+                    elif min_pen == pen_right:
+                        ax += pen_right
+                    elif min_pen == pen_top:
+                        ay -= pen_top
+                    else:  # pen_bottom
+                        ay += pen_bottom
+                    # write back center from rect
+                    self.x = ax + aw / 2
+                    self.y = ay + ah / 2
+                    return
 
         # Check closed gate collisions
         try:
