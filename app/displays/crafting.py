@@ -64,6 +64,8 @@ class Crafting_Menu(BaseDisplay):
             self.game.crafting = False
             self.game.atomic_masses=[]
             self.trans={"oxygen":8,"hydrogen":1,"zinc":30,"sodium":11,"krypton":36,"barium":56,"sulphur":16,"iron":26,"helium":2,"uranium":92}
+            for obj in self.game.twodgame.player.friends:
+                self.game.twodgame.game_objects.remove(obj)
             self.game.twodgame.player.friends=[]
             for x in self.inventory.inv.keys():
                 for y in range(self.inventory.inv[x]):
