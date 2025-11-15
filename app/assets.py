@@ -49,7 +49,7 @@ def load():
     images["Tablica"] = rl.load_texture("app/assets/images/Tablica.png")
     images["Tablica_Fatass"] = rl.load_texture("app/assets/images/Tablica_Fatass.png")
     images["Taskbar"] = rl.load_texture("app/assets/images/Taskbar.png")
-
+    images["Uranium_Standby"]=rl.load_texture("app/assets/images/MC_Standby.png")
     font = rl.load_font('app/assets/Fonts/Chernobyl.otf')
 
     sounds["shot"] = rl.load_sound("app/assets/Sounds/roblox-death-sound-effect.mp3")
