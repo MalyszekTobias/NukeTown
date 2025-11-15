@@ -21,6 +21,11 @@ class Player(Atom):
 
     def update(self, rooms = None, corridor_tiles = None):
         super().update(rooms, corridor_tiles)
+        for room in rooms:
+            if rl.check_collision_recs(self.rect, room.one_collision_rect(16)):
+                print("Player collided with room at", room)
+
+
         for enemy_bullet in self.display.enemy_bullets:
             if rl.check_collision_circles(rl.Vector2(self.x, self.y), self.radius / 2,
                                           rl.Vector2(enemy_bullet.x, enemy_bullet.y), enemy_bullet.radius / 2):
