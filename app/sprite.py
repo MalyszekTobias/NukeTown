@@ -51,7 +51,7 @@ class Sprite:
 
 class Jumping_sprite_test(Sprite):
     def __init__(self, display, scaleXframewidth=600):
-        self.img = assets.images['movingblob']
+        self.img = rl.load_texture('app/assets/Spritesheets/Sigma_salto_2.png')
 
         super().__init__(display, scaleXframewidth)
         self.x = self.game.width/1.3
