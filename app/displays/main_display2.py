@@ -4,10 +4,15 @@ from app.REACTOR import Reactor
 from app.displays.base import BaseDisplay
 from app.cameras import twodcamera
 from app import assets, map, room, player, enemy_blob, atom
+from app.enemy_blob import EnemyBlob
 from app.ui import text
+import random
+import random
 
 
-class MainDisplay(BaseDisplay):
+
+class MainDisplay2(BaseDisplay):
+
     def __init__(self, game):
         super().__init__(game)
         self.game = game
@@ -15,8 +20,9 @@ class MainDisplay(BaseDisplay):
         self.delta_time = rl.get_frame_time()
         self.camera = twodcamera.Camera(self.game.width, self.game.height, 0, 0, 3)
         self.enemy_bullets = []
-        self.player_bullets = []
+        self.player_bullets=[]
         self.enemies = []
+
 
         for mass in self.game.atomic_masses:
             self.player.spawn_friend(mass)
@@ -24,39 +30,84 @@ class MainDisplay(BaseDisplay):
         self.texture =  rl.load_render_texture(game.width, game.height)
         rl.set_texture_filter(self.texture.texture, rl.TextureFilter.TEXTURE_FILTER_BILINEAR)
 
-        self.jeff_image = assets.images["Jeff"]
 
-        # Store the reactor so we can check proximity for crafting
-        self.reactor = Reactor(self)
-
-
-        self.map = map.Map(self.game)
-        r1=self.map.add_room(room.Room(10, 10, 7, 7))
-        r2He=self.map.add_room(room.Room(20, 2, 17, 21))
-        self.map.connect_two_rooms(r1, r2He, required_atom="helium")
-        r3=self.map.add_room(room.Room(40, 7, 13, 11))
-        self.map.connect_two_rooms(r3, r2He)
-        r4=self.map.add_room(room.Room(24, -10, 9, 7))
-        self.map.connect_two_rooms(r4, r2He)
-        r5O = self.map.add_room(room.Room(3, -10, 9, 13))
-        self.map.connect_two_rooms(r4, r5O, required_atom="oxygen")
-
-        r6Zn = self.map.add_room(room.Room(40, -5, 11, 7))
-        self.map.connect_two_rooms(r4, r6Zn, required_atom="zinc")
-        r7Fe = self.map.add_room(room.Room(20, 30, 13, 13))
-        self.map.connect_two_rooms(r2He, r7Fe, required_atom="iron")
-        r8 = self.map.add_room(room.Room(50, 45, 11, 7))
-        self.map.connect_two_rooms(r8, r7Fe)
-        r9Kr = self.map.add_room(room.Room(45, 25, 15, 7))
-        self.map.connect_two_rooms(r7Fe, r9Kr, required_atom="krypton")
-        r10Ba = self.map.add_room(room.Room(0, 20, 13, 7))
-        self.map.connect_two_rooms(r7Fe, r10Ba, required_atom="barium")
-        # self.map.add_room(room.Room(20, -1, 10, 10))
-        # self.map.add_room(room.Room(30, -1, 10, 10))
-        # self.map.add_room(room.Room(20, 10, 5, 5))
-        # self.map.connect_rooms()
 
         self.crafting=False
+        self.map = map.Map(self.game)
+
+
+        DIRS = [(0, 1), (0, -1), (1, 0), (-1, 0)]  # 4-neighborhood grid
+
+        def generate_spanning_tree(n):
+            """Tworzy drzewo rozpinające (spójny graf bez cykli)."""
+            graph = {(x, y): [] for y in range(n) for x in range(n)}
+            visited = set()
+
+            stack = [(0, 0)]
+            visited.add((0, 0))
+
+            while stack:
+                x, y = stack.pop()
+
+                dirs = DIRS[:]
+                random.shuffle(dirs)
+
+                for dx, dy in dirs:
+                    nx, ny = x + dx, y + dy
+                    if 0 <= nx < n and 0 <= ny < n and (nx, ny) not in visited:
+                        visited.add((nx, ny))
+
+                        graph[(x, y)].append((nx, ny))
+                        graph[(nx, ny)].append((x, y))
+                        stack.append((nx, ny))
+
+            return graph
+
+        def add_random_edges(graph, n, probability=0.05):
+
+            for y in range(n):
+                for x in range(n):
+                    for dx, dy in DIRS:
+                        nx, ny = x + dx, y + dy
+                        if 0 <= nx < n and 0 <= ny < n:
+
+                            if (nx, ny) not in graph[(x, y)] and random.random() < probability:
+                                graph[(x, y)].append((nx, ny))
+                                graph[(nx, ny)].append((x, y))
+
+            return graph
+
+        def generate_loopy_connected_grid_graph(n, extra_edge_probability=0.05):
+
+            graph = generate_spanning_tree(n)
+            graph = add_random_edges(graph, n, extra_edge_probability)
+            return graph
+
+
+        l= 10
+        g = generate_loopy_connected_grid_graph(l, extra_edge_probability=0.1)
+        lista=[0 for x in range(l**2)]
+        la=0
+
+
+        self.rooms = [[0 for r in range(l)] for c in range(l)]
+        self.rooms_checked = [[0 for r in range(l)] for c in range(l)]
+        for r in range(l):
+            for c in range(l):
+                self.rooms[r][c] = self.map.add_room(room.Room(c * 10 + 11, r * 10 + 11, 3, 3))
+                lista[la]=[r,c]
+                la+=1
+        for x in g.keys():
+            for y in g[x]:
+                self.map.connect_two_rooms_no_doors(self.rooms[x[0]][x[1]], self.rooms[y[0]][y[1]])
+        samp=random.sample(lista, 10)
+        print(samp)
+        self.enemies2=[]
+        for x in samp:
+            e=EnemyBlob(self,200, 200,100,92)
+            self.enemies.append(e)
+
+
 
         self.start_zoom = self.camera.camera.zoom
         self.intro = True
@@ -65,31 +116,9 @@ class MainDisplay(BaseDisplay):
 
 
         # Seed a static example light; player light will be first element and updated per-frame
-        self.map.add_light(self.player.x, self.player.y, 420.0, rl.Color(150, 150, 150, 255))
-
-        # Add a light in the center of each room
-        tile_size = self.map.tile_size
-        # r1
-        self.map.add_light(220, 223, 600.0, rl.Color(255, 0, 0, 255))
-        # r2He
-        self.map.add_light((20 + 17/2) * tile_size, (2 + 21/2) * tile_size, 1500.0, rl.Color(190, 150, 200, 255))
-        # r3
-        self.map.add_light((40 + 13/2) * tile_size, (7 + 11/2) * tile_size, 700.0, rl.Color(200, 200, 180, 255))
-        # r4
-        self.map.add_light((24 + 9/2) * tile_size, (-10 + 7/2) * tile_size, 700.0, rl.Color(200, 200, 180, 255))
-        # r5O
-        self.map.add_light((3 + 9/2) * tile_size, (-10 + 13/2) * tile_size, 750.0, rl.Color(200, 100, 100, 255))
-        # r6Zn
-        self.map.add_light((40 + 11/2) * tile_size, (-5 + 7/2) * tile_size, 800.0, rl.Color(85, 160, 160, 255))
-        # r7Fe
-        self.map.add_light((20 + 13/2) * tile_size, (30 + 13/2) * tile_size, 850.0, rl.Color(190, 135, 80, 255))
-        # r8
-        self.map.add_light((50 + 11/2) * tile_size, (45 + 7/2) * tile_size, 700.0, rl.Color(200, 200, 180, 255))
-        # r9Kr
-        self.map.add_light((45 + 15/2) * tile_size, (25 + 7/2) * tile_size, 750.0, rl.Color(60, 90, 115, 255))
-        # r10Ba
-        self.map.add_light((0 + 13/2) * tile_size, (20 + 7/2) * tile_size, 700.0, rl.Color(190, 130, 91, 255))
-
+        self.map.add_light(self.player.x, self.player.y, 420.0, rl.Color(255, 255, 255, 255))
+        self.map.add_light(200, 200, 150.0, rl.Color(255, 0, 0, 255))
+        self.map.add_light(400, 67, 670.0, rl.Color(200, 150, 5, 255))
 
         self.light_shader = self.game.light_shader
         self.lights_pos_loc = rl.get_shader_location(self.light_shader, "lights")
@@ -98,10 +127,72 @@ class MainDisplay(BaseDisplay):
         self.ambient_loc = rl.get_shader_location(self.light_shader, "ambient")
         rl.set_shader_value(self.light_shader, self.ambient_loc, rl.ffi.new("float *", 0.0),
                             rl.ShaderUniformDataType.SHADER_UNIFORM_FLOAT)
+    def make_map(self):
+        l = 15
 
-        for i in self.map.gates:
-            print(str(i))
+        self.rooms = [[0 for r in range(l)] for c in range(l)]
+        self.rooms_checked = [[0 for r in range(l)] for c in range(l)]
+        for r in range(l):
+            for c in range(l):
+                self.rooms[r][c] = self.map.add_room(room.Room(c * 10 + 11, r * 10 + 11, 3, 3))
+        queue = [0 for x in range(l ** 2)]
+        queue[0] = [0, 0]
+        start = 0
+        end = 1
+        factor = 5
+        while start < end:
+            current = queue[start]
+            print('current', current)
+            self.rooms_checked[queue[start][0]][queue[start][1]] = 1
+            neighbours = [[current[0] - 1, current[1]], [current[0] + 1, current[1]], [current[0], current[1] - 1],
+                          [current[0], current[1] + 1]]
 
+            for n in neighbours:
+                print(n)
+                if random.uniform(1, 10) > factor:
+                    if n[0] >= 0 and n[0] < l and n[1] >= 0 and n[1] < l:
+                        self.map.connect_two_rooms_no_doors(self.rooms[current[0]][current[1]], self.rooms[n[0]][n[1]])
+
+                        if self.rooms_checked[n[0]][n[1]] == 0:
+                            queue[end] = n
+                            end += 1
+                            self.rooms_checked[n[0]][n[1]] = 1
+            start += 1
+            print(queue[0:end + 1], start, end)
+        if end<20:
+            self.make_map()
+    def make_map2(self):
+        l = 15
+
+        self.rooms = [[0 for r in range(l)] for c in range(l)]
+        self.rooms_checked = [[0 for r in range(l)] for c in range(l)]
+        for r in range(l):
+            for c in range(l):
+                self.rooms[r][c] = self.map.add_room(room.Room(c * 10 + 11, r * 10 + 11, 3, 3))
+        queue = [0 for x in range(l ** 2)]
+        queue[0] = [0, 0]
+        start = 0
+        end = 1
+        factor =0
+        while start < end:
+            current = queue[start]
+            print('current', current)
+            self.rooms_checked[queue[start][0]][queue[start][1]] = 1
+            neighbours = [[current[0] - 1, current[1]], [current[0] + 1, current[1]], [current[0], current[1] - 1],
+                          [current[0], current[1] + 1]]
+
+            for n in neighbours:
+                print(n)
+                if random.uniform(1, 10) > factor:
+                    if n[0] >= 0 and n[0] < l and n[1] >= 0 and n[1] < l:
+                        self.map.connect_two_rooms_no_doors(self.rooms[current[0]][current[1]], self.rooms[n[0]][n[1]])
+
+                        if self.rooms_checked[n[0]][n[1]] == 0:
+                            queue[end] = n
+                            end += 1
+                            self.rooms_checked[n[0]][n[1]] = 1
+            start += 1
+            print(queue[0:end + 1], start, end)
     def draw_minimap(self):
         if not getattr(self.map, "rooms", None):
             return
@@ -144,18 +235,6 @@ class MainDisplay(BaseDisplay):
             rl.draw_rectangle(int(rx+scale), int(ry+scale), int(rw-(2*scale)), int(rh-(2*scale)), rl.WHITE)
             rl.draw_rectangle_lines(rx, ry, rw, rh, rl.GRAY)
         tile_size = self.map.tile_size
-
-#debug stuff: draw lights on minimap
-        for light in getattr(self.map, "lights", [])[:100]:
-                lx_tiles = float(light['pos'].x) / float(tile_size)
-                ly_tiles = float(light['pos'].y) / float(tile_size)
-                mx = x + padding + int((lx_tiles - min_x) * scale)
-                my = y + padding + int((ly_tiles - min_y) * scale)
-                # small marker; don't scale with light radius to avoid clutter
-                marker_r = max(1, int(max(1.5, scale)))
-                rl.draw_circle(mx, my, marker_r, light['color'])
-
-
         player_map_x = float(self.player.x) / float(tile_size)
         player_map_y = float(self.player.y) / float(tile_size)
         # draw player
@@ -200,13 +279,10 @@ class MainDisplay(BaseDisplay):
         self.map.draw()
         for obj in self.game_objects:
             obj.render()
-        for b in self.player_bullets:
-            b.render()
+        # for b in self.player_bullets:
+        #     b.render()
         for b in self.enemy_bullets:
             b.render()
-
-        for e in self.enemies:
-            e.render()
 
         self.camera.end_mode()
         rl.end_texture_mode()
@@ -220,6 +296,7 @@ class MainDisplay(BaseDisplay):
 
         # 3) UI / minimap (no shaders)
         self.draw_minimap()
+        rl.draw_fps(10, 10)
         if self.game.gamepad_enabled:
             text.draw_text(f"Gamepad X: {self.game.left_joystick_x:.2f}  Y: {self.game.left_joystick_y:.2f}", 10, 130, 20,
                          rl.YELLOW, )
@@ -243,13 +320,10 @@ class MainDisplay(BaseDisplay):
 
         self.camera.update_target(self.player.x, self.player.y, self.delta_time)
 
-        for b in self.player_bullets:
-            b.update()
+        # for b in self.player_bullets:
+        #     b.update()
         for b in self.enemy_bullets:
             b.update()
-
-        for e in self.enemies:
-            e.update()
 
 
         for object in self.game_objects:
@@ -270,24 +344,4 @@ class MainDisplay(BaseDisplay):
         except Exception:
             can_open_crafting = False
 
-        if (rl.is_key_pressed(rl.KeyboardKey.KEY_C) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_UP)) and can_open_crafting:
-            if self.game.crafting==False:
-                self.game.crafting = True
-                self.game.current_display = self.game.crafting_display
-                self.trans = {8:"oxygen" ,  1:"hydrogen", 30:"zinc", 11:"sodium",36: "krypton", 56:"barium",
-                              16:"sulphur", 26:"iron", 2:"helium", 92:"uranium"}
-                self.game.crafting_display.inventory.inv={}
-                for x in self.game.atomic_masses:
-                    try:
-                        self.game.crafting_display.inventory.inv[self.trans[x]]+=1
-                    except:
-                        self.game.crafting_display.inventory.inv[self.trans[x]]=1
-                self.game.crafting_display.atom_bar.update()
-
-
-
-        elif rl.is_key_pressed(rl.KeyboardKey.KEY_ESCAPE):
-            rl.draw_rectangle(self.game.width - 300 - 10, 10, 300, 300, rl.BLACK)
-            rl.draw_rectangle(0, 0, 400, 200, rl.BLACK)
-            self.game.change_display(self.game.pause_menu)
 

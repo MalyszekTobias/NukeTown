@@ -1,5 +1,7 @@
 # app/player.py
 import pyray as rl
+
+import app.enemy_blob
 from app.atom import Atom
 from app import assets
 
@@ -22,8 +24,14 @@ class Player(Atom):
     def update(self, rooms = None, corridor_tiles = None):
         super().update(rooms, corridor_tiles)
         for room in rooms:
-            if rl.check_collision_recs(self.rect, room.one_collision_rect(16)):
-                print("Player collided with room at", room)
+            if room.busy == 0:
+                if rl.check_collision_recs(self.rect, room.one_collision_rect(16)):
+                    room.busy = 1
+                    if not self.game.chapter2:
+                        print('gsdgesfsrwagggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg',self.game.current_display,self.game.display2)
+                        e = app.enemy_blob.EnemyBlob(self.display, (room.x + room.width / 2) * 16,
+                                                     16 * (room.y + room.height / 2), 10, 8)
+                        self.display.enemies.append(e)
 
 
         for enemy_bullet in self.display.enemy_bullets:
