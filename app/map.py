@@ -23,6 +23,7 @@ class Map:
 
     def add_room(self, room: Room):
         self.rooms.append(room)
+        return room
 
     def _create_corridor_between(self, a: Tile, b: Tile):
         # L-shaped: horizontal from a.x to b.x at a.y, then vertical to b.y
@@ -38,7 +39,30 @@ class Map:
         for y in range(y_start, y_end + 1):
             tiles.add((bx, y))
         return tiles
-
+    def connect_two_rooms(self,room1,room2):
+        # self.corridor_tiles.clear()
+        if len(self.rooms) < 2:
+            return
+        # sort by center x to create a simple chain
+        rooms_sorted = [room1,room2]
+        for i in range(len(rooms_sorted) - 1):
+            a = rooms_sorted[i].center()
+            b = rooms_sorted[i + 1].center()
+            self.corridor_tiles.update(self._create_corridor_between(a, b))
+        # After corridor generation, populate gates for removed wall tiles
+        try:
+            from app.gate import Gate
+        except Exception:
+            Gate = None
+        if Gate:
+            # create gates for wall tiles that were removed by corridors
+            for room in self.rooms:
+                all_walls = room.wall_tiles()
+                visible_walls = room.wall_tiles(exclude_tiles=self.corridor_tiles)
+                removed = all_walls - visible_walls
+                for tile in removed:
+                    if tile not in self.gates:
+                        self.gates[tile] = Gate(self, tile, room_ref=room, is_open=False)
     def connect_rooms(self):
         self.corridor_tiles.clear()
         if len(self.rooms) < 2:

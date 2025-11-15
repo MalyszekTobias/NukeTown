@@ -34,12 +34,30 @@ class MainDisplay(BaseDisplay):
 
 
         self.map = map.Map(self.game)
-        self.map.add_room(room.Room(10, 10, 5, 5))
-        self.map.add_room(room.Room(20, 15, 17, 20))
-        self.map.add_room(room.Room(20, -1, 10, 10))
-        self.map.add_room(room.Room(30, -1, 10, 10))
-        self.map.add_room(room.Room(20, 10, 5, 5))
-        self.map.connect_rooms()
+        r1=self.map.add_room(room.Room(10, 10, 5, 5))
+        r2He=self.map.add_room(room.Room(20, 2, 17, 21))
+        self.map.connect_two_rooms(r1, r2He)
+        r3=self.map.add_room(room.Room(40, 7, 13, 11))
+        self.map.connect_two_rooms(r3, r2He)
+        r4=self.map.add_room(room.Room(24, -10, 9, 7))
+        self.map.connect_two_rooms(r4, r2He)
+        r5O = self.map.add_room(room.Room(3, -10, 9, 13))
+        self.map.connect_two_rooms(r4, r5O)
+
+        r6Zn = self.map.add_room(room.Room(40, -5, 11, 7))
+        self.map.connect_two_rooms(r4, r6Zn)
+        r7Fe = self.map.add_room(room.Room(20, 30, 13, 13))
+        self.map.connect_two_rooms(r2He, r7Fe)
+        r8 = self.map.add_room(room.Room(50, 45, 11, 7))
+        self.map.connect_two_rooms(r8, r7Fe)
+        r9Kr = self.map.add_room(room.Room(45, 25, 15, 7))
+        self.map.connect_two_rooms(r7Fe,r9Kr)
+        r10Ba = self.map.add_room(room.Room(0, 20, 13, 7))
+        self.map.connect_two_rooms(r7Fe, r10Ba)
+        # self.map.add_room(room.Room(20, -1, 10, 10))
+        # self.map.add_room(room.Room(30, -1, 10, 10))
+        # self.map.add_room(room.Room(20, 10, 5, 5))
+        # self.map.connect_rooms()
 
         self.crafting=False
 
