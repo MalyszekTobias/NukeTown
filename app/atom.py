@@ -1,23 +1,17 @@
 # app/atom.py
 import pyray as rl
 import app
-from app import assets
+from app import assets, sprite
 
-class Atom:
-    def __init__(self, game, weight, leader):
-        self.game = game
+class Atom(sprite.Sprite):
+    def __init__(self, display, weight, leader, scaleXframewidth=6):
+
+
         self.weight = weight
         self.leader = leader
         self.img = self.get_sprite()
-        print(self.img.width, self.img.height)
-        self.num_of_frames = int(self.img.height / self.img.width)
-        self.frame_width = int(self.img.width)
-        self.frame_height = int(self.img.height / self.num_of_frames)
-        self.current_frame = 0
-        self.frame_timer = 0.0
-        self.frame_duration = 0.08
         self.radius = 10
-
+        super().__init__(display, scaleXframewidth)
         self.rect = rl.Rectangle(0, 0, self.radius, self.radius)
 
         self.x = 100
@@ -31,12 +25,13 @@ class Atom:
         self.velRight = 0
         self.maxSpeed = 0.5
         self.acceleration = 0.012
-        self.gameHeight = self.game.height
-        self.gameWidth = self.game.width
+
         self.hpHeight = 30
         self.run_tilt = 4
         self.target_x = None
         self.target_y = None
+
+
 
     def get_sprite(self):
         if self.weight in [0, 92]:
@@ -153,7 +148,38 @@ class Atom:
             if abs(self.y - self.target_y) < 8:
                 self.up = False
                 self.down = False
+
+        # remember previous position so we can prevent leaving corridors
+        old_x, old_y = self.x, self.y
+
         self.movement()
+
+        # tile logic: prevent leaving corridor tiles unless entering a room
+        tile_size = 16
+        if corridor_tiles is not None:
+
+            old_tile = (int(old_x) // tile_size, int(old_y) // tile_size)
+            new_tile = (int(self.x) // tile_size, int(self.y) // tile_size)
+
+            was_in_corridor = old_tile in corridor_tiles if old_tile is not None else False
+            now_in_corridor = new_tile in corridor_tiles if new_tile is not None else False
+
+            entering_room = False
+            if rooms and new_tile is not None:
+                for room in rooms:
+                    # allow entering room background tiles
+                    if new_tile in room.background_tiles():
+                        entering_room = True
+                        break
+
+            # if we started in corridor and tried to move to a non-corridor tile that is not a room, revert
+            if was_in_corridor and (not now_in_corridor) and (not entering_room):
+                self.x, self.y = old_x, old_y
+                # cancel velocities so we don't push against the boundary
+                self.velUp = 0
+                self.velRight = 0
+                # stop movement inputs so atom won't immediately try again
+                self.up = self.down = self.left = self.right = False
 
         dt = rl.get_frame_time()
         moving = any((self.up, self.down, self.left, self.right)) or abs(self.velUp) > 1e-6 or abs(self.velRight) > 1e-6
@@ -211,9 +237,9 @@ class Atom:
 
     def render(self):
         if self.leader == None:
-            scale = 14.0 / float(self.frame_width)
+            scale = (self.scaleXframewidth + 8) / float(self.frame_width)
         else:
-            scale = 6.0 / float(self.frame_width)
+            scale = self.scaleXframewidth / float(self.frame_width)
 
         src = rl.Rectangle(0.0, float(self.frame_height * self.current_frame),
                            float(self.frame_width), float(self.frame_height))
@@ -230,7 +256,7 @@ class Atom:
             angle = -self.run_tilt
         if self.leader == None:
             if self.velRight > 0.09 or self.velRight < -0.09 or self.velUp > 0.09 or self.velUp < -0.09:
-                for friend in self.game.player.friends:
+                for friend in self.display.player.friends:
                     friend.set_destination(15)
         rl.draw_texture_pro(self.img, src, dst, origin, angle, rl.WHITE)
         rl.draw_rectangle_lines(int(self.rect.x), int(self.rect.y), int(self.rect.width), int(self.rect.height), rl.RED)

@@ -3,11 +3,13 @@ import pyray as rl
 shaders = {}
 models = {}
 images = {}
+sounds = {}
 font = None
 
 def load():
     global font
     shaders["bloom"] = rl.load_shader("", "app/assets/shaders/bloom.fs")
+    shaders["lights"] = rl.load_shader("", "app/assets/shaders/lights.fs")
     images["Jeff"] = rl.load_texture("app/assets/images/Jeff.png")
     images["movingblob"] = rl.load_texture("app/assets/Spritesheets/Uranek_jump.png")
     images["Floor_Default"] = rl.load_texture("app/assets/images/Floor_Default.png")
@@ -49,5 +51,8 @@ def load():
     images["Table"] = rl.load_texture("app/assets/images/Table.png")
     images["Tablica"] = rl.load_texture("app/assets/images/Tablica.png")
     images["Tablica_Fatass"] = rl.load_texture("app/assets/images/Tablica_Fatass.png")
+    images["Taskbar"] = rl.load_texture("app/assets/images/Taskbar.png")
 
     font = rl.load_font('app/assets/Fonts/Chernobyl.otf')
+
+    sounds["shot"] = rl.load_sound("app/assets/Sounds/roblox-death-sound-effect.mp3")

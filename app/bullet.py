@@ -1,10 +1,12 @@
 import pyray as rl
 from app import assets
 class Bullet:
-    def __init__(self, game, x, y, velRight, velUp, target):
-        self.game = game
+    def __init__(self, display, x, y, velRight, velUp, target):
+        self.display = display
+        self.game = display.game
         self.x, self.y = x, y
         self.speed = 0.5
+        self.radius = 1
         self.velRight = velRight
         self.velUp = velUp
         self.target = target
@@ -32,7 +34,7 @@ class Bullet:
             self.y += self.velUp
         else:
             self.lifespan -= 1
-            x, y = self.game.player.x, self.game.player.y
+            x, y = self.display.player.x, self.display.player.y
             if self.x < x:
                 self.x += self.speed
             elif self.x > x:
@@ -41,8 +43,17 @@ class Bullet:
                 self.y += self.speed
             elif self.y > y:
                 self.y -= self.speed
-            if self.lifespan <= 0:
-                self.game.enemy_bullets.remove(self)
+            if self.lifespan == 10:
+                self.img = assets.images["Bullet_Bad_Explode"]
+                self.num_of_frames = int(self.img.height / self.img.width)
+                self.frame_width = int(self.img.width)
+                self.frame_height = int(self.img.height / self.num_of_frames)
+                self.current_frame = 0
+                self.frame_timer = 0.0
+                self.frame_duration = 0.02
+            if self.frame_duration == 0.02 and self.current_frame == self.num_of_frames - 1:
+                self.display.enemy_bullets.remove(self)
+                print(1232)
                 del  self
                 return
 

@@ -2,27 +2,22 @@ from app import assets
 import pyray as rl
 
 class Sprite:
-    def __init__(self, display, weight=None):
+    def __init__(self, display, scaleXframewidth=5):
         self.display = display
         self.game = display.game
-
-        self.weight = weight
-        print(self.img.width, self.img.height)
+        self.scaleXframewidth = scaleXframewidth
         self.num_of_frames = int(self.img.height / self.img.width)
         self.frame_width = int(self.img.width)
         self.frame_height = int(self.img.height / self.num_of_frames)
         self.current_frame = 0
         self.frame_timer = 0.0
         self.frame_duration = 0.08
-        self.radius = 40
-        self.x = 200
-        self.y = 189
+        self.x = 0
+        self.y = 0
         self.gameHeight = self.game.height
         self.gameWidth = self.game.width
 
         self.display.game_objects.append(self)
-
-
 
 
     def update(self):
@@ -37,8 +32,7 @@ class Sprite:
                 break
 
     def render(self):
-        print(self.current_frame)
-        scale = 60.0 / float(self.frame_width)
+        scale = self.scaleXframewidth / float(self.frame_width)
 
         src = rl.Rectangle(0.0, float(self.frame_height * self.current_frame),
                            float(self.frame_width), float(self.frame_height))
