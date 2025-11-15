@@ -17,9 +17,6 @@ class MainDisplay(BaseDisplay):
         self.enemy_bullets = []
         self.player_bullets = []
         self.enemies = []
-        for _i in range(1, 5):
-            enemy = enemy_blob.EnemyBlob(self, _i * 200, _i * 200, 100, 2)
-            self.enemies.append(enemy)
 
         for mass in self.game.atomic_masses:
             self.player.spawn_friend(mass)
