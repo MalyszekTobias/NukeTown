@@ -34,6 +34,7 @@ class Atom(sprite.Sprite):
         self.target_y = None
 
         self.cooldown = 0
+        self.shittin = False
 
 
 
@@ -115,8 +116,15 @@ class Atom(sprite.Sprite):
         self.cooldown -= 1
         if rl.is_mouse_button_pressed(0):
             if self.cooldown <= 0:
-                self.shoot(rl.get_mouse_x(), rl.get_mouse_y())
-                self.cooldown = 50
+                self.shittin = True
+                self.img = assets.images["Bullet_Good_Create"]
+                self.num_of_frames = int(self.img.height / self.img.width)
+                self.frame_width = int(self.img.width)
+                self.frame_height = int(self.img.height / self.num_of_frames)
+                self.current_frame = 0
+                self.frame_timer = 0.0
+                self.frame_duration = 0.08
+                self.cooldown = 70
         elif self.target_x != None and self.target_y != None:
             if self.x < self.target_x:
                 self.right = True
@@ -172,26 +180,41 @@ class Atom(sprite.Sprite):
 
         dt = rl.get_frame_time()
         moving = any((self.up, self.down, self.left, self.right)) or abs(self.velUp) > 1e-6 or abs(self.velRight) > 1e-6
-
-        if moving:
+        if self.shittin:
             self.frame_timer += dt
             while self.frame_timer >= self.frame_duration:
                 self.frame_timer -= self.frame_duration
                 self.current_frame = (self.current_frame + 1) % self.num_of_frames
+            if self.current_frame == self.num_of_frames - 1:
+                self.shoot()
+                self.shittin = False
+                self.img = self.get_sprite()
+                self.num_of_frames = int(self.img.height / self.img.width)
+                self.frame_width = int(self.img.width)
+                self.frame_height = int(self.img.height / self.num_of_frames)
+                self.current_frame = 0
+                self.frame_timer = 0.0
+                self.frame_duration = 0.08
         else:
-            # If we're mid-animation, continue advancing frames until we wrap back to frame 0,
-            # then stop there. If already at frame 0, keep it idle.
-            if self.current_frame != 0:
+            if moving:
                 self.frame_timer += dt
                 while self.frame_timer >= self.frame_duration:
                     self.frame_timer -= self.frame_duration
                     self.current_frame = (self.current_frame + 1) % self.num_of_frames
-                    if self.current_frame == 0:
-                        self.frame_timer = 0.0
-                        break
             else:
-                self.current_frame = 0
-                self.frame_timer = 0.0
+                # If we're mid-animation, continue advancing frames until we wrap back to frame 0,
+                # then stop there. If already at frame 0, keep it idle.
+                if self.current_frame != 0:
+                    self.frame_timer += dt
+                    while self.frame_timer >= self.frame_duration:
+                        self.frame_timer -= self.frame_duration
+                        self.current_frame = (self.current_frame + 1) % self.num_of_frames
+                        if self.current_frame == 0:
+                            self.frame_timer = 0.0
+                            break
+                else:
+                    self.current_frame = 0
+                    self.frame_timer = 0.0
         self._resolve_wall_collisions(rooms, 16, corridor_tiles)
 
     def _resolve_wall_collisions(self, rooms, tile_size, corridor_tiles=None):
@@ -199,6 +222,8 @@ class Atom(sprite.Sprite):
         if not rooms:
             return
         ax, ay, aw, ah = self.rect.x, self.rect.y, self.rect.width, self.rect.height
+
+        # Check room wall collisions
         for room in rooms:
             for (wx, wy, ww, wh) in room.collision_rects(tile_size, corridor_tiles):
                 # AABB overlap test
@@ -223,6 +248,37 @@ class Atom(sprite.Sprite):
                     self.x = ax + aw / 2
                     self.y = ay + ah / 2
                     return
+
+        # Check closed gate collisions
+        try:
+            mp = getattr(self.display, 'map', None)
+            if mp and getattr(mp, 'gates', None):
+                for gate in mp.gates.values():
+                    if not gate.is_open:
+                        wx, wy, ww, wh = gate.collision_rect()
+                        # AABB overlap test
+                        if ax < wx + ww and ax + aw > wx and ay < wy + wh and ay + ah > wy:
+                            # compute penetration depths on each side
+                            pen_left = (ax + aw) - wx
+                            pen_right = (wx + ww) - ax
+                            pen_top = (ay + ah) - wy
+                            pen_bottom = (wy + wh) - ay
+                            # choose smallest penetration axis
+                            min_pen = min(pen_left, pen_right, pen_top, pen_bottom)
+                            if min_pen == pen_left:
+                                ax -= pen_left
+                            elif min_pen == pen_right:
+                                ax += pen_right
+                            elif min_pen == pen_top:
+                                ay -= pen_top
+                            else:  # pen_bottom
+                                ay += pen_bottom
+                            # write back center from rect
+                            self.x = ax + aw / 2
+                            self.y = ay + ah / 2
+                            return
+        except Exception:
+            pass
 
     def render(self):
         if self.leader == None:
@@ -250,7 +306,7 @@ class Atom(sprite.Sprite):
         rl.draw_texture_pro(self.img, src, dst, origin, angle, rl.WHITE)
         rl.draw_rectangle_lines(int(self.rect.x), int(self.rect.y), int(self.rect.width), int(self.rect.height), rl.RED)
 
-    def shoot(self, x, y):
+    def shoot(self):
         mouse_pos = rl.get_mouse_position()
         world_pos = rl.get_screen_to_world_2d(mouse_pos, self.display.camera.camera)
         mouse_x, mouse_y = world_pos.x, world_pos.y
@@ -261,7 +317,7 @@ class Atom(sprite.Sprite):
             return
         vel_right = (dx / dist)
         vel_up = (dy / dist)
-        bullet = app.bullet.Bullet(self.display, self.x, self.y, vel_right, vel_up, "enemy")
+        bullet = app.bullet.Bullet(self.display, self.x, self.y - 5, vel_right, vel_up, "enemy")
         self.display.player_bullets.append(bullet)
         self.game.music_manager.play_sound(assets.sounds["Plum"])
 
