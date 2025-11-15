@@ -202,11 +202,11 @@ class Room:
                     else:
                         rotation = 0  # default fallback
                     if gy == y0:
-                        dest_y += tile_size /3
+                        pass
                     elif gy == y0 + h - 1:
-                        dest_y -= tile_size /3
+                        pass
                     elif gx == x0:
-                        dest_x += tile_size + (tile_size /3)
+                        dest_x += tile_size
                     elif gx == x0 + w - 1:
-                        dest_x += tile_size - (tile_size /3)
+                        dest_x += tile_size
                     pyray.draw_texture_ex(gate_open_tex, (dest_x, dest_y), rotation, 1 / 4 / tile_size, pyray.WHITE)

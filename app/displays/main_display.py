@@ -35,7 +35,7 @@ class MainDisplay(BaseDisplay):
         self.shader_resolution_location = rl.get_shader_location(self.bloom_shader, "resolution")
         self.shader_time_location = rl.get_shader_location(self.bloom_shader, "time")
 
-        self.map = map.Map()
+        self.map = map.Map(self.game)
         self.map.add_room(room.Room(10, 10, 5, 5))
         self.map.add_room(room.Room(20, 15, 17, 20))
         self.map.add_room(room.Room(20, -1, 10, 10))
