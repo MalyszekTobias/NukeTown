@@ -185,6 +185,8 @@ class Atom(sprite.Sprite):
             while self.frame_timer >= self.frame_duration:
                 self.frame_timer -= self.frame_duration
                 self.current_frame = (self.current_frame + 1) % self.num_of_frames
+            if self.leader == None and self.current_frame == self.num_of_frames - 9:
+                self.game.music_manager.play_sound(assets.sounds["Plum"])
             if self.current_frame == self.num_of_frames - 1:
                 self.shoot()
                 self.shittin = False
@@ -286,7 +288,7 @@ class Atom(sprite.Sprite):
         vel_up = (dy / dist)
         bullet = app.bullet.Bullet(self.display, self.x, self.y - 5, vel_right, vel_up, "enemy")
         self.display.player_bullets.append(bullet)
-        self.game.music_manager.play_sound(assets.sounds["Plum"])
+
 
     def set_destination(self, radius):
         x = rl.get_random_value(- radius, radius)
