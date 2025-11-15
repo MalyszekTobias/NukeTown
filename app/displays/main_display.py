@@ -208,6 +208,13 @@ class MainDisplay(BaseDisplay):
             if self.game.crafting==False:
                 self.game.crafting = True
                 self.game.current_display = self.game.crafting_display
-                self.game.current_display = self.game.crafting_display
+                self.trans = {8:"oxygen" ,  1:"hydrogen", 30:"zinc", 11:"sodium",36: "krypton", 56:"barium",
+                              16:"sulphur", 26:"iron", 2:"helium", 92:"uranium"}
+                for x in self.game.atomic_masses:
+                    try:
+                        self.game.crafting_display.inventory.inv[self.trans[x]]+=1
+                    except:
+                        self.game.crafting_display.inventory.inv[self.trans[x]]=1
+                self.game.crafting_display.atom_bar.update()
                 if self.game.music_manager.current != 1:
                     self.game.music_manager.play_music1()
