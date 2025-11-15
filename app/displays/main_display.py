@@ -244,6 +244,21 @@ class MainDisplay(BaseDisplay):
         except Exception:
             pass
 
+        # Show shooting tooltip when enemies are nearby
+        try:
+            enemy_nearby = False
+            for e in self.enemies:
+                # Check if enemy is within reasonable distance (e.g., 400 pixels)
+                distance = ((e.x - self.player.x) ** 2 + (e.y - self.player.y) ** 2) ** 0.5
+                if distance < 20:
+                    enemy_nearby = True
+                    break
+
+            if enemy_nearby:
+                text.draw_text("Press Left Mouse to shoot", 10, 100, 24, rl.RED)
+        except Exception:
+            pass
+
         if self.book_message is not None:
             book_text = f"Hello World {self.book_message}"
             try:
