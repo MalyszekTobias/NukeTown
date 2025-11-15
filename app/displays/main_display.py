@@ -31,9 +31,6 @@ class MainDisplay(BaseDisplay):
 
         Reactor(self)
 
-        self.bloom_shader = self.game.bloom_shader
-        self.shader_resolution_location = rl.get_shader_location(self.bloom_shader, "resolution")
-        self.shader_time_location = rl.get_shader_location(self.bloom_shader, "time")
 
         self.map = map.Map(self.game)
         self.map.add_room(room.Room(10, 10, 5, 5))
@@ -44,9 +41,7 @@ class MainDisplay(BaseDisplay):
         self.map.connect_rooms()
 
         self.crafting=False
-        res = rl.ffi.new("float[2]", [float(self.game.width), float(self.game.height)])
-        rl.set_shader_value(self.bloom_shader, self.shader_resolution_location, res,
-                            rl.ShaderUniformDataType.SHADER_UNIFORM_VEC2)
+
         self.start_zoom = self.camera.camera.zoom
         self.intro = True
         self._intro_tolerance = 0.01
@@ -186,10 +181,6 @@ class MainDisplay(BaseDisplay):
                 self.intro = False
 
         self.camera.update_target(self.player.x, self.player.y, self.delta_time)
-
-        t = rl.ffi.new("float *", float(rl.get_time()))
-        rl.set_shader_value(self.bloom_shader, self.shader_time_location, t,
-                            rl.ShaderUniformDataType.SHADER_UNIFORM_FLOAT)
 
         for b in self.player_bullets:
             b.update()

@@ -23,7 +23,7 @@ class Game:
         # Perform heavier initialization after showing the loading screen
         self.music_manager = music.MusicManager()
         assets.load()
-        self.bloom_shader = assets.shaders["bloom"]
+
         self.light_shader = assets.shaders["lights"]
         self.base_display = startscreen.StartDisplay(self)
         self.crafting_display = crafting.Crafting_Menu(self)
