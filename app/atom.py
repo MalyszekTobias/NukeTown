@@ -88,31 +88,11 @@ class Atom(sprite.Sprite):
             else:
                 self.velRight = 0
 
-        if self.velUp < 0:
-            if self.y < self.gameHeight - self.radius:
-                if self.y < self.gameHeight - self.radius + self.velUp:
-                    self.y -= self.velUp
-                else:
-                    self.y = self.gameHeight - self.radius
-        else:
-            if self.y > self.radius + self.hpHeight:
-                if self.y > self.radius + self.velUp + self.hpHeight:
-                    self.y -= self.velUp
-                else:
-                    self.y = self.radius + self.hpHeight
+        self.y -= self.velUp
 
-        if self.velRight < 0:
-            if self.x > self.radius:
-                if self.x > self.radius - self.velRight:
-                    self.x += self.velRight
-                else:
-                    self.x = self.radius
-        else:
-            if self.x < self.gameWidth - self.radius:
-                if self.x < self.gameWidth - self.radius - self.velRight:
-                    self.x += self.velRight
-                else:
-                    self.x = self.gameWidth - self.radius
+
+
+        self.x += self.velRight
 
     def update(self, rooms = None, corridor_tiles = None):
         self.rect = rl.Rectangle(self.x - self.radius / 2, self.y - self.radius / 2,
@@ -148,7 +128,38 @@ class Atom(sprite.Sprite):
             if abs(self.y - self.target_y) < 8:
                 self.up = False
                 self.down = False
+
+        # remember previous position so we can prevent leaving corridors
+        old_x, old_y = self.x, self.y
+
         self.movement()
+
+        # tile logic: prevent leaving corridor tiles unless entering a room
+        tile_size = 16
+        if corridor_tiles is not None:
+
+            old_tile = (int(old_x) // tile_size, int(old_y) // tile_size)
+            new_tile = (int(self.x) // tile_size, int(self.y) // tile_size)
+
+            was_in_corridor = old_tile in corridor_tiles if old_tile is not None else False
+            now_in_corridor = new_tile in corridor_tiles if new_tile is not None else False
+
+            entering_room = False
+            if rooms and new_tile is not None:
+                for room in rooms:
+                    # allow entering room background tiles
+                    if new_tile in room.background_tiles():
+                        entering_room = True
+                        break
+
+            # if we started in corridor and tried to move to a non-corridor tile that is not a room, revert
+            if was_in_corridor and (not now_in_corridor) and (not entering_room):
+                self.x, self.y = old_x, old_y
+                # cancel velocities so we don't push against the boundary
+                self.velUp = 0
+                self.velRight = 0
+                # stop movement inputs so atom won't immediately try again
+                self.up = self.down = self.left = self.right = False
 
         dt = rl.get_frame_time()
         moving = any((self.up, self.down, self.left, self.right)) or abs(self.velUp) > 1e-6 or abs(self.velRight) > 1e-6

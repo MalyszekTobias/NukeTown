@@ -9,6 +9,7 @@ font = None
 def load():
     global font
     shaders["bloom"] = rl.load_shader("", "app/assets/shaders/bloom.fs")
+    shaders["lights"] = rl.load_shader("", "app/assets/shaders/lights.fs")
     images["Jeff"] = rl.load_texture("app/assets/images/Jeff.png")
     images["movingblob"] = rl.load_texture("app/assets/Spritesheets/Uranek_jump.png")
     images["Floor_Default"] = rl.load_texture("app/assets/images/Floor_Default.png")
@@ -31,6 +32,9 @@ def load():
     images["Bullet_Bad_Explode"] = rl.load_texture("app/assets/Spritesheets/Bullet_Bad_Explode.png")
     images["Bullet_Bad_Create"] = rl.load_texture("app/assets/Spritesheets/Bullet_Bad_Create.png")
     images["Bullet_Good_Create"] = rl.load_texture("app/assets/Spritesheets/Bullet_Good_Create.png")
+    images["Picture"] = rl.load_texture("app/assets/Spritesheets/Pojawiajacy_sie_obrazek.png")
+    images["Ex"] = rl.load_texture("app/assets/Spritesheets/iks.png")
+    images["Arrow"] = rl.load_texture("app/assets/Spritesheets/Szczałka.png")
     # images["Elektrownia"] = rl.load_texture("app/assets/Spritesheets/Komin.png")
     images["Wall_horizontal"] = rl.load_texture("app/assets/images/Wall_1.png")
     images["Wall_vertical"] = rl.load_texture("app/assets/images/Wall_2.png")
@@ -49,7 +53,10 @@ def load():
     images["Tablica"] = rl.load_texture("app/assets/images/Tablica.png")
     images["Tablica_Fatass"] = rl.load_texture("app/assets/images/Tablica_Fatass.png")
     images["Taskbar"] = rl.load_texture("app/assets/images/Taskbar.png")
+    images["Lampa"] = rl.load_texture("app/assets/images/Lampa.png")
+
     images["Uranium_Standby"]=rl.load_texture("app/assets/images/MC_Standby.png")
     font = rl.load_font('app/assets/Fonts/Chernobyl.otf')
 
     sounds["shot"] = rl.load_sound("app/assets/Sounds/roblox-death-sound-effect.mp3")
+    sounds["Plum"] = rl.load_sound("app/assets/Sounds/Slime_join.mp3")
