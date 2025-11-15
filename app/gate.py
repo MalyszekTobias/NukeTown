@@ -61,13 +61,16 @@ class Gate:
         # Make collision rect thin to match gate visual thickness
         gate_thickness = 4  # pixels - adjust based on gate texture appearance
 
-        if self.orientation in ('vertical0', 'vertical1'):
+        if self.orientation == 'vertical1':
             # Vertical gate: thin width, full height
             return (self.x, self.y, gate_thickness, self.tile_size)
-        else:
+        elif self.orientation == 'vertical0':
+            return (self.x + self.tile_size - gate_thickness, self.y, gate_thickness, self.tile_size)
+        elif self.orientation == 'horizontal0':
             # Horizontal gate: full width, thin height
+            return (self.x, self.y + self.tile_size - gate_thickness, self.tile_size, gate_thickness)
+        else:  # 'horizontal0'
             return (self.x, self.y, self.tile_size, gate_thickness)
-
     def can_interact(self, player) -> bool:
         # AABB collision: expand gate rect by interaction_radius
         gate_rect_expanded = (
