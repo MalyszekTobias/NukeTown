@@ -3,20 +3,26 @@ import pyray as rl
 from app.REACTOR import Reactor
 from app.displays.base import BaseDisplay
 from app.cameras import twodcamera
-from app import assets, map, room
+from app import assets, map, room, player, enemy_blob, atom
 from app.ui import text
 
 
 class MainDisplay(BaseDisplay):
-    def __init__(self, game, player, enemies):
-        self.player = player
+    def __init__(self, game):
         super().__init__(game)
         self.game = game
-        self.player = player
-        self.enemies = enemies
+        self.player = player.Player(self)
         self.delta_time = rl.get_frame_time()
         self.camera = twodcamera.Camera(self.game.width, self.game.height, 0, 0, 3)
-        self.enemy_blobs = []
+        self.enemy_bullets = []
+        self.player_bullets = []
+        self.enemies = []
+        for _i in range(1, 5):
+            enemy = enemy_blob.EnemyBlob(self, _i * 200, _i * 200, 100, 2)
+            self.enemies.append(enemy)
+
+        for mass in self.game.atomic_masses:
+            self.player.spawn_friend(mass)
 
         self.texture =  rl.load_render_texture(game.width, game.height)
         rl.set_texture_filter(self.texture.texture, rl.TextureFilter.TEXTURE_FILTER_BILINEAR)
@@ -98,20 +104,15 @@ class MainDisplay(BaseDisplay):
         # clear the render texture to transparent so only player pixels contribute to bloom
         rl.clear_background((0, 0, 0, 0))
         self.camera.begin_mode()
-        for friend in self.player.friends:
-            friend.render()
-        for e in self.enemies:
-            e.render()
 
         for object in self.game_objects:
             object.render()
 
-        for b in self.game.player_bullets:
+        for b in self.player_bullets:
             b.render()
-        for b in self.game.enemy_bullets:
+        for b in self.enemy_bullets:
             b.render()
 
-        self.player.render()
         self.camera.end_mode()
         rl.end_texture_mode()
 
@@ -148,21 +149,18 @@ class MainDisplay(BaseDisplay):
         rl.set_shader_value(self.bloom_shader, self.shader_time_location, t,
                             rl.ShaderUniformDataType.SHADER_UNIFORM_FLOAT)
 
-
-        for enemy in self.enemies:
-            enemy.update()
-        for b in self.game.player_bullets:
+        for b in self.player_bullets:
             b.update()
-        for b in self.game.enemy_bullets:
+        for b in self.enemy_bullets:
             b.update()
 
-        self.player.update(self.map.rooms, self.map.corridor_tiles)
-
-        for friend in self.player.friends:
-            friend.update(self.map.rooms, self.map.corridor_tiles)
 
         for object in self.game_objects:
-            object.update()
+            if issubclass(type(object), atom.Atom):
+                object.update(self.map.rooms, self.map.corridor_tiles)
+            else:
+
+                object.update()
 
         if rl.is_key_pressed(rl.KeyboardKey.KEY_C) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_UP):
             if self.game.crafting==False:
