@@ -1,5 +1,9 @@
+from email.mime import image
+import copy
+# from zipimport import alt_path_sep
+import time
 from app.ui import text
-
+from app import sprite
 import pyray as rl
 from app.displays.base import BaseDisplay
 from app.cameras import twodcamera
@@ -71,8 +75,10 @@ class Crafting_Menu(BaseDisplay):
             if self.end_chapter_1:
                 print("End Chapter 1")
                 self.end_chapter_1=False
-                self.game.current_display=self.game.chapter2_display
+                self.game.current_display=self.game.display2
+                self.game.twodgame=self.game.display2
                 self.game.chapter2=True
+                self.game.stop=True
 
         if rl.is_mouse_button_pressed(0):
             self.mouse_down=True
@@ -197,7 +203,7 @@ class TextObject():
 
     def draw(self):
         # print('bb')
-        text.draw_text(self.text,self.x,self.y,self.w,self.color,)
+        text.draw_text_with_border(self.text,self.x,self.y,self.w,self.color,)
     def delete(self):
         self.display.objects.remove(self)
     def __str__(self):
@@ -241,15 +247,15 @@ class Inventory():
         rl.draw_texture_pro(self.tablica_image, self.src,
                             rl.Rectangle(self.x, self.y + 100 + (i - 1) * 100, self.display.game.width // 2 - 240, 100),
                             (0, 0), 0, rl.WHITE)
-        text.draw_text("Inventory", self.x+20, self.y+8, self.w, rl.WHITE, )
+        text.draw_text_with_border("Inventory", self.x+20, self.y+8, self.w, rl.WHITE)
 
 
         for atom in self.inv:
             i+=1
 
             rl.draw_texture_pro(self.tablica_image,self.src,rl.Rectangle(self.x,self.y+100+(i-1)*100,self.display.game.width // 2 - 240,100),(0, 0), 0, rl.WHITE)
-            text.draw_text(f"{atom}: {self.inv[atom]}", self.x+20, self.y+8 + self.w * i, self.w, rl.WHITE)
-        for fgwegwe in range(10-len(self.inv)):
+            text.draw_text_with_border(f"{atom}: {self.inv[atom]}", self.x+20, self.y+8 + self.w * i, self.w, rl.WHITE)
+        for xi in range(10 - len(self.inv)):
             i += 1
             rl.draw_texture_pro(self.tablica_image, self.src,
                                 rl.Rectangle(self.x, self.y + 100 + (i - 1) * 100, self.display.game.width // 2 - 240,
@@ -373,28 +379,41 @@ class Table():
         self.translator={"H":"hydrogen","He":"helium","O":"oxygen","Na":"sodium","Ba":"barium","Kr":"krypton","Zn":"zinc","S":"sulphur","Fe":"iron","U":"uranium"}
         self.values=[[1,"hydrogen"],[2,"helium"],[8,"oxygen"],[11,"sodium"],[16,"sulphur"],[26,"iron"],[30,"zinc"],[36,"krypton"],[56,"barium"],[92,"uranium"]]
     def update(self):
-        self.clear_text.text=str(" ".join([atom.name for atom in self.atoms]))+str(self.display.current_atom)
+        if self.display.end_chapter_1==False:
+                if self.display.inventory.inv['uranium']>=2:
+                    self.fuse_text.text="Start the chain reaction"
+                else:
+
+                    self.fuse_text.text="Not enough uranium"
     def do_fusion(self):
+        if self.display.end_chapter_1==False:
+            if self.protons == 92:
+                if self.display.end_chapter_1 == False:
+                    self.display.game.change_display(self.display.game.cutscene_display)
+                    self.display.game.change_display(self.display.game.cutscene_display)
+                self.display.end_chapter_1 = True
 
-        if self.protons==92:
-            self.display.end_chapter_1=True
-            self.display.game.change_display(self.display.game.cutscene_display)
-            self.display.game.change_display(self.display.game.cutscene_display)
-        if self.protons>92:
-            print('nope')
-        elif len(self.atoms)>1:
-            a=True
-            i=len(self.values)-1
-            while a:
+            if self.protons > 92:
+                print('nope')
+            elif len(self.atoms) > 1:
+                a = True
+                i = len(self.values) - 1
+                while a:
 
-                if self.protons>=self.values[i][0]:
-                    if self.values[i][0] > self.display.game.best_craft:
-                        self.display.game.best_craft = self.values[i][0]
-                    self.clear_before_fusion()
-                    self.atoms.append(Atom(self.display, self.atom_properites[self.values[i][1]][2], self.x+self.w//2 , self.y+self.h//2, 100, 100, self.atom_properites[self.values[i][1]][0], self.atom_properites[self.values[i][1]][1], 40))
-                    self.protons =self.atom_properites[self.values[i][1]][1]
-                    break
-                i-=1
+                    if self.protons >= self.values[i][0]:
+                        if self.values[i][0] > self.display.game.best_craft:
+                            self.display.game.best_craft = self.values[i][0]
+                        self.clear_before_fusion()
+                        self.atoms.append(
+                            Atom(self.display, self.atom_properites[self.values[i][1]][2], self.x + self.w // 2,
+                                 self.y + self.h // 2, 100, 100, self.atom_properites[self.values[i][1]][0],
+                                 self.atom_properites[self.values[i][1]][1], 40))
+                        self.protons = self.atom_properites[self.values[i][1]][1]
+                        break
+                    i -= 1
+        else:
+            if self.display.inventory.inv['uranium'] >= 2:
+                print('you_win')
 
         # self.clear()
     def clear(self):

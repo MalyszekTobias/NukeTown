@@ -5,6 +5,7 @@ import app.atom
 from app import assets
 from app import bullet, sprite
 
+
 class EnemyBlob(sprite.Sprite):
     def __init__(self, display, x, y, health, weight, scaleXframe=10, room=None):
 
