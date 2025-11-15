@@ -100,11 +100,12 @@ class MainDisplay2(BaseDisplay):
         for x in g.keys():
             for y in g[x]:
                 self.map.connect_two_rooms_no_doors(self.rooms[x[0]][x[1]], self.rooms[y[0]][y[1]])
-        samp=random.sample(lista, 10)
+        samp=random.sample(lista, 30)
         print(samp)
         self.enemies2=[]
         for x in samp:
-            e=EnemyBlob(self,200, 200,100,92)
+            e=EnemyBlob(self,200+x[0]*160,200+x[1]*160,100,92)
+            e.speed=0
             self.enemies.append(e)
 
 
@@ -279,8 +280,8 @@ class MainDisplay2(BaseDisplay):
         self.map.draw()
         for obj in self.game_objects:
             obj.render()
-        # for b in self.player_bullets:
-        #     b.render()
+        for b in self.player_bullets:
+            b.render()
         for b in self.enemy_bullets:
             b.render()
 
@@ -306,6 +307,19 @@ class MainDisplay2(BaseDisplay):
                 text.draw_text("Press C to craft", 10, 40, 24, rl.WHITE)
         except Exception:
             pass
+        # if (rl.is_key_pressed(rl.KeyboardKey.KEY_C) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_UP)):
+        #     if self.game.crafting==False:
+        #         self.game.crafting = True
+        #         self.game.current_display = self.game.crafting_display
+        #         self.trans = {8:"oxygen" ,  1:"hydrogen", 30:"zinc", 11:"sodium",36: "krypton", 56:"barium",
+        #                       16:"sulphur", 26:"iron", 2:"helium", 92:"uranium"}
+        #         self.game.crafting_display.inventory.inv={}
+        #         for x in self.game.atomic_masses:
+        #             try:
+        #                 self.game.crafting_display.inventory.inv[self.trans[x]]+=1
+        #             except:
+        #                 self.game.crafting_display.inventory.inv[self.trans[x]]=1
+        #         self.game.crafting_display.atom_bar.update()
 
     def update(self):
         if self.game.music_manager.current is None:
@@ -320,8 +334,8 @@ class MainDisplay2(BaseDisplay):
 
         self.camera.update_target(self.player.x, self.player.y, self.delta_time)
 
-        # for b in self.player_bullets:
-        #     b.update()
+        for b in self.player_bullets:
+            b.update()
         for b in self.enemy_bullets:
             b.update()
 

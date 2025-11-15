@@ -3,8 +3,18 @@ import pyray as rl
 from app.REACTOR import Reactor
 from app.displays.base import BaseDisplay
 from app.cameras import twodcamera
-from app import assets, map, room, player, enemy_blob, atom, book
+from app import assets, map, room, player, enemy_blob, atom, book, sprite
 from app.ui import text
+
+class Cutscene(sprite.Sprite):
+    def __init__(self, display, scaleXframewidth=60):
+            self.img = assets.images["Cutscene1"]
+            self.x = 0
+            self.y = 0
+            super().__init__(display, scaleXframewidth)
+            self.num_of_frames = 42
+
+
 
 
 class MainDisplay(BaseDisplay):
