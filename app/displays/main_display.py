@@ -167,14 +167,14 @@ class MainDisplay(BaseDisplay):
         tile_size = self.map.tile_size
 
 #debug stuff: draw lights on minimap
-        for light in getattr(self.map, "lights", [])[:100]:
-                lx_tiles = float(light['pos'].x) / float(tile_size)
-                ly_tiles = float(light['pos'].y) / float(tile_size)
-                mx = x + padding + int((lx_tiles - min_x) * scale)
-                my = y + padding + int((ly_tiles - min_y) * scale)
-                # small marker; don't scale with light radius to avoid clutter
-                marker_r = max(1, int(max(1.5, scale)))
-                rl.draw_circle(mx, my, marker_r, light['color'])
+        # for light in getattr(self.map, "lights", [])[:100]:
+        #         lx_tiles = float(light['pos'].x) / float(tile_size)
+        #         ly_tiles = float(light['pos'].y) / float(tile_size)
+        #         mx = x + padding + int((lx_tiles - min_x) * scale)
+        #         my = y + padding + int((ly_tiles - min_y) * scale)
+        #         # small marker; don't scale with light radius to avoid clutter
+        #         marker_r = max(1, int(max(1.5, scale)))
+        #         rl.draw_circle(mx, my, marker_r, light['color'])
 
 
         player_map_x = float(self.player.x) / float(tile_size)
