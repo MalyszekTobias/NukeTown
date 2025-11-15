@@ -23,13 +23,14 @@ class Player(Atom):
 
     def update(self, rooms = None, corridor_tiles = None):
         super().update(rooms, corridor_tiles)
+        print(self.game.best_craft)
         for room in rooms:
             if room.busy == 0:
                 if rl.check_collision_recs(self.rect, room.one_collision_rect(16)):
                     room.busy = 1
                     if not self.game.chapter2:
                         e = app.enemy_blob.EnemyBlob(self.display, (room.x + room.width / 2) * 16,
-                                                     16 * (room.y + room.height / 2), 10, 8, room=room)
+                                                     16 * (room.y + room.height / 2), 10, self.get_weight_of_spawned(), room=room)
                         self.display.enemies.append(e)
 
             elif room.busy == 2:
@@ -55,3 +56,7 @@ class Player(Atom):
                             pass
         except Exception:
             pass
+    def get_weight_of_spawned(self):
+        weights = [1, 2, 8, 11, 16, 26, 30, 36, 56, 92]
+        i = weights.index(self.game.best_craft)
+        return weights[i-1] if i > 0 else weights[0]

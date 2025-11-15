@@ -30,7 +30,7 @@ class Atom(sprite.Sprite):
         self.target_x = None
         self.target_y = None
         self.cooldown = 0
-        self.shittin = False
+        self.shootin = False
         # Distance beyond which follower atoms skip collisions to save perf and avoid snagging far away
         self._collision_disable_distance = 40.0
 
@@ -125,7 +125,7 @@ class Atom(sprite.Sprite):
         self.cooldown -= 1
         if rl.is_mouse_button_pressed(0):
             if self.cooldown <= 0:
-                self.shittin = True
+                self.shootin = True
                 self.img = assets.images["Bullet_Good_Create"]
                 self.num_of_frames = int(self.img.height / self.img.width)
                 self.frame_width = int(self.img.width)
@@ -191,7 +191,7 @@ class Atom(sprite.Sprite):
 
         dt = rl.get_frame_time()
         moving = any((self.up, self.down, self.left, self.right)) or abs(self.velUp) > 1e-6 or abs(self.velRight) > 1e-6
-        if self.shittin:
+        if self.shootin:
             self.frame_timer += dt
             while self.frame_timer >= self.frame_duration:
                 self.frame_timer -= self.frame_duration
@@ -200,7 +200,7 @@ class Atom(sprite.Sprite):
                 self.game.music_manager.play_sound(assets.sounds["Plum"])
             if self.current_frame == self.num_of_frames - 1:
                 self.shoot()
-                self.shittin = False
+                self.shootin = False
                 self.img = self.get_sprite()
                 self.num_of_frames = int(self.img.height / self.img.width)
                 self.frame_width = int(self.img.width)

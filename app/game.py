@@ -29,6 +29,7 @@ class Game:
         self.crafting_display = crafting.Crafting_Menu(self)
         self.chapter1_display = chapter1.Chapter1(self)
         self.chapter2_display = chapter2.Chapter2(self)
+        self.best_craft = 1
 
         # initialize music manager and start default music
 

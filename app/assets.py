@@ -63,7 +63,7 @@ def load():
     images["Wall_corner"] = rl.load_texture("app/assets/images/Corner.png")
     images["Table"] = rl.load_texture("app/assets/images/Table.png")
     images["Tablica"] = rl.load_texture("app/assets/images/Tablica.png")
-    images["Tablica_Fatass"] = rl.load_texture("app/assets/images/Tablica_Fatass.png")
+    images["Tablica_big"] = rl.load_texture("app/assets/images/Tablica_big.png")
     images["Taskbar"] = rl.load_texture("app/assets/images/Taskbar.png")
     images["Lampa"] = rl.load_texture("app/assets/images/Lampa.png")
 
