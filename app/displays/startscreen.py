@@ -45,7 +45,7 @@ class StartDisplay(BaseDisplay):
             self.text_x -= self.speed
 
         if self.counter >= 77:
-            self.game.change_display(self.game.ending)
+            self.game.change_display(self.game.twodgame)
 
 
 
