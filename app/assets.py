@@ -36,6 +36,7 @@ def load():
     images["Ex"] = rl.load_texture("app/assets/Spritesheets/iks.png")
     images["Arrow"] = rl.load_texture("app/assets/Spritesheets/Szczałka.png")
     images["Salto"] = rl.load_texture("app/assets/Spritesheets/Sigma_salto.png")
+    images["Salto2"] = rl.load_texture("app/assets/Spritesheets/Sigma_salto_2.png")
     # images["Elektrownia"] = rl.load_texture("app/assets/Spritesheets/Komin.png")
     images["Wall_horizontal"] = rl.load_texture("app/assets/images/Wall_1.png")
     images["Wall_vertical"] = rl.load_texture("app/assets/images/Wall_2.png")
