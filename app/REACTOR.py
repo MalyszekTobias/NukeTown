@@ -9,6 +9,8 @@ class Reactor(sprite.Sprite):
         # Precompute display size for interaction/collision
         self.visible_width = float(self.scaleXframewidth)
         self.visible_height = (self.frame_height / float(self.frame_width)) * self.visible_width if self.frame_width else self.visible_width
+        self.x = 220
+        self.y = 200
 
     def _reactor_rect(self):
         """Return the on-screen axis-aligned rect of the reactor as (x,y,w,h)."""

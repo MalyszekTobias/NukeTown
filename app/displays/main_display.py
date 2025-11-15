@@ -34,7 +34,7 @@ class MainDisplay(BaseDisplay):
 
 
         self.map = map.Map(self.game)
-        r1=self.map.add_room(room.Room(10, 10, 5, 5))
+        r1=self.map.add_room(room.Room(10, 10, 7, 7))
         r2He=self.map.add_room(room.Room(20, 2, 17, 21))
         self.map.connect_two_rooms(r1, r2He)
         r3=self.map.add_room(room.Room(40, 7, 13, 11))
