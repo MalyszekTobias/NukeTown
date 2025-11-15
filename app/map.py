@@ -1,16 +1,22 @@
 # python
 # File: app/map.py
 import pyray
-from typing import List, Set, Tuple
+from typing import List, Set, Tuple, Dict, Any
 from app.room import Room
 
 Tile = Tuple[int, int]
+Light = Dict[str, Any]
+
 
 class Map:
     def __init__(self):
         self.rooms: List[Room] = []
         self.corridor_tiles: Set[Tile] = set()
         self.tile_size: int = 16
+        self.lights: List[Light] = []
+
+    def add_light(self, x: float, y: float, radius: float, color: pyray.Color):
+        self.lights.append({'pos': pyray.Vector2(x, y), 'radius': radius, 'color': color})
 
     def add_room(self, room: Room):
         self.rooms.append(room)

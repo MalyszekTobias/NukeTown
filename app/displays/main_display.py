@@ -50,15 +50,18 @@ class MainDisplay(BaseDisplay):
         self._intro_tolerance = 0.01
         self.camera.camera.zoom = 100.0  # start zoomed in
 
-        self.lights = []
-        self.lights.append(
-            {'pos': rl.Vector2(self.player.x, self.player.y), 'radius': 200.0, 'color': rl.Color(255, 255, 255, 255)})
-        self.lights.append({'pos': rl.Vector2(500, 500), 'radius': 150.0, 'color': rl.Color(255, 0, 0, 255)})
+
+        # Seed a static example light; player light will be first element and updated per-frame
+        self.map.add_light(self.player.x, self.player.y, 220.0, rl.Color(255, 255, 255, 255))
+        self.map.add_light(200, 200, 150.0, rl.Color(255, 0, 0, 255))
 
         self.light_shader = self.game.light_shader
         self.lights_pos_loc = rl.get_shader_location(self.light_shader, "lights")
         self.lights_color_loc = rl.get_shader_location(self.light_shader, "light_colors")
         self.num_lights_loc = rl.get_shader_location(self.light_shader, "num_lights")
+        self.ambient_loc = rl.get_shader_location(self.light_shader, "ambient")
+        rl.set_shader_value(self.light_shader, self.ambient_loc, rl.ffi.new("float *", 0.0),
+                            rl.ShaderUniformDataType.SHADER_UNIFORM_FLOAT)
 
     def draw_minimap(self):
         if not getattr(self.map, "rooms", None):
@@ -105,11 +108,18 @@ class MainDisplay(BaseDisplay):
 
         super().render()
 
-        # Update light shader uniforms
-        num_lights = len(self.lights)
+        # Ensure first light follows player (player light)
+        if self.map.lights:
+            self.map.lights[0]['pos'].x = self.player.x
+            self.map.lights[0]['pos'].y = self.player.y
+
+        # Update light shader uniforms (clamp to MAX_LIGHTS from shader)
+        MAX_LIGHTS = 10
+        visible_lights = self.map.lights[:MAX_LIGHTS]
+        num_lights = len(visible_lights)
         light_pos_data = []
         light_color_data = []
-        for light in self.lights:
+        for light in visible_lights:
             cam_pos = rl.get_world_to_screen_2d(light['pos'], self.camera.camera)
             # Invert Y-coordinate for shader
             light_pos_data.extend([cam_pos.x, self.game.height - cam_pos.y, light['radius']])
@@ -118,10 +128,11 @@ class MainDisplay(BaseDisplay):
 
         rl.set_shader_value(self.light_shader, self.num_lights_loc, rl.ffi.new("int *", num_lights),
                             rl.ShaderUniformDataType.SHADER_UNIFORM_INT)
-        rl.set_shader_value_v(self.light_shader, self.lights_pos_loc, rl.ffi.new("float[]", light_pos_data),
-                             rl.ShaderUniformDataType.SHADER_UNIFORM_VEC3, num_lights)
-        rl.set_shader_value_v(self.light_shader, self.lights_color_loc, rl.ffi.new("float[]", light_color_data),
-                             rl.ShaderUniformDataType.SHADER_UNIFORM_VEC4, num_lights)
+        if num_lights > 0:
+            rl.set_shader_value_v(self.light_shader, self.lights_pos_loc, rl.ffi.new("float[]", light_pos_data),
+                                 rl.ShaderUniformDataType.SHADER_UNIFORM_VEC3, num_lights)
+            rl.set_shader_value_v(self.light_shader, self.lights_color_loc, rl.ffi.new("float[]", light_color_data),
+                                 rl.ShaderUniformDataType.SHADER_UNIFORM_VEC4, num_lights)
 
         # 1) Draw the main scene (map + objects) to a texture
         rl.begin_texture_mode(self.texture)
@@ -189,8 +200,3 @@ class MainDisplay(BaseDisplay):
                 self.game.current_display = self.game.crafting_display
                 if self.game.music_manager.current != 1:
                     self.game.music_manager.play_music1()
-
-
-
-
-

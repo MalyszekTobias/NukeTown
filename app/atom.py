@@ -88,31 +88,11 @@ class Atom(sprite.Sprite):
             else:
                 self.velRight = 0
 
-        if self.velUp < 0:
-            if self.y < self.gameHeight - self.radius:
-                if self.y < self.gameHeight - self.radius + self.velUp:
-                    self.y -= self.velUp
-                else:
-                    self.y = self.gameHeight - self.radius
-        else:
-            if self.y > self.radius + self.hpHeight:
-                if self.y > self.radius + self.velUp + self.hpHeight:
-                    self.y -= self.velUp
-                else:
-                    self.y = self.radius + self.hpHeight
+        self.y -= self.velUp
 
-        if self.velRight < 0:
-            if self.x > self.radius:
-                if self.x > self.radius - self.velRight:
-                    self.x += self.velRight
-                else:
-                    self.x = self.radius
-        else:
-            if self.x < self.gameWidth - self.radius:
-                if self.x < self.gameWidth - self.radius - self.velRight:
-                    self.x += self.velRight
-                else:
-                    self.x = self.gameWidth - self.radius
+
+
+        self.x += self.velRight
 
     def update(self, rooms = None, corridor_tiles = None):
         self.rect = rl.Rectangle(self.x - self.radius / 2, self.y - self.radius / 2,
