@@ -29,9 +29,12 @@ class Player(Atom):
                     room.busy = 1
                     if not self.game.chapter2:
                         e = app.enemy_blob.EnemyBlob(self.display, (room.x + room.width / 2) * 16,
-                                                     16 * (room.y + room.height / 2), 10, 8)
+                                                     16 * (room.y + room.height / 2), 10, 8, room=room)
                         self.display.enemies.append(e)
 
+            elif room.busy == 2:
+                if not rl.check_collision_recs(self.rect, room.one_collision_rect(16)):
+                    room.busy = 0
 
         for enemy_bullet in self.display.enemy_bullets:
             if rl.check_collision_circles(rl.Vector2(self.x, self.y), self.radius / 2,

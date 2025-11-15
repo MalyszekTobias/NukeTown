@@ -31,6 +31,8 @@ class Atom(sprite.Sprite):
         self.target_y = None
         self.cooldown = 0
         self.shittin = False
+        # Distance beyond which follower atoms skip collisions to save perf and avoid snagging far away
+        self._collision_disable_distance = 40.0
 
     def get_sprite(self):
         if self.weight in [0, 92]:
@@ -93,6 +95,19 @@ class Atom(sprite.Sprite):
 
         self.x += self.velRight
 
+    def _is_far_from_player(self):
+        """Return True if this atom (when follower) is far enough from player to skip collisions."""
+        # Only followers (leader set) get their collisions disabled by distance.
+        if self.leader is None:
+            return False
+        try:
+            px, py = self.display.player.x, self.display.player.y
+        except Exception:
+            return False
+        dx = self.x - px
+        dy = self.y - py
+        return (dx * dx + dy * dy) > (self._collision_disable_distance * self._collision_disable_distance)
+
     def update(self, rooms = None, corridor_tiles = None):
         self.rect = rl.Rectangle(self.x - self.radius / 2, self.y - self.radius / 2,
                                 self.radius, self.radius)
@@ -147,7 +162,9 @@ class Atom(sprite.Sprite):
 
         # tile logic: prevent leaving corridor tiles unless entering a room
         tile_size = 16
-        if corridor_tiles is not None:
+        # Skip corridor constraints when far from player (followers only)
+        far_from_player = self._is_far_from_player()
+        if corridor_tiles is not None and not far_from_player:
 
             old_tile = (int(old_x) // tile_size, int(old_y) // tile_size)
             new_tile = (int(self.x) // tile_size, int(self.y) // tile_size)
@@ -211,7 +228,9 @@ class Atom(sprite.Sprite):
                 else:
                     self.current_frame = 0
                     self.frame_timer = 0.0
-        self._resolve_wall_collisions(rooms, 16, corridor_tiles)
+        # Skip wall/gate collision resolution when far from player (followers only)
+        if not far_from_player:
+            self._resolve_wall_collisions(rooms, 16, corridor_tiles)
 
     def _resolve_wall_collisions(self, rooms, tile_size, corridor_tiles=None):
         """Rect vs rect: push atom out of first colliding wall rect."""
@@ -326,3 +345,4 @@ class Atom(sprite.Sprite):
         y = rl.get_random_value(- radius, radius)
         self.target_x = self.leader.x + x
         self.target_y = self.leader.y + y
+

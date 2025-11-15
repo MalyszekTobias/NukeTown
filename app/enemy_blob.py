@@ -6,13 +6,14 @@ from app import assets
 from app import bullet, sprite
 
 class EnemyBlob(sprite.Sprite):
-    def __init__(self, display, x, y, health, weight, scaleXframe=10, ):
+    def __init__(self, display, x, y, health, weight, scaleXframe=10, room=None):
 
         self.weight = weight
         self.health = health
 
         self.scaleXframe = scaleXframe
         self.img = self.get_sprite()
+        self.room = room
         print(self.img.width, self.img.height)
         print(self.img)
         super().__init__(display, self.scaleXframe)
@@ -178,11 +179,15 @@ class EnemyBlob(sprite.Sprite):
 
     def die(self):
         a = app.atom.Atom(self.display, self.weight, self.display.player, self.x * 16, self.y * 16)
-        print(self.x, self.y)
+        if not self.room == None:
+            self.room.busy = 2
         self.display.player.friends.append(a)
-        self.display.enemies.remove(self)
-        self.display.game_objects.remove(self)
-        del self
+        try:
+            self.display.enemies.remove(self)
+            self.display.game_objects.remove(self)
+            del self
+        except:
+            pass
 
     def _resolve_wall_collisions(self, rooms, tile_size, corridor_tiles=None):
         """Rect vs rect: push enemy blob out of first colliding wall rect."""
