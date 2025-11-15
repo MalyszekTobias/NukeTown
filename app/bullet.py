@@ -5,6 +5,7 @@ class Bullet:
         self.game = game
         self.x, self.y = x, y
         self.speed = 0.5
+        self.radius = 1
         self.velRight = velRight
         self.velUp = velUp
         self.target = target
