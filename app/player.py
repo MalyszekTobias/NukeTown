@@ -9,6 +9,8 @@ class Player(Atom):
         self.friends = []
         self.x = 200
         self.y = 200
+        self.hp = 100
+        self.hpHeight = 20
 
 
     def spawn_friend(self, weight):
@@ -22,9 +24,9 @@ class Player(Atom):
         for enemy_bullet in self.display.enemy_bullets:
             if rl.check_collision_circles(rl.Vector2(self.x, self.y), self.radius / 2,
                                           rl.Vector2(enemy_bullet.x, enemy_bullet.y), enemy_bullet.radius / 2):
+                self.hp -= enemy_bullet.damage
                 self.display.enemy_bullets.remove(enemy_bullet)
                 self.game.music_manager.play_sound(assets.sounds["shot"])
-        # Interaction: open nearby gates by pressing E (or gamepad button)
         try:
             if rl.is_key_pressed(rl.KeyboardKey.KEY_E) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_LEFT):
                 mp = getattr(self.display, 'map', None)
