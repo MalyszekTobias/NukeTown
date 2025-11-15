@@ -140,43 +140,36 @@ class MainDisplay(BaseDisplay):
         map_h = max(1, max_y - min_y)
         scale = min(content_size / map_w, content_size / map_h)
 
-        rl.draw_rectangle(x-5, y-5, size+10, size+10, rl.DARKGRAY)
-        rl.draw_rectangle(x, y, size, size, rl.BLACK)
+        # Semi-transparent frame and background
+        rl.draw_rectangle(x - 5, y - 5, size + 10, size + 10, rl.fade(rl.DARKGRAY, 0.6))
+        rl.draw_rectangle(x, y, size, size, rl.fade(rl.BLACK, 0.5))
 
+        # Corridors
         for (tile_x, tile_y) in self.map.corridor_tiles:
             cx = x + padding + int((tile_x - min_x) * scale)
             cy = y + padding + int((tile_y - min_y) * scale)
             cw = max(1, int(scale))
             ch = max(1, int(scale))
-            rl.draw_rectangle(cx, cy, cw, ch, rl.DARKGRAY)
+            rl.draw_rectangle(cx, cy, cw, ch, rl.fade(rl.DARKGRAY, 1))
 
-        # draw rooms
+        # Rooms
         for rm in self.map.rooms:
             rx = x + padding + int((rm.x - min_x) * scale)
             ry = y + padding + int((rm.y - min_y) * scale)
             rw = max(1, int(rm.width * scale))
             rh = max(1, int(rm.height * scale))
-            rl.draw_rectangle(int(rx+scale), int(ry+scale), int(rw-(2*scale)), int(rh-(2*scale)), rl.WHITE)
-            rl.draw_rectangle_lines(rx, ry, rw, rh, rl.GRAY)
+            rl.draw_rectangle(int(rx + scale), int(ry + scale), int(rw - (2 * scale)), int(rh - (2 * scale)),
+                              rl.fade(rl.WHITE, 1))
+            rl.draw_rectangle_lines(rx, ry, rw, rh, rl.fade(rl.GRAY, 0.85))
+
         tile_size = self.map.tile_size
 
-#debug stuff: draw lights on minimap
-        # for light in getattr(self.map, "lights", [])[:100]:
-        #         lx_tiles = float(light['pos'].x) / float(tile_size)
-        #         ly_tiles = float(light['pos'].y) / float(tile_size)
-        #         mx = x + padding + int((lx_tiles - min_x) * scale)
-        #         my = y + padding + int((ly_tiles - min_y) * scale)
-        #         # small marker; don't scale with light radius to avoid clutter
-        #         marker_r = max(1, int(max(1.5, scale)))
-        #         rl.draw_circle(mx, my, marker_r, light['color'])
-
-
+        # Player marker (keep mostly opaque)
         player_map_x = float(self.player.x) / float(tile_size)
         player_map_y = float(self.player.y) / float(tile_size)
-        # draw player
         px = x + padding + int((player_map_x - min_x) * scale)
         py = y + padding + int((player_map_y - min_y) * scale)
-        rl.draw_circle(px, py, 3, rl.GREEN)
+        rl.draw_circle(px, py, 3, rl.fade(rl.GREEN, 0.95))
 
     def render(self):
 
