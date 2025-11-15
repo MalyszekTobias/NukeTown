@@ -1,21 +1,50 @@
 import pyray as rl
 from app.displays.base import BaseDisplay
-from app.ui import button
+from app.ui import button, text
+import itertools, math
+from app import sprite
+
+
 class StartDisplay(BaseDisplay):
 
     def __init__(self, game):
         super().__init__(game)
-        self.button_to_2dgame = button.Button(self.game, 200, 100, 100, 100, "click to enter 2dgame", 20, rl.WHITE, rl.GRAY, rl.GREEN, rl.RED)
+        self.button_to_2dgame = button.Button(self.game, self.game.width//4, self.game.height//2 + 100, 150, 50, "BEGIN", 50, rl.WHITE, (rl.GRAY[0], rl.GRAY[0],rl.GRAY[0], 0), rl.RED, rl.RED)
         self.buttons = [self.button_to_2dgame]
         self.focus_index = 0
+        self.jumping_mascot = sprite.Jumping_sprite_test(self)
+        self.fader = itertools.cycle(self.color_cycle())
 
     def render(self):
-        super().render()
+
         rl.draw_fps(10, 10)
+
+        r, g, b = next(self.fader)
+        self.jumping_mascot.tint = (r, g, b, 255)
+        text.draw_text('NUKE TOWN', 100, self.game.height // 2 - 100, 200, (r, g, b, 255))
+        self.button_to_2dgame.text_color = (r, g, b, 255)
         for b in self.buttons:
             b.draw()
 
+        super().render()
+
+    def color_cycle(self):
+        period = 5000
+        t = 0
+        while True:
+            # red goes 0 → 255 → 0
+            red = int((math.sin((t * 2 * math.pi / period) + math.pi/2) + 1) * 127.5)
+
+            green = 255
+            blue = 0
+
+            yield (red, green, blue)
+            t += 1
+
+
+
     def update(self):
+        super().update()
         if self.game.gamepad_enabled:
             y = getattr(self.game, "left_joystick_y", 0.0)
             if y < -self.game.gamepad_deadzone:

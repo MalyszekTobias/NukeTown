@@ -60,7 +60,7 @@ def load():
     images["GateOpen"] = rl.load_texture("app/assets/images/Gate_Open.png")
 
     images["Uranium_Standby"]=rl.load_texture("app/assets/images/MC_Standby.png")
-    font = rl.load_font('app/assets/Fonts/Chernobyl.otf')
+    font = rl.load_font_ex('app/assets/Fonts/Chernobyl.otf', 1024, None, 0)
 
     sounds["shot"] = rl.load_sound("app/assets/Sounds/roblox-death-sound-effect.mp3")
     sounds["Plum"] = rl.load_sound("app/assets/Sounds/Slime_join.mp3")

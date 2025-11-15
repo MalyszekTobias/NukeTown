@@ -10,5 +10,9 @@ class BaseDisplay:
     def render(self):
         rl.clear_background(rl.BLACK)
 
+        for object in self.game_objects:
+            object.render()
+
     def update(self):
-        pass
+        for object in self.game_objects:
+            object.update()
