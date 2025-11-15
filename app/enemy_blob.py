@@ -20,7 +20,7 @@ class EnemyBlob(sprite.Sprite):
         self.x, self.y = x, y
         self.speed = 0.55
         self.detection_radius = 100
-        self.shittin = False
+        self.shootin = False
 
         self.shooting_range = 26
 
@@ -65,7 +65,7 @@ class EnemyBlob(sprite.Sprite):
         dist = math.hypot(dx, dy)
         self.cooldown_timer -= 1
         if self.cooldown_timer <= 0 and dist <= self.shooting_range + 5:
-            self.shittin = True
+            self.shootin = True
             self.img = assets.images["Bullet_Bad_Create"]
             self.num_of_frames = int(self.img.height / self.img.width)
             self.frame_width = int(self.img.width)
@@ -92,13 +92,13 @@ class EnemyBlob(sprite.Sprite):
                 self.frame_timer -= self.frame_duration
                 self.current_frame = (self.current_frame + 1) % self.num_of_frames
 
-        if self.shittin:
+        if self.shootin:
             print(self.current_frame)
             if self.current_frame == self.num_of_frames - 9:
                 self.game.music_manager.play_sound(assets.sounds["Plum"])
             if self.current_frame == self.num_of_frames - 1:
                 self.shoot()
-                self.shittin = False
+                self.shootin = False
                 self.img = self.get_sprite()
                 self.num_of_frames = int(self.img.height / self.img.width)
                 self.frame_width = int(self.img.width)
@@ -108,7 +108,7 @@ class EnemyBlob(sprite.Sprite):
                 self.frame_duration = 0.08
 
         # postępuj klatkami także podczas animacji strzału
-        if self.current_frame != 0 or self.shittin:
+        if self.current_frame != 0 or self.shootin:
             self.frame_timer += rl.get_frame_time()
             while self.frame_timer >= self.frame_duration:
                 self.frame_timer -= self.frame_duration
@@ -182,6 +182,7 @@ class EnemyBlob(sprite.Sprite):
         if not self.room == None:
             self.room.busy = 2
         self.display.player.friends.append(a)
+        self.game.atomic_masses.append(self.weight)
         try:
             self.display.enemies.remove(self)
             self.display.game_objects.remove(self)
@@ -190,52 +191,41 @@ class EnemyBlob(sprite.Sprite):
             pass
 
     def _resolve_wall_collisions(self, rooms, tile_size, corridor_tiles=None):
-        """Rect vs rect: push enemy blob out of first colliding wall rect."""
         if not rooms:
             return
         ax, ay, aw, ah = self.rect.x, self.rect.y, self.rect.width, self.rect.height
 
-        # Check room wall collisions
         for room in rooms:
             for (wx, wy, ww, wh) in room.collision_rects(tile_size, corridor_tiles):
-                # AABB overlap test
                 if ax < wx + ww and ax + aw > wx and ay < wy + wh and ay + ah > wy:
-                    # compute penetration depths on each side
                     pen_left = (ax + aw) - wx
                     pen_right = (wx + ww) - ax
                     pen_top = (ay + ah) - wy
                     pen_bottom = (wy + wh) - ay
-                    # choose smallest penetration axis
                     min_pen = min(pen_left, pen_right, pen_top, pen_bottom)
                     if min_pen == pen_left:
-                        # push blob left
                         ax -= pen_left
                     elif min_pen == pen_right:
                         ax += pen_right
                     elif min_pen == pen_top:
                         ay -= pen_top
-                    else:  # pen_bottom
+                    else:
                         ay += pen_bottom
-                    # write back center from rect
                     self.x = ax + aw / 2
                     self.y = ay + ah / 2
                     return
 
-        # Check closed gate collisions
         try:
             mp = getattr(self.display, 'map', None)
             if mp and getattr(mp, 'gates', None):
                 for gate in mp.gates.values():
                     if not gate.is_open:
                         wx, wy, ww, wh = gate.collision_rect()
-                        # AABB overlap test
                         if ax < wx + ww and ax + aw > wx and ay < wy + wh and ay + ah > wy:
-                            # compute penetration depths on each side
                             pen_left = (ax + aw) - wx
                             pen_right = (wx + ww) - ax
                             pen_top = (ay + ah) - wy
                             pen_bottom = (wy + wh) - ay
-                            # choose smallest penetration axis
                             min_pen = min(pen_left, pen_right, pen_top, pen_bottom)
                             if min_pen == pen_left:
                                 ax -= pen_left
@@ -243,9 +233,8 @@ class EnemyBlob(sprite.Sprite):
                                 ax += pen_right
                             elif min_pen == pen_top:
                                 ay -= pen_top
-                            else:  # pen_bottom
+                            else:
                                 ay += pen_bottom
-                            # write back center from rect
                             self.x = ax + aw / 2
                             self.y = ay + ah / 2
                             return

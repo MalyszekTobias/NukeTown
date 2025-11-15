@@ -138,16 +138,13 @@ class Room:
         py = self.y * tile_size
         pw = self.width * tile_size
         ph = self.height * tile_size
-        pyray.draw_rectangle_lines(px, py, pw, ph, color)
 
-        # floor textures
         floor_tex = assets.images.get("Floor_Default")
         cracked_tex = assets.images.get("Floor_Cracked")
         flower1_tex = assets.images.get("Floor_flower_1")
         flower2_tex = assets.images.get("Floor_flower_2")
         flower3_tex = assets.images.get("Floor_flower_3")
 
-        # draw floors (background tiles)
         for tx, ty in self.background_tiles():
             dest_x = tx * tile_size
             dest_y = ty * tile_size
@@ -165,7 +162,6 @@ class Room:
             else:
                 pyray.draw_rectangle(dest_x, dest_y, tile_size, tile_size, pyray.DARKGRAY)
 
-        # wall textures: horizontal for top/bottom, vertical for left/right
         wall_h_tex = assets.images.get("Wall_horizontal")
         wall_v_tex = assets.images.get("Wall_vertical")
         wall_corner_tex = assets.images.get("Wall_corner")
@@ -178,11 +174,9 @@ class Room:
             (x0 + w - 1, y0 + h - 1),
         ]
 
-        # Compute wall sets
         all_wall_tiles = self.wall_tiles()  # without exclusions
         visible_wall_tiles = self.wall_tiles(exclude_tiles=corridor_tiles)
 
-        # Draw remaining walls
         for wx, wy in visible_wall_tiles:
             dest_x = wx * tile_size
             dest_y = wy * tile_size

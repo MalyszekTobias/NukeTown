@@ -14,8 +14,8 @@ class MusicManager:
     """
 
     # default expected paths (may be overridden by discovery)
-    MUSIC1_DEFAULT = "app/assets/Sounds/music.mp3"
-    MUSIC2_DEFAULT = "app/assets/Sounds/music.mp3"
+    MUSIC1_DEFAULT = "app/assets/Sounds/Doom Eternal OST - The Only Thing They Fear Is You (Mick Gordon) [Doom Eternal Theme].mp3"
+    MUSIC2_DEFAULT = "app/assets/Sounds/Terraria Music - Day.mp3"
 
     def __init__(self):
         # initialize audio device if available

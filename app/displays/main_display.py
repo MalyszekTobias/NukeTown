@@ -26,7 +26,6 @@ class MainDisplay(BaseDisplay):
 
         self.jeff_image = assets.images["Jeff"]
 
-        # Store the reactor so we can check proximity for crafting
         self.reactor = Reactor(self)
 
 
@@ -85,10 +84,8 @@ class MainDisplay(BaseDisplay):
         self.camera.camera.zoom = 100.0  # start zoomed in
 
 
-        # Seed a static example light; player light will be first element and updated per-frame
         self.map.add_light(self.player.x, self.player.y, 420.0, rl.Color(150, 150, 150, 255))
 
-        # Add a light in the center of each room
         tile_size = self.map.tile_size
         # r1
         self.map.add_light(220, 223, 600.0, rl.Color(255, 0, 0, 255))
@@ -134,7 +131,6 @@ class MainDisplay(BaseDisplay):
         padding = 4
         content_size = size - padding * 2
 
-        # compute map bounds
         min_x = min((r.x for r in self.map.rooms), default=0)
         max_x = max((r.x + r.width for r in self.map.rooms), default=1)
         min_y = min((r.y for r in self.map.rooms), default=0)
@@ -144,11 +140,9 @@ class MainDisplay(BaseDisplay):
         map_h = max(1, max_y - min_y)
         scale = min(content_size / map_w, content_size / map_h)
 
-        # background + border
         rl.draw_rectangle(x-5, y-5, size+10, size+10, rl.DARKGRAY)
         rl.draw_rectangle(x, y, size, size, rl.BLACK)
 
-        # draw corridors
         for (tile_x, tile_y) in self.map.corridor_tiles:
             cx = x + padding + int((tile_x - min_x) * scale)
             cy = y + padding + int((tile_y - min_y) * scale)
@@ -188,7 +182,6 @@ class MainDisplay(BaseDisplay):
 
         super().render()
 
-        # Ensure first light follows player (player light)
         if self.map.lights:
             self.map.lights[0]['pos'].x = self.player.x
             self.map.lights[0]['pos'].y = self.player.y
@@ -244,14 +237,12 @@ class MainDisplay(BaseDisplay):
         if self.game.gamepad_enabled:
             text.draw_text(f"Gamepad X: {self.game.left_joystick_x:.2f}  Y: {self.game.left_joystick_y:.2f}", 10, 130, 20,
                          rl.YELLOW, )
-        # Interaction hint when colliding with the reactor
         try:
             if self.reactor and self.reactor.can_interact(self.player):
                 text.draw_text("Press C to craft", 10, 40, 24, rl.WHITE)
         except Exception:
             pass
 
-        # Interaction hint when near any book
         try:
             for bk in self.books:
                 if bk.can_interact(self.player):
@@ -260,10 +251,8 @@ class MainDisplay(BaseDisplay):
         except Exception:
             pass
 
-        # Display book message if one is active
         if self.book_message is not None:
-            # Find the book object to get its flavour text
-            book_text = f"Hello World {self.book_message}"  # Fallback
+            book_text = f"Hello World {self.book_message}"
             try:
                 for bk in self.books:
                     if bk.book_id == self.book_message:
@@ -272,9 +261,7 @@ class MainDisplay(BaseDisplay):
             except Exception:
                 pass
 
-            # Draw a semi-transparent overlay
             rl.draw_rectangle(0, 0, self.game.width, self.game.height, rl.Color(0, 0, 0, 180))
-            # Draw the message box (larger for longer texts)
             box_width = 800
             box_height = 300
             box_x = (self.game.width - box_width) // 2
@@ -282,13 +269,11 @@ class MainDisplay(BaseDisplay):
             rl.draw_rectangle(box_x, box_y, box_width, box_height, rl.Color(50, 50, 50, 255))
             rl.draw_rectangle_lines(box_x, box_y, box_width, box_height, rl.WHITE)
 
-            # Draw the text with word wrapping
             text_x = box_x + 30
             text_y = box_y + 30
             text_width = box_width - 60
             text_size = 24
 
-            # Simple word wrapping
             words = book_text.split(' ')
             current_line = ""
             y_offset = 0
@@ -296,7 +281,6 @@ class MainDisplay(BaseDisplay):
 
             for word in words:
                 test_line = current_line + word + " "
-                # Approximate text width (rough estimate)
                 if len(test_line) * (text_size * 0.8) > text_width:
                     if current_line:
                         text.draw_text(current_line.strip(), text_x, text_y + y_offset, text_size, rl.WHITE)
@@ -305,11 +289,9 @@ class MainDisplay(BaseDisplay):
                 else:
                     current_line = test_line
 
-            # Draw the last line
             if current_line:
                 text.draw_text(current_line.strip(), text_x, text_y + y_offset, text_size, rl.WHITE)
 
-            # Draw close instruction at bottom
             text.draw_text("Press E to close", box_x + 30, box_y + box_height - 50, 20, rl.GRAY)
 
     def update(self):
@@ -319,7 +301,6 @@ class MainDisplay(BaseDisplay):
 
         if self.intro:
             self.camera.zoom_intro(self.delta_time)
-            # stop the intro once the camera zoom reaches (close enough to) the target
             if abs(self.camera.camera.zoom - self.camera.target_zoom) < 0.01:
                 self.intro = False
 
@@ -336,15 +317,12 @@ class MainDisplay(BaseDisplay):
 
         for object in self.game_objects:
             if issubclass(type(object), atom.Atom):
-                # Keep corridor tiles intact, but closed gates will be treated as walls via collision rects
                 object.update(self.map.rooms, self.map.corridor_tiles)
             elif isinstance(object, enemy_blob.EnemyBlob):
-                # Enemy blobs also need rooms and corridor_tiles for gate/wall collision
                 object.update(self.map.rooms, self.map.corridor_tiles)
             else:
                 object.update()
 
-        # Open crafting only when near the reactor
         can_open_crafting = False
         try:
             if self.reactor and hasattr(self.reactor, 'can_interact'):
@@ -373,13 +351,10 @@ class MainDisplay(BaseDisplay):
             rl.draw_rectangle(0, 0, 400, 200, rl.BLACK)
             self.game.change_display(self.game.pause_menu)
 
-        # Check for E key press near books
         if rl.is_key_pressed(rl.KeyboardKey.KEY_E) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_LEFT):
-            # If a book message is showing, close it
             if self.book_message is not None:
                 self.book_message = None
             else:
-                # Check if player is near any book
                 try:
                     for bk in self.books:
                         if bk.can_interact(self.player):
