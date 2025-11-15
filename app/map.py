@@ -14,6 +14,8 @@ class Map:
         self.rooms: List[Room] = []
         self.corridor_tiles: Set[Tile] = set()
         self.tile_size: int = 16
+        # gates keyed by tile coordinate -> Gate instance
+        self.gates = {}
         self.lights: List[Light] = []
 
     def add_light(self, x: float, y: float, radius: float, color: pyray.Color):
@@ -47,6 +49,20 @@ class Map:
             a = rooms_sorted[i].center()
             b = rooms_sorted[i + 1].center()
             self.corridor_tiles.update(self._create_corridor_between(a, b))
+        # After corridor generation, populate gates for removed wall tiles
+        try:
+            from app.gate import Gate
+        except Exception:
+            Gate = None
+        if Gate:
+            # create gates for wall tiles that were removed by corridors
+            for room in self.rooms:
+                all_walls = room.wall_tiles()
+                visible_walls = room.wall_tiles(exclude_tiles=self.corridor_tiles)
+                removed = all_walls - visible_walls
+                for tile in removed:
+                    if tile not in self.gates:
+                        self.gates[tile] = Gate(self, tile, room_ref=room, is_open=False)
 
     def draw(self):
         tile_size = self.tile_size
@@ -56,3 +72,9 @@ class Map:
             pyray.draw_rectangle(x * tile_size, y * tile_size, tile_size, tile_size, pyray.DARKGRAY)
         for room in self.rooms:
             room.draw(tile_size=tile_size, color=pyray.RED, corridor_tiles=self.corridor_tiles)
+        # draw gates on top of rooms/corridors
+        for g in list(self.gates.values()):
+            try:
+                g.draw(tile_size)
+            except Exception:
+                pass

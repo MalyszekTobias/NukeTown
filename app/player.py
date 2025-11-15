@@ -24,3 +24,17 @@ class Player(Atom):
                                           rl.Vector2(enemy_bullet.x, enemy_bullet.y), enemy_bullet.radius / 2):
                 self.display.enemy_bullets.remove(enemy_bullet)
                 self.game.music_manager.play_sound(assets.sounds["shot"])
+        # Interaction: open nearby gates by pressing E (or gamepad button)
+        try:
+            if rl.is_key_pressed(rl.KeyboardKey.KEY_E) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_LEFT):
+                mp = getattr(self.display, 'map', None)
+                if mp and getattr(mp, 'gates', None):
+                    for g in mp.gates.values():
+                        try:
+                            if g.can_interact(self):
+                                g.interact(self)
+                                break
+                        except Exception:
+                            pass
+        except Exception:
+            pass
