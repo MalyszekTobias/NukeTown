@@ -1,6 +1,6 @@
 import pyray as rl
 
-from app.displays import startscreen, main_display,crafting, chapter1, pause, chapter2, main_display2
+from app.displays import startscreen, main_display,crafting, chapter1, pause, chapter2, main_display2, cutscene, cutscene2
 from app import assets
 
 from app import music
@@ -9,6 +9,7 @@ from app import music
 class Game:
     def __init__(self):
         self.width, self.height = 1920, 1080
+        self.stop=False
         rl.set_config_flags(rl.ConfigFlags.FLAG_VSYNC_HINT)
         rl.set_config_flags(rl.ConfigFlags.FLAG_MSAA_4X_HINT)
         rl.init_window(self.width, self.height, "raylib template?")
@@ -26,9 +27,11 @@ class Game:
         self.crafting_display = crafting.Crafting_Menu(self)
         self.chapter1_display = chapter1.Chapter1(self)
         self.chapter2_display = chapter2.Chapter2(self)
+        self.cutscene_display = cutscene.Cutscene(self)
+        self.ending = cutscene2.Cutscene(self)
         self.best_craft = 1
 
-        self.atomic_masses = [1,1,1,1,36,56]
+        self.atomic_masses = [1,1,1,1]
         self.twodgame = main_display.MainDisplay(self)
         self.display2 = main_display2.MainDisplay2(self)
         self.chapter2=False
@@ -38,6 +41,7 @@ class Game:
         self.gamepad_id = 0
         self.gamepad_deadzone = 0.25
         self.gamepad_enabled = False
+        self.quit = False
 
 
     def draw_loading_screen(self, message: str = "Loading…"):
@@ -57,10 +61,12 @@ class Game:
         self.current_display = display
 
     def loop(self):
-        while not rl.window_should_close():
-            self.update()
-            self.render()
-
+       if not self.quit:
+            while not rl.window_should_close():
+                self.update()
+                self.render()
+       else:
+           rl.close_window()
 
     def render(self):
         rl.begin_drawing()

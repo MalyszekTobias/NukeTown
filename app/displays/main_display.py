@@ -3,8 +3,18 @@ import pyray as rl
 from app.REACTOR import Reactor
 from app.displays.base import BaseDisplay
 from app.cameras import twodcamera
-from app import assets, map, room, player, enemy_blob, atom, book
+from app import assets, map, room, player, enemy_blob, atom, book, sprite
 from app.ui import text
+
+class Cutscene(sprite.Sprite):
+    def __init__(self, display, scaleXframewidth=60):
+            self.img = assets.images["Cutscene1"]
+            self.x = 0
+            self.y = 0
+            super().__init__(display, scaleXframewidth)
+            self.num_of_frames = 42
+
+
 
 
 class MainDisplay(BaseDisplay):
@@ -140,43 +150,36 @@ class MainDisplay(BaseDisplay):
         map_h = max(1, max_y - min_y)
         scale = min(content_size / map_w, content_size / map_h)
 
-        rl.draw_rectangle(x-5, y-5, size+10, size+10, rl.DARKGRAY)
-        rl.draw_rectangle(x, y, size, size, rl.BLACK)
+        # Semi-transparent frame and background
+        rl.draw_rectangle(x - 5, y - 5, size + 10, size + 10, rl.fade(rl.DARKGRAY, 0.6))
+        rl.draw_rectangle(x, y, size, size, rl.fade(rl.BLACK, 0.5))
 
+        # Corridors
         for (tile_x, tile_y) in self.map.corridor_tiles:
             cx = x + padding + int((tile_x - min_x) * scale)
             cy = y + padding + int((tile_y - min_y) * scale)
             cw = max(1, int(scale))
             ch = max(1, int(scale))
-            rl.draw_rectangle(cx, cy, cw, ch, rl.DARKGRAY)
+            rl.draw_rectangle(cx, cy, cw, ch, rl.fade(rl.DARKGRAY, 1))
 
-        # draw rooms
+        # Rooms
         for rm in self.map.rooms:
             rx = x + padding + int((rm.x - min_x) * scale)
             ry = y + padding + int((rm.y - min_y) * scale)
             rw = max(1, int(rm.width * scale))
             rh = max(1, int(rm.height * scale))
-            rl.draw_rectangle(int(rx+scale), int(ry+scale), int(rw-(2*scale)), int(rh-(2*scale)), rl.WHITE)
-            rl.draw_rectangle_lines(rx, ry, rw, rh, rl.GRAY)
+            rl.draw_rectangle(int(rx + scale), int(ry + scale), int(rw - (2 * scale)), int(rh - (2 * scale)),
+                              rl.fade(rl.WHITE, 1))
+            rl.draw_rectangle_lines(rx, ry, rw, rh, rl.fade(rl.GRAY, 0.85))
+
         tile_size = self.map.tile_size
 
-#debug stuff: draw lights on minimap
-        # for light in getattr(self.map, "lights", [])[:100]:
-        #         lx_tiles = float(light['pos'].x) / float(tile_size)
-        #         ly_tiles = float(light['pos'].y) / float(tile_size)
-        #         mx = x + padding + int((lx_tiles - min_x) * scale)
-        #         my = y + padding + int((ly_tiles - min_y) * scale)
-        #         # small marker; don't scale with light radius to avoid clutter
-        #         marker_r = max(1, int(max(1.5, scale)))
-        #         rl.draw_circle(mx, my, marker_r, light['color'])
-
-
+        # Player marker (keep mostly opaque)
         player_map_x = float(self.player.x) / float(tile_size)
         player_map_y = float(self.player.y) / float(tile_size)
-        # draw player
         px = x + padding + int((player_map_x - min_x) * scale)
         py = y + padding + int((player_map_y - min_y) * scale)
-        rl.draw_circle(px, py, 3, rl.GREEN)
+        rl.draw_circle(px, py, 3, rl.fade(rl.GREEN, 0.95))
 
     def render(self):
 
@@ -222,7 +225,6 @@ class MainDisplay(BaseDisplay):
         for e in self.enemies:
             e.render()
 
-
         self.camera.end_mode()
         rl.end_texture_mode()
 
@@ -251,6 +253,22 @@ class MainDisplay(BaseDisplay):
                     break
         except Exception:
             pass
+
+        # Show shooting tooltip when enemies are nearby
+        try:
+            enemy_nearby = False
+            for e in self.enemies:
+                # Check if enemy is within reasonable distance (e.g., 400 pixels)
+                distance = ((e.x - self.player.x) ** 2 + (e.y - self.player.y) ** 2) ** 0.5
+                if distance < 20:
+                    enemy_nearby = True
+                    break
+
+            if enemy_nearby:
+                text.draw_text("Press Left Mouse to shoot", 10, 100, 24, rl.RED)
+        except Exception:
+            pass
+
         self.player.render_bar()
         if self.book_message is not None:
             book_text = f"Hello World {self.book_message}"
@@ -332,18 +350,21 @@ class MainDisplay(BaseDisplay):
             can_open_crafting = False
 
         if (rl.is_key_pressed(rl.KeyboardKey.KEY_C) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_UP)) and can_open_crafting:
-            if self.game.crafting==False:
-                self.game.crafting = True
-                self.game.current_display = self.game.crafting_display
-                self.trans = {8:"oxygen" ,  1:"hydrogen", 30:"zinc", 11:"sodium",36: "krypton", 56:"barium",
-                              16:"sulphur", 26:"iron", 2:"helium", 92:"uranium"}
-                self.game.crafting_display.inventory.inv={}
-                for x in self.game.atomic_masses:
-                    try:
-                        self.game.crafting_display.inventory.inv[self.trans[x]]+=1
-                    except:
-                        self.game.crafting_display.inventory.inv[self.trans[x]]=1
-                self.game.crafting_display.atom_bar.update()
+            if self.game.stop:
+                self.game.stop=False
+            else:
+                if self.game.crafting == False:
+                    self.game.crafting = True
+                    self.game.current_display = self.game.crafting_display
+                    self.trans = {8: "oxygen", 1: "hydrogen", 30: "zinc", 11: "sodium", 36: "krypton", 56: "barium",
+                                  16: "sulphur", 26: "iron", 2: "helium", 92: "uranium"}
+                    self.game.crafting_display.inventory.inv = {}
+                    for x in self.game.atomic_masses:
+                        try:
+                            self.game.crafting_display.inventory.inv[self.trans[x]] += 1
+                        except:
+                            self.game.crafting_display.inventory.inv[self.trans[x]] = 1
+                    self.game.crafting_display.atom_bar.update()
 
 
 

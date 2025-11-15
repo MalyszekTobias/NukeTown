@@ -1,10 +1,23 @@
+import time
 from itertools import count
 
 import pyray as rl
 from app.displays.base import BaseDisplay
 from app.ui import button, text
 import itertools, math
-from app import sprite
+from app import sprite, assets
+
+
+
+class Cutscene(sprite.Sprite):
+    def __init__(self, display, scaleXframewidth=500):
+            self.img = assets.images["Cutscene1"]
+
+            super().__init__(display, scaleXframewidth)
+            self.x = 500
+            self.y = 500
+            self.num_of_frames = 42
+
 
 
 class StartDisplay(BaseDisplay):
@@ -20,9 +33,10 @@ class StartDisplay(BaseDisplay):
         self.speed = 25
         self.counter = 0
         self.text_x = 100
+        Cutscene(self)
 
     def render(self):
-
+        rl.clear_background(rl.BLACK)
 
         if self.start:
             self.counter += 1
@@ -31,7 +45,7 @@ class StartDisplay(BaseDisplay):
             self.text_x -= self.speed
 
         if self.counter >= 77:
-            self.game.change_display(self.game.chapter1_display)
+            self.game.change_display(self.game.ending)
 
 
 
@@ -43,7 +57,12 @@ class StartDisplay(BaseDisplay):
         for b in self.buttons:
             b.draw()
 
-        super().render()
+        for object in self.game_objects:
+            if type(object) == Cutscene and not self.game.crafting_display.end_chapter_1:
+                continue
+            object.render()
+
+
 
     def color_cycle(self):
         period = 5000
@@ -61,7 +80,12 @@ class StartDisplay(BaseDisplay):
 
 
     def update(self):
-        super().update()
+        for object in self.game_objects:
+            if type(object) == Cutscene and not self.game.crafting_display.end_chapter_1:
+                continue
+            if type(object) == Cutscene:
+                time.sleep(5)
+            object.update()
         if self.game.gamepad_enabled:
             y = getattr(self.game, "left_joystick_y", 0.0)
             if y < -self.game.gamepad_deadzone:
