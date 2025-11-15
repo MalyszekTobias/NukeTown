@@ -9,7 +9,8 @@ Light = Dict[str, Any]
 
 
 class Map:
-    def __init__(self):
+    def __init__(self, game):
+        self.game = game
         self.rooms: List[Room] = []
         self.corridor_tiles: Set[Tile] = set()
         self.tile_size: int = 16
