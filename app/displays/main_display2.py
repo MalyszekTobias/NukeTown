@@ -113,10 +113,9 @@ class MainDisplay2(BaseDisplay):
         self.start_zoom = self.camera.camera.zoom
         self.intro = True
         self._intro_tolerance = 0.01
-        self.camera.camera.zoom = 100.0  # start zoomed in
+        self.camera.camera.zoom = 100.0
 
 
-        # Seed a static example light; player light will be first element and updated per-frame
         self.map.add_light(self.player.x, self.player.y, 420.0, rl.Color(255, 255, 255, 255))
         self.map.add_light(200, 200, 150.0, rl.Color(255, 0, 0, 255))
         self.map.add_light(400, 67, 670.0, rl.Color(200, 150, 5, 255))
@@ -205,7 +204,6 @@ class MainDisplay2(BaseDisplay):
         padding = 4
         content_size = size - padding * 2
 
-        # compute map bounds
         min_x = min((r.x for r in self.map.rooms), default=0)
         max_x = max((r.x + r.width for r in self.map.rooms), default=1)
         min_y = min((r.y for r in self.map.rooms), default=0)
@@ -215,11 +213,9 @@ class MainDisplay2(BaseDisplay):
         map_h = max(1, max_y - min_y)
         scale = min(content_size / map_w, content_size / map_h)
 
-        # background + border
         rl.draw_rectangle(x-5, y-5, size+10, size+10, rl.DARKGRAY)
         rl.draw_rectangle(x, y, size, size, rl.BLACK)
 
-        # draw corridors
         for (tile_x, tile_y) in self.map.corridor_tiles:
             cx = x + padding + int((tile_x - min_x) * scale)
             cy = y + padding + int((tile_y - min_y) * scale)
@@ -227,7 +223,6 @@ class MainDisplay2(BaseDisplay):
             ch = max(1, int(scale))
             rl.draw_rectangle(cx, cy, cw, ch, rl.DARKGRAY)
 
-        # draw rooms
         for rm in self.map.rooms:
             rx = x + padding + int((rm.x - min_x) * scale)
             ry = y + padding + int((rm.y - min_y) * scale)

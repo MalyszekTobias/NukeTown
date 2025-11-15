@@ -1,5 +1,3 @@
-# python
-# File: app/map.py
 import pyray
 from typing import List, Set, Tuple, Dict, Any
 from app.room import Room
@@ -59,33 +57,27 @@ class Map:
         except Exception:
             Gate = None
         if Gate:
-            # create gates for wall tiles that were removed by corridors
             for room in self.rooms:
                 all_walls = room.wall_tiles()
                 visible_walls = room.wall_tiles(exclude_tiles=self.corridor_tiles)
                 removed = all_walls - visible_walls
                 for tile in removed:
                     if tile not in self.gates:
-                        # Use the required_atom for gates of room2 (the target room)
                         atom_for_gate = required_atom if room == room2 else None
                         self.gates[tile] = Gate(self, tile, room_ref=room, is_open=False, required_atom=atom_for_gate)
     def connect_two_rooms_no_doors(self,room1,room2):
-        # self.corridor_tiles.clear()
         if len(self.rooms) < 2:
             return
-        # sort by center x to create a simple chain
         rooms_sorted = [room1,room2]
         for i in range(len(rooms_sorted) - 1):
             a = rooms_sorted[i].center()
             b = rooms_sorted[i + 1].center()
             self.corridor_tiles.update(self._create_corridor_between(a, b))
-        # After corridor generation, populate gates for removed wall tiles
         try:
             from app.gate import Gate
         except Exception:
             Gate = None
         if Gate:
-            # create gates for wall tiles that were removed by corridors
             for room in self.rooms:
                 all_walls = room.wall_tiles()
                 visible_walls = room.wall_tiles(exclude_tiles=self.corridor_tiles)
@@ -95,19 +87,16 @@ class Map:
         self.corridor_tiles.clear()
         if len(self.rooms) < 2:
             return
-        # sort by center x to create a simple chain
         rooms_sorted = sorted(self.rooms, key=lambda r: r.center()[0])
         for i in range(len(rooms_sorted) - 1):
             a = rooms_sorted[i].center()
             b = rooms_sorted[i + 1].center()
             self.corridor_tiles.update(self._create_corridor_between(a, b))
-        # After corridor generation, populate gates for removed wall tiles
         try:
             from app.gate import Gate
         except Exception:
             Gate = None
         if Gate:
-            # create gates for wall tiles that were removed by corridors
             for room in self.rooms:
                 all_walls = room.wall_tiles()
                 visible_walls = room.wall_tiles(exclude_tiles=self.corridor_tiles)
@@ -117,7 +106,6 @@ class Map:
                         self.gates[tile] = Gate(self, tile, room_ref=room, is_open=False)
 
     def check_collision_point(self, x: float, y: float) -> bool:
-        """Check if a point collides with walls or closed gates. Returns True if collision detected."""
         for room in self.rooms:
             for (wx, wy, ww, wh) in room.collision_rects(self.tile_size, self.corridor_tiles):
                 if wx <= x <= wx + ww and wy <= y <= wy + wh:
@@ -133,13 +121,10 @@ class Map:
 
     def draw(self):
         tile_size = self.tile_size
-        # draw rooms (walls) and corridors
-        # corridors first (different color)
         for (x, y) in self.corridor_tiles:
             pyray.draw_rectangle(x * tile_size, y * tile_size, tile_size, tile_size, pyray.DARKGRAY)
         for room in self.rooms:
             room.draw(tile_size=tile_size, color=pyray.RED, corridor_tiles=self.corridor_tiles)
-        # draw gates on top of rooms/corridors
         for g in list(self.gates.values()):
             try:
                 g.draw(tile_size)

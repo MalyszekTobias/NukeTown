@@ -55,7 +55,6 @@ class Crafting_Menu(BaseDisplay):
                          rl.YELLOW)
 
     def update(self):
-        super().update()
         self.delta_time = rl.get_frame_time()
 
 
@@ -233,7 +232,7 @@ class Inventory():
         self.display.objects.append(self)
         self.inv=inv
         self.atom_images={}
-        self.tablica_image=assets.images["Tablica_Fatass"]
+        self.tablica_image=assets.images["Tablica_big"]
         self.src=rl.Rectangle(0,0,235,32)
         self.display.objects.append(self)
     def add_element(self,atom,amount):
@@ -383,13 +382,18 @@ class Table():
 
         if self.protons==92:
             self.display.end_chapter_1=True
+            self.display.game.change_display(self.display.game.cutscene_display)
+            self.display.game.change_display(self.display.game.cutscene_display)
         if self.protons>92:
             print('nope')
         elif len(self.atoms)>1:
             a=True
             i=len(self.values)-1
             while a:
+
                 if self.protons>=self.values[i][0]:
+                    if self.values[i][0] > self.display.game.best_craft:
+                        self.display.game.best_craft = self.values[i][0]
                     self.clear_before_fusion()
                     self.atoms.append(Atom(self.display, self.atom_properites[self.values[i][1]][2], self.x+self.w//2 , self.y+self.h//2, 100, 100, self.atom_properites[self.values[i][1]][0], self.atom_properites[self.values[i][1]][1], 40))
                     self.protons =self.atom_properites[self.values[i][1]][1]

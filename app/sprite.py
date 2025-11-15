@@ -47,6 +47,7 @@ class Sprite:
 
 
         rl.draw_texture_pro(self.img, src, dst, origin, angle, rl.WHITE)
+        # rl.draw_rectangle(int(dst.x), int(dst_y), int(dst_w), int(dst_h), rl.RED)
 
 
 
@@ -74,6 +75,8 @@ class Jumping_sprite_test(Sprite):
         angle = 0
 
         rl.draw_texture_pro(self.img, src, dst, origin, angle, self.tint)
+        # rl.draw_rectangle(int(dst.x), int(dst_y), int(dst_w), int(dst_h), rl.RED)
+
 
     def move_out(self, speed):
         self.x += speed
