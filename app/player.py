@@ -27,8 +27,11 @@ class Player(Atom):
             if room.busy == 0:
                 if rl.check_collision_recs(self.rect, room.one_collision_rect(16)):
                     room.busy = 1
-                    e = app.enemy_blob.EnemyBlob(self.display, (room.x + room.width / 2) * 16, 16 * (room.y + room.height/2), 10, 2)
-                    self.display.enemies.append(e)
+                    if not self.game.chapter2:
+                        print('gsdgesfsrwagggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg',self.game.current_display,self.game.display2)
+                        e = app.enemy_blob.EnemyBlob(self.display, (room.x + room.width / 2) * 16,
+                                                     16 * (room.y + room.height / 2), 10, 8)
+                        self.display.enemies.append(e)
 
 
         for enemy_bullet in self.display.enemy_bullets:

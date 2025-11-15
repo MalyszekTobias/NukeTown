@@ -84,7 +84,7 @@ class MainDisplay2(BaseDisplay):
             return graph
 
 
-        l= 15
+        l= 10
         g = generate_loopy_connected_grid_graph(l, extra_edge_probability=0.1)
         lista=[0 for x in range(l**2)]
         la=0
@@ -100,11 +100,12 @@ class MainDisplay2(BaseDisplay):
         for x in g.keys():
             for y in g[x]:
                 self.map.connect_two_rooms_no_doors(self.rooms[x[0]][x[1]], self.rooms[y[0]][y[1]])
-        samp=random.sample(lista, 225)
+        samp=random.sample(lista, 10)
         print(samp)
         self.enemies2=[]
         for x in samp:
-            self.enemies2.append(EnemyBlob(self,x[1] * 10 + 11, x[0] * 10 + 11,100,92))
+            e=EnemyBlob(self,200, 200,100,92)
+            self.enemies.append(e)
 
 
 
