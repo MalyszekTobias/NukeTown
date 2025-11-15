@@ -58,7 +58,7 @@ class Crafting_Menu(BaseDisplay):
         self.delta_time = rl.get_frame_time()
 
 
-        if rl.is_key_pressed(rl.KeyboardKey.KEY_C) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_UP):
+        if rl.is_key_pressed(rl.KeyboardKey.KEY_C) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_UP) or rl.is_key_pressed(rl.KeyboardKey.KEY_ESCAPE):
             self.table.clear()
             self.game.current_display = self.game.twodgame
             self.game.crafting = False
