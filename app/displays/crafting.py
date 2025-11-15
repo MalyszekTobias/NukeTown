@@ -69,7 +69,6 @@ class Crafting_Menu(BaseDisplay):
             for x in self.inventory.inv.keys():
                 for y in range(self.inventory.inv[x]):
                     self.game.atomic_masses.append(self.trans[x])
-            print(self.game.atomic_masses)
             for mass in self.game.atomic_masses:
                 self.game.twodgame.player.spawn_friend(mass)
 
@@ -135,13 +134,11 @@ class Crafting_Menu(BaseDisplay):
                             except:
                                 self.inventory.inv[self.translator[self.current_atom_name]] = 1
                             self.atom_bar.update()
-                            print(self.inventory.inv)
                         break
                 if not a:
                     if self.from_bar:
                         self.inventory.inv[self.current_atom_name] -= 1
                         self.table.protons+=self.current_atom.mass
-                        print(self.table.protons)
                     a = False
                     if self.from_bar:
                         self.table.atoms.append(self.current_atom)

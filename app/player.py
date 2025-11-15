@@ -7,7 +7,7 @@ from app import assets
 
 class Player(Atom):
     def __init__(self, game, weight=0):
-        super().__init__(game, weight, None)
+        super().__init__(game, weight, None, 200, 200)
         self.friends = []
         self.x = 200
         self.y = 200
@@ -16,7 +16,7 @@ class Player(Atom):
 
 
     def spawn_friend(self, weight):
-        friend = Atom(self.display, weight, self)
+        friend = Atom(self.display, weight, self, self.x, self.y)
         friend.x = self.x + rl.get_random_value(-5, 5)
         friend.y = self.y + rl.get_random_value(-5, 5)
         self.friends.append(friend)
@@ -28,6 +28,7 @@ class Player(Atom):
                 if rl.check_collision_recs(self.rect, room.one_collision_rect(16)):
                     room.busy = 1
                     e = app.enemy_blob.EnemyBlob(self.display, (room.x + room.width / 2) * 16, 16 * (room.y + room.height/2), 10, 2)
+
                     self.display.enemies.append(e)
 
 

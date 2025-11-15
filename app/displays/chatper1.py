@@ -29,7 +29,6 @@ class Chapter1(BaseDisplay):
 
         if self.opacity <=0:
             self.text_y -= self.speed
-            print(self.text_y, self.speed, self.text_y - self.speed)
 
         if self.text_y <= -150:
             self.game.change_display(self.game.twodgame)
