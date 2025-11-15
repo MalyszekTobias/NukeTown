@@ -50,6 +50,16 @@ class MainDisplay(BaseDisplay):
         self._intro_tolerance = 0.01
         self.camera.camera.zoom = 100.0  # start zoomed in
 
+        self.lights = []
+        self.lights.append(
+            {'pos': rl.Vector2(self.player.x, self.player.y), 'radius': 200.0, 'color': rl.Color(255, 255, 255, 255)})
+        self.lights.append({'pos': rl.Vector2(500, 500), 'radius': 150.0, 'color': rl.Color(255, 0, 0, 255)})
+
+        self.light_shader = self.game.light_shader
+        self.lights_pos_loc = rl.get_shader_location(self.light_shader, "lights")
+        self.lights_color_loc = rl.get_shader_location(self.light_shader, "light_colors")
+        self.num_lights_loc = rl.get_shader_location(self.light_shader, "num_lights")
+
     def draw_minimap(self):
         if not getattr(self.map, "rooms", None):
             return
@@ -95,19 +105,31 @@ class MainDisplay(BaseDisplay):
 
         super().render()
 
+        # Update light shader uniforms
+        num_lights = len(self.lights)
+        light_pos_data = []
+        light_color_data = []
+        for light in self.lights:
+            cam_pos = rl.get_world_to_screen_2d(light['pos'], self.camera.camera)
+            # Invert Y-coordinate for shader
+            light_pos_data.extend([cam_pos.x, self.game.height - cam_pos.y, light['radius']])
+            c = light['color']
+            light_color_data.extend([c.r / 255.0, c.g / 255.0, c.b / 255.0, c.a / 255.0])
+
+        rl.set_shader_value(self.light_shader, self.num_lights_loc, rl.ffi.new("int *", num_lights),
+                            rl.ShaderUniformDataType.SHADER_UNIFORM_INT)
+        rl.set_shader_value_v(self.light_shader, self.lights_pos_loc, rl.ffi.new("float[]", light_pos_data),
+                             rl.ShaderUniformDataType.SHADER_UNIFORM_VEC3, num_lights)
+        rl.set_shader_value_v(self.light_shader, self.lights_color_loc, rl.ffi.new("float[]", light_color_data),
+                             rl.ShaderUniformDataType.SHADER_UNIFORM_VEC4, num_lights)
+
+        # 1) Draw the main scene (map + objects) to a texture
+        rl.begin_texture_mode(self.texture)
+        rl.clear_background(rl.BLACK)
         self.camera.begin_mode()
         self.map.draw()
-        self.camera.end_mode()
-
-        # 2) Render only the player (and any bloom-only elements) into the render texture
-        rl.begin_texture_mode(self.texture)
-        # clear the render texture to transparent so only player pixels contribute to bloom
-        rl.clear_background((0, 0, 0, 0))
-        self.camera.begin_mode()
-
-        for object in self.game_objects:
-            object.render()
-
+        for obj in self.game_objects:
+            obj.render()
         for b in self.player_bullets:
             b.render()
         for b in self.enemy_bullets:
@@ -116,16 +138,14 @@ class MainDisplay(BaseDisplay):
         self.camera.end_mode()
         rl.end_texture_mode()
 
-        # 3) Apply bloom shader to the render texture (this draws the bloomed player on top of the map)
-        rl.begin_shader_mode(self.bloom_shader)
-        src = rl.Rectangle(0.0, 0.0,
-                           float(self.texture.texture.width),
-                           -float(self.texture.texture.height))
+        # 2) Draw the scene texture to the screen using the light shader
+        rl.begin_shader_mode(self.light_shader)
+        src = rl.Rectangle(0.0, 0.0, float(self.texture.texture.width), -float(self.texture.texture.height))
         dst = rl.Rectangle(0.0, 0.0, float(self.game.width), float(self.game.height))
         rl.draw_texture_pro(self.texture.texture, src, dst, rl.Vector2(0.0, 0.0), 0.0, rl.WHITE)
         rl.end_shader_mode()
 
-        # 4) UI / minimap (no bloom)
+        # 3) UI / minimap (no shaders)
         self.draw_minimap()
         rl.draw_fps(10, 10)
         if self.game.gamepad_enabled:
