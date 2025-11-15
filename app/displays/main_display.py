@@ -349,18 +349,22 @@ class MainDisplay(BaseDisplay):
             can_open_crafting = False
 
         if (rl.is_key_pressed(rl.KeyboardKey.KEY_C) or rl.is_gamepad_button_pressed(self.game.gamepad_id, rl.GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_UP)) and can_open_crafting:
-            if self.game.crafting==False:
-                self.game.crafting = True
-                self.game.current_display = self.game.crafting_display
-                self.trans = {8:"oxygen" ,  1:"hydrogen", 30:"zinc", 11:"sodium",36: "krypton", 56:"barium",
-                              16:"sulphur", 26:"iron", 2:"helium", 92:"uranium"}
-                self.game.crafting_display.inventory.inv={}
-                for x in self.game.atomic_masses:
-                    try:
-                        self.game.crafting_display.inventory.inv[self.trans[x]]+=1
-                    except:
-                        self.game.crafting_display.inventory.inv[self.trans[x]]=1
-                self.game.crafting_display.atom_bar.update()
+            if self.game.stop:
+                self.game.stop=False
+            else:
+                if self.game.crafting == False:
+                    self.game.crafting = True
+                    self.game.current_display = self.game.crafting_display
+                    self.trans = {8: "oxygen", 1: "hydrogen", 30: "zinc", 11: "sodium", 36: "krypton", 56: "barium",
+                                  16: "sulphur", 26: "iron", 2: "helium", 92: "uranium"}
+                    self.game.crafting_display.inventory.inv = {}
+                    for x in self.game.atomic_masses:
+                        try:
+                            self.game.crafting_display.inventory.inv[self.trans[x]] += 1
+                        except:
+                            self.game.crafting_display.inventory.inv[self.trans[x]] = 1
+                    self.game.crafting_display.atom_bar.update()
+
 
 
 

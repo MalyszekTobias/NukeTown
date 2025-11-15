@@ -9,6 +9,7 @@ from app import music
 class Game:
     def __init__(self):
         self.width, self.height = 1920, 1080
+        self.stop=False
         rl.set_config_flags(rl.ConfigFlags.FLAG_VSYNC_HINT)
         rl.set_config_flags(rl.ConfigFlags.FLAG_MSAA_4X_HINT)
         rl.init_window(self.width, self.height, "raylib template?")
