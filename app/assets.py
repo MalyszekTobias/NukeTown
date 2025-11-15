@@ -69,6 +69,7 @@ def load():
 
     images["GateClosed"] = rl.load_texture("app/assets/images/Gate_Closed.png")
     images["GateOpen"] = rl.load_texture("app/assets/images/Gate_Open.png")
+    images["Paper"] = rl.load_texture("app/assets/Flavour/Paper.png")
 
     images["Uranium_Standby"]=rl.load_texture("app/assets/images/MC_Standby.png")
     font = rl.load_font_ex('app/assets/Fonts/Chernobyl.otf', 1024, None, 0)
