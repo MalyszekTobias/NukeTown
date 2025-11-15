@@ -148,15 +148,13 @@ class TwoDGameDisplay(BaseDisplay):
         rl.set_shader_value(self.bloom_shader, self.shader_time_location, t,
                             rl.ShaderUniformDataType.SHADER_UNIFORM_FLOAT)
 
-        for fellow in self.player.friends:
-            fellow.update()
+
         for enemy in self.enemies:
             enemy.update()
         for b in self.game.player_bullets:
             b.update()
         for b in self.game.enemy_bullets:
             b.update()
-        self.player.update(self.map.rooms)
 
         self.player.update(self.map.rooms, self.map.corridor_tiles)
 

@@ -6,7 +6,7 @@ class Player(Atom):
     def __init__(self, game, weight=0):
         super().__init__(game, weight, None)
         self.friends = []
-        self.x = 300
+        self.x = 200
         self.y = 200
 
 
