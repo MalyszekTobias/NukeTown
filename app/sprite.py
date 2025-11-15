@@ -6,7 +6,6 @@ class Sprite:
         self.display = display
         self.game = display.game
         self.scaleXframewidth = scaleXframewidth
-        print(self.img.width, self.img.height)
         self.num_of_frames = int(self.img.height / self.img.width)
         self.frame_width = int(self.img.width)
         self.frame_height = int(self.img.height / self.num_of_frames)

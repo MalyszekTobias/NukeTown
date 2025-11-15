@@ -269,6 +269,7 @@ class MainDisplay(BaseDisplay):
         except Exception:
             pass
 
+        self.player.render_bar()
         if self.book_message is not None:
             book_text = f"Hello World {self.book_message}"
             try:
@@ -364,7 +365,6 @@ class MainDisplay(BaseDisplay):
                         except:
                             self.game.crafting_display.inventory.inv[self.trans[x]] = 1
                     self.game.crafting_display.atom_bar.update()
-
 
 
 
