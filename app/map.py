@@ -12,8 +12,6 @@ class Map:
     def __init__(self, game):
         self.game = game
         self.rooms: List[Room] = []
-        self.enemy_spawn_points: List[Tile] = []
-        self.busy_rooms = [0 for _ in range(len(self.rooms))]  # Example: 10 rooms, all unoccupied
         self.corridor_tiles: Set[Tile] = set()
         self.tile_size: int = 16
         # gates keyed by tile coordinate -> Gate instance
@@ -67,6 +65,29 @@ class Map:
                         # Use the required_atom for gates of room2 (the target room)
                         atom_for_gate = required_atom if room == room2 else None
                         self.gates[tile] = Gate(self, tile, room_ref=room, is_open=False, required_atom=atom_for_gate)
+                        self.gates[tile] = Gate(self, tile, room_ref=room, is_open=False)
+    def connect_two_rooms_no_doors(self,room1,room2):
+        # self.corridor_tiles.clear()
+        if len(self.rooms) < 2:
+            return
+        # sort by center x to create a simple chain
+        rooms_sorted = [room1,room2]
+        for i in range(len(rooms_sorted) - 1):
+            a = rooms_sorted[i].center()
+            b = rooms_sorted[i + 1].center()
+            self.corridor_tiles.update(self._create_corridor_between(a, b))
+        # After corridor generation, populate gates for removed wall tiles
+        try:
+            from app.gate import Gate
+        except Exception:
+            Gate = None
+        if Gate:
+            # create gates for wall tiles that were removed by corridors
+            for room in self.rooms:
+                all_walls = room.wall_tiles()
+                visible_walls = room.wall_tiles(exclude_tiles=self.corridor_tiles)
+                removed = all_walls - visible_walls
+
     def connect_rooms(self):
         self.corridor_tiles.clear()
         if len(self.rooms) < 2:
