@@ -8,6 +8,7 @@ class Bullet:
         self.velRight = velRight
         self.velUp = velUp
         self.target = target
+        self.lifespan = 300
         if target == "enemy":
             self.img = assets.images["Bullet_Good"]
         else:
@@ -16,13 +17,21 @@ class Bullet:
         self.frame_width = int(self.img.width)
         self.frame_height = int(self.img.height / self.num_of_frames)
         self.current_frame = 0
+        self.frame_timer = 0.0
+        self.frame_duration = 0.08
 
 
     def update(self):
+        dt = rl.get_frame_time()
+        self.frame_timer += dt
+        while self.frame_timer >= self.frame_duration:
+            self.frame_timer -= self.frame_duration
+            self.current_frame = (self.current_frame + 1) % self.num_of_frames
         if self.target == "enemy":
             self.x += self.velRight
             self.y += self.velUp
         else:
+            self.lifespan -= 1
             x, y = self.game.player.x, self.game.player.y
             if self.x < x:
                 self.x += self.speed
@@ -32,6 +41,10 @@ class Bullet:
                 self.y += self.speed
             elif self.y > y:
                 self.y -= self.speed
+            if self.lifespan <= 0:
+                self.game.enemy_bullets.remove(self)
+                del  self
+                return
 
     def render(self):
         scale = 0.08
