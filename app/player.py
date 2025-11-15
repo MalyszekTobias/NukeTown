@@ -1,4 +1,3 @@
-# app/player.py
 import pyray as rl
 
 import app.enemy_blob

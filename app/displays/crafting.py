@@ -1,7 +1,3 @@
-from email.mime import image
-import copy
-# from zipimport import alt_path_sep
-
 from app.ui import text
 
 import pyray as rl

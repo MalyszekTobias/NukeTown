@@ -80,7 +80,6 @@ class Game:
         self.current_display.update()
         self.update_gamepad_status()
         self.update_joystick()
-        # update music streaming
         try:
             self.music_manager.update()
         except Exception:

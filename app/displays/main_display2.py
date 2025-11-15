@@ -112,10 +112,9 @@ class MainDisplay2(BaseDisplay):
         self.start_zoom = self.camera.camera.zoom
         self.intro = True
         self._intro_tolerance = 0.01
-        self.camera.camera.zoom = 100.0  # start zoomed in
+        self.camera.camera.zoom = 100.0
 
 
-        # Seed a static example light; player light will be first element and updated per-frame
         self.map.add_light(self.player.x, self.player.y, 420.0, rl.Color(255, 255, 255, 255))
         self.map.add_light(200, 200, 150.0, rl.Color(255, 0, 0, 255))
         self.map.add_light(400, 67, 670.0, rl.Color(200, 150, 5, 255))
@@ -204,7 +203,6 @@ class MainDisplay2(BaseDisplay):
         padding = 4
         content_size = size - padding * 2
 
-        # compute map bounds
         min_x = min((r.x for r in self.map.rooms), default=0)
         max_x = max((r.x + r.width for r in self.map.rooms), default=1)
         min_y = min((r.y for r in self.map.rooms), default=0)
@@ -214,11 +212,9 @@ class MainDisplay2(BaseDisplay):
         map_h = max(1, max_y - min_y)
         scale = min(content_size / map_w, content_size / map_h)
 
-        # background + border
         rl.draw_rectangle(x-5, y-5, size+10, size+10, rl.DARKGRAY)
         rl.draw_rectangle(x, y, size, size, rl.BLACK)
 
-        # draw corridors
         for (tile_x, tile_y) in self.map.corridor_tiles:
             cx = x + padding + int((tile_x - min_x) * scale)
             cy = y + padding + int((tile_y - min_y) * scale)
@@ -226,7 +222,6 @@ class MainDisplay2(BaseDisplay):
             ch = max(1, int(scale))
             rl.draw_rectangle(cx, cy, cw, ch, rl.DARKGRAY)
 
-        # draw rooms
         for rm in self.map.rooms:
             rx = x + padding + int((rm.x - min_x) * scale)
             ry = y + padding + int((rm.y - min_y) * scale)
@@ -237,7 +232,6 @@ class MainDisplay2(BaseDisplay):
         tile_size = self.map.tile_size
         player_map_x = float(self.player.x) / float(tile_size)
         player_map_y = float(self.player.y) / float(tile_size)
-        # draw player
         px = x + padding + int((player_map_x - min_x) * scale)
         py = y + padding + int((player_map_y - min_y) * scale)
         rl.draw_circle(px, py, 3, rl.GREEN)
@@ -246,12 +240,10 @@ class MainDisplay2(BaseDisplay):
 
         super().render()
 
-        # Ensure first light follows player (player light)
         if self.map.lights:
             self.map.lights[0]['pos'].x = self.player.x
             self.map.lights[0]['pos'].y = self.player.y
 
-        # Update light shader uniforms (clamp to MAX_LIGHTS from shader)
         MAX_LIGHTS = 100
         visible_lights = self.map.lights[:MAX_LIGHTS]
         num_lights = len(visible_lights)
@@ -259,7 +251,6 @@ class MainDisplay2(BaseDisplay):
         light_color_data = []
         for light in visible_lights:
             cam_pos = rl.get_world_to_screen_2d(light['pos'], self.camera.camera)
-            # Invert Y-coordinate for shader
             light_pos_data.extend([cam_pos.x, self.game.height - cam_pos.y, light['radius']])
             c = light['color']
             light_color_data.extend([c.r / 255.0, c.g / 255.0, c.b / 255.0, c.a / 255.0])
@@ -272,35 +263,29 @@ class MainDisplay2(BaseDisplay):
             rl.set_shader_value_v(self.light_shader, self.lights_color_loc, rl.ffi.new("float[]", light_color_data),
                                  rl.ShaderUniformDataType.SHADER_UNIFORM_VEC4, num_lights)
 
-        # 1) Draw the main scene (map + objects) to a texture
         rl.begin_texture_mode(self.texture)
         rl.clear_background(rl.BLACK)
         self.camera.begin_mode()
         self.map.draw()
         for obj in self.game_objects:
             obj.render()
-        # for b in self.player_bullets:
-        #     b.render()
         for b in self.enemy_bullets:
             b.render()
 
         self.camera.end_mode()
         rl.end_texture_mode()
 
-        # 2) Draw the scene texture to the screen using the light shader
         rl.begin_shader_mode(self.light_shader)
         src = rl.Rectangle(0.0, 0.0, float(self.texture.texture.width), -float(self.texture.texture.height))
         dst = rl.Rectangle(0.0, 0.0, float(self.game.width), float(self.game.height))
         rl.draw_texture_pro(self.texture.texture, src, dst, rl.Vector2(0.0, 0.0), 0.0, rl.WHITE)
         rl.end_shader_mode()
 
-        # 3) UI / minimap (no shaders)
         self.draw_minimap()
         rl.draw_fps(10, 10)
         if self.game.gamepad_enabled:
             text.draw_text(f"Gamepad X: {self.game.left_joystick_x:.2f}  Y: {self.game.left_joystick_y:.2f}", 10, 130, 20,
                          rl.YELLOW, )
-        # Interaction hint when colliding with the reactor
         try:
             if self.reactor and self.reactor.can_interact(self.player):
                 text.draw_text("Press C to craft", 10, 40, 24, rl.WHITE)
@@ -314,29 +299,23 @@ class MainDisplay2(BaseDisplay):
 
         if self.intro:
             self.camera.zoom_intro(self.delta_time)
-            # stop the intro once the camera zoom reaches (close enough to) the target
             if abs(self.camera.camera.zoom - self.camera.target_zoom) < 0.01:
                 self.intro = False
 
         self.camera.update_target(self.player.x, self.player.y, self.delta_time)
 
-        # for b in self.player_bullets:
-        #     b.update()
         for b in self.enemy_bullets:
             b.update()
 
 
         for object in self.game_objects:
             if issubclass(type(object), atom.Atom):
-                # Keep corridor tiles intact, but closed gates will be treated as walls via collision rects
                 object.update(self.map.rooms, self.map.corridor_tiles)
             elif isinstance(object, enemy_blob.EnemyBlob):
-                # Enemy blobs also need rooms and corridor_tiles for gate/wall collision
                 object.update(self.map.rooms, self.map.corridor_tiles)
             else:
                 object.update()
 
-        # Open crafting only when near the reactor
         can_open_crafting = False
         try:
             if self.reactor and hasattr(self.reactor, 'can_interact'):

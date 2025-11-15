@@ -1,4 +1,3 @@
-# app/gate.py
 import pyray as rl
 from typing import Tuple, Optional
 from app import assets
@@ -16,8 +15,6 @@ class Gate:
         self.is_open = is_open
         self.interaction_radius = interaction_radius
         self.required_atom = required_atom  # e.g., "hydrogen", "helium", "oxygen", etc.
-        # Determine orientation based on room if available
-        # use concrete keys that draw() expects ('horizontal0','horizontal1','vertical0','vertical1')
         self.orientation = 'horizontal0'
         if room_ref is not None:
             x0, y0, w, h = room_ref.x, room_ref.y, room_ref.width, room_ref.height
@@ -41,43 +38,36 @@ class Gate:
             return
         dest_x = self.x
         dest_y = self.y
-        # rotation default
         rotation = 0
-        # rotation: different values per orientation
         if self.orientation == 'vertical0':
             rotation = 270
-            dest_y += tile_size  # Slight offsets to better align with room walls (copied style from room.draw)
+            dest_y += tile_size
         elif self.orientation == 'vertical1':
             rotation = 90
-            dest_x += tile_size  # Slight offsets to better align with room walls (copied style from room.draw)
+            dest_x += tile_size
         elif self.orientation == 'horizontal1':
             rotation = 180
-            dest_x += tile_size  # Slight offsets to better align with room walls (copied
+            dest_x += tile_size
             dest_y += tile_size
         elif self.orientation == 'horizontal0':
             rotation = 0
-        # Slight offsets to better align with room walls (copied style from room.draw)
 
         # Draw the gate
         measured_text = rl.measure_text(self.required_atom or "", tile_size)
         if self.required_atom:
-            # Draw with a tint to indicate locked status
             rl.draw_texture_ex(tex, (dest_x, dest_y), rotation, 1 / 4 / tile_size, rl.RED)
             rl.draw_text(self.required_atom, dest_x, dest_y, 10, rl.WHITE)
         else:
             rl.draw_texture_ex(tex, (dest_x, dest_y), rotation, 1 / 4 / tile_size, rl.WHITE)
-        # If locked, draw the required atom icon on top
         if self.required_atom and not self.is_open:
             atom_asset_name = self.required_atom.capitalize() + "_Standby"
             atom_tex = assets.images.get(atom_asset_name)
             if atom_tex:
-                atom_scale = 0.01  # Adjust this to scale the atom icon appropriately
+                atom_scale = 0.01
                 rl.draw_texture_ex(atom_tex, (dest_x-(measured_text*0.3), dest_y), 0, atom_scale, rl.WHITE)
 
     def collision_rect(self):
-        """Returns a rectangle (x,y,w,h) in world pixels representing the blocking area when closed."""
-        # Make collision rect thin to match gate visual thickness
-        gate_thickness = 4  # pixels - adjust based on gate texture appearance
+        gate_thickness = 4  # pixels
 
         if self.orientation == 'vertical1':
             # Vertical gate: thin width, full height
@@ -97,18 +87,15 @@ class Gate:
             self.tile_size + 2 * self.interaction_radius,
             self.tile_size + 2 * self.interaction_radius
         )
-        # Get player rect (assuming player has rect or x,y,radius)
         if hasattr(player, 'rect'):
             px, py, pw, ph = player.rect.x, player.rect.y, player.rect.width, player.rect.height
         else:
-            # fallback: use player x,y as center with radius
             radius = getattr(player, 'radius', 10)
             px = player.x - radius / 2
             py = player.y - radius / 2
             pw = radius
             ph = radius
 
-        # AABB overlap test
         gx, gy, gw, gh = gate_rect_expanded
         return px < gx + gw and px + pw > gx and py < gy + gh and py + ph > gy
 
@@ -131,9 +118,7 @@ class Gate:
             self.open()
 
     def interact(self, player):
-        # Check if gate requires an atom
         if self.required_atom and not self.is_open:
-            # Try to access player's inventory through the game's crafting display
             try:
                 inventory = self.map.game.crafting_display.inventory.inv
                 # Check if player has the required atom
@@ -145,5 +130,4 @@ class Gate:
                 print(f"Could not access inventory: {e}")
                 return
         else:
-            # No atom required or gate is already open, just toggle
             self.toggle()

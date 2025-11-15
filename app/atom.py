@@ -96,8 +96,6 @@ class Atom(sprite.Sprite):
         self.x += self.velRight
 
     def _is_far_from_player(self):
-        """Return True if this atom (when follower) is far enough from player to skip collisions."""
-        # Only followers (leader set) get their collisions disabled by distance.
         if self.leader is None:
             return False
         try:
@@ -155,14 +153,11 @@ class Atom(sprite.Sprite):
                 self.up = False
                 self.down = False
 
-        # remember previous position so we can prevent leaving corridors
         old_x, old_y = self.x, self.y
 
         self.movement()
 
-        # tile logic: prevent leaving corridor tiles unless entering a room
         tile_size = 16
-        # Skip corridor constraints when far from player (followers only)
         far_from_player = self._is_far_from_player()
         if corridor_tiles is not None and not far_from_player:
 
@@ -175,18 +170,14 @@ class Atom(sprite.Sprite):
             entering_room = False
             if rooms and new_tile is not None:
                 for room in rooms:
-                    # allow entering room background tiles
                     if new_tile in room.background_tiles():
                         entering_room = True
                         break
 
-            # if we started in corridor and tried to move to a non-corridor tile that is not a room, revert
             if was_in_corridor and (not now_in_corridor) and (not entering_room):
                 self.x, self.y = old_x, old_y
-                # cancel velocities so we don't push against the boundary
                 self.velUp = 0
                 self.velRight = 0
-                # stop movement inputs so atom won't immediately try again
                 self.up = self.down = self.left = self.right = False
 
         dt = rl.get_frame_time()
@@ -215,8 +206,6 @@ class Atom(sprite.Sprite):
                     self.frame_timer -= self.frame_duration
                     self.current_frame = (self.current_frame + 1) % self.num_of_frames
             else:
-                # If we're mid-animation, continue advancing frames until we wrap back to frame 0,
-                # then stop there. If already at frame 0, keep it idle.
                 if self.current_frame != 0:
                     self.frame_timer += dt
                     while self.frame_timer >= self.frame_duration:
@@ -228,57 +217,45 @@ class Atom(sprite.Sprite):
                 else:
                     self.current_frame = 0
                     self.frame_timer = 0.0
-        # Skip wall/gate collision resolution when far from player (followers only)
         if not far_from_player:
             self._resolve_wall_collisions(rooms, 16, corridor_tiles)
 
     def _resolve_wall_collisions(self, rooms, tile_size, corridor_tiles=None):
-        """Rect vs rect: push atom out of first colliding wall rect."""
         if not rooms:
             return
         ax, ay, aw, ah = self.rect.x, self.rect.y, self.rect.width, self.rect.height
 
-        # Check room wall collisions
         for room in rooms:
             for (wx, wy, ww, wh) in room.collision_rects(tile_size, corridor_tiles):
-                # AABB overlap test
                 if ax < wx + ww and ax + aw > wx and ay < wy + wh and ay + ah > wy:
-                    # compute penetration depths on each side
                     pen_left = (ax + aw) - wx
                     pen_right = (wx + ww) - ax
                     pen_top = (ay + ah) - wy
                     pen_bottom = (wy + wh) - ay
-                    # choose smallest penetration axis
                     min_pen = min(pen_left, pen_right, pen_top, pen_bottom)
                     if min_pen == pen_left:
-                        # push atom left
                         ax -= pen_left
                     elif min_pen == pen_right:
                         ax += pen_right
                     elif min_pen == pen_top:
                         ay -= pen_top
-                    else:  # pen_bottom
+                    else:
                         ay += pen_bottom
-                    # write back center from rect
                     self.x = ax + aw / 2
                     self.y = ay + ah / 2
                     return
 
-        # Check closed gate collisions
         try:
             mp = getattr(self.display, 'map', None)
             if mp and getattr(mp, 'gates', None):
                 for gate in mp.gates.values():
                     if not gate.is_open:
                         wx, wy, ww, wh = gate.collision_rect()
-                        # AABB overlap test
                         if ax < wx + ww and ax + aw > wx and ay < wy + wh and ay + ah > wy:
-                            # compute penetration depths on each side
                             pen_left = (ax + aw) - wx
                             pen_right = (wx + ww) - ax
                             pen_top = (ay + ah) - wy
                             pen_bottom = (wy + wh) - ay
-                            # choose smallest penetration axis
                             min_pen = min(pen_left, pen_right, pen_top, pen_bottom)
                             if min_pen == pen_left:
                                 ax -= pen_left
@@ -286,9 +263,8 @@ class Atom(sprite.Sprite):
                                 ax += pen_right
                             elif min_pen == pen_top:
                                 ay -= pen_top
-                            else:  # pen_bottom
+                            else:
                                 ay += pen_bottom
-                            # write back center from rect
                             self.x = ax + aw / 2
                             self.y = ay + ah / 2
                             return
@@ -323,7 +299,6 @@ class Atom(sprite.Sprite):
                 for friend in self.display.player.friends:
                     friend.set_destination(15)
         rl.draw_texture_pro(self.img, src, dst, origin, angle, rl.WHITE)
-        rl.draw_rectangle_lines(int(self.rect.x), int(self.rect.y), int(self.rect.width), int(self.rect.height), rl.RED)
 
     def shoot(self):
         mouse_pos = rl.get_mouse_position()
