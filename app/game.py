@@ -1,6 +1,6 @@
 import pyray as rl
 
-from app.displays import startscreen, twodgame,crafting
+from app.displays import startscreen, main_display,crafting
 from app import assets
 from app import player
 from app import enemy_blob
@@ -26,13 +26,15 @@ class Game:
         self.atomic_masses = [1, 2, 8, 11, 16, 26, 30, 36, 56]
         self.player = player.Player(self)
         self.enemies = []
+        self.enemy_bullets = []
+        self.player_bullets = []
         for _i in range(1,5):
             enemy = enemy_blob.EnemyBlob(self, _i*200, _i*200, 100, 2)
             self.enemies.append(enemy)
 
         for mass in self.atomic_masses:
             self.player.spawn_friend(mass)
-        self.twodgame = twodgame.TwoDGameDisplay(self, self.player, self.enemies)
+        self.twodgame = main_display.MainDisplay(self, self.player, self.enemies)
         self.current_display = self.base_display
         self.crafting = False
         # controller

@@ -7,7 +7,7 @@ from app import assets, map, room
 from app.ui import text
 
 
-class TwoDGameDisplay(BaseDisplay):
+class MainDisplay(BaseDisplay):
     def __init__(self, game, player, enemies):
         self.player = player
         super().__init__(game)
@@ -106,6 +106,11 @@ class TwoDGameDisplay(BaseDisplay):
         for object in self.game_objects:
             object.render()
 
+        for b in self.game.player_bullets:
+            b.render()
+        for b in self.game.enemy_bullets:
+            b.render()
+
         self.player.render()
         self.camera.end_mode()
         rl.end_texture_mode()
@@ -143,10 +148,13 @@ class TwoDGameDisplay(BaseDisplay):
         rl.set_shader_value(self.bloom_shader, self.shader_time_location, t,
                             rl.ShaderUniformDataType.SHADER_UNIFORM_FLOAT)
 
-        for fellow in self.player.friends:
-            fellow.update()
+
         for enemy in self.enemies:
             enemy.update()
+        for b in self.game.player_bullets:
+            b.update()
+        for b in self.game.enemy_bullets:
+            b.update()
 
         self.player.update(self.map.rooms, self.map.corridor_tiles)
 
