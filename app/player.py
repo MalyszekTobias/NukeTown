@@ -18,7 +18,7 @@ class Player(Atom):
         self.friends.append(friend)
 
     def update(self, rooms = None, corridor_tiles = None):
-        super().update()
+        super().update(rooms, corridor_tiles)
         for enemy_bullet in self.display.enemy_bullets:
             if rl.check_collision_circles(rl.Vector2(self.x, self.y), self.radius / 2,
                                           rl.Vector2(enemy_bullet.x, enemy_bullet.y), enemy_bullet.radius / 2):

@@ -1,5 +1,6 @@
 from email.mime import image
 import copy
+# from zipimport import alt_path_sep
 
 from app.ui import text
 
@@ -28,11 +29,12 @@ class Crafting_Menu(BaseDisplay):
         self.objects = []
         # a=GameObject(self,assets.images["Jeff"],0,0,10,10)
         # t1=TextObject(self,'aaa',0,0,100,rl.WHITE)
-        # self.inventory=Inventory({"oxygen":2,"hydrogen":2,"zinc":3,"sodium":2,"krypton":10,"barium":11,"sulphur":67,"iron":11,"helium":1000},self,0,0,100,200)
-        self.inventory=Inventory({"hydrogen":1000},self,0,0,100,200)
+        self.table = Table(self, self.game.width // 2, 0, self.game.width // 2, self.game.height)
+        self.inventory=Inventory({"oxygen":2,"hydrogen":2,"zinc":3,"sodium":2,"krypton":10,"barium":11,"sulphur":67,"iron":11,"helium":1000},self,0,0,100,200)
+        # self.inventory=Inventory({"hydrogen":1000},self,0,0,100,200)
         # self.oxygen1=Atom(self,assets.images["Oxygen_Standby"] ,1000,100,100,100,"O",8,40)
         self.atom_bar=Atom_Bar(self,self.game.width//2,0,self.game.width//2,100)
-        self.table=Table(self,self.game.width//2,0,self.game.width//2,self.game.height)
+
     def render(self):
         # print(self.square_pos)
         super().render()
@@ -201,23 +203,38 @@ class Inventory():
         self.y = y
         self.w = w
         self.h = h
-        self.inv={}
         self.display.objects.append(self)
         self.inv=inv
         self.atom_images={}
-
+        self.tablica_image=assets.images["Tablica_Fatass"]
+        self.src=rl.Rectangle(0,0,235,32)
+        self.display.objects.append(self)
     def add_element(self,atom,amount):
         if atom in self.inv:
             self.inv[atom] += amount
         else:
             self.inv[atom] = amount
     def draw(self):
-        text.draw_text("Inventory", self.x, self.y, self.w, rl.WHITE, )
-        i=0
+        i = 0
+        rl.draw_texture_pro(self.tablica_image, self.src,
+                            rl.Rectangle(self.x, self.y + 100 + (i - 1) * 100, self.display.game.width // 2 - 225, 100),
+                            (0, 0), 0, rl.WHITE)
+        text.draw_text("Inventory", self.x+20, self.y+8, self.w, rl.WHITE, )
+
+
         for atom in self.inv:
             i+=1
-            text.draw_text(f"{atom}: {self.inv[atom]}",self.x,self.y+self.w*i,self.w,rl.WHITE)
 
+            rl.draw_texture_pro(self.tablica_image,self.src,rl.Rectangle(self.x,self.y+100+(i-1)*100,self.display.game.width // 2 - 225,100),(0, 0), 0, rl.WHITE)
+            text.draw_text(f"{atom}: {self.inv[atom]}", self.x+20, self.y+8 + self.w * i, self.w, rl.WHITE)
+        i+=1
+        rl.draw_texture_pro(self.tablica_image, self.src,
+                            rl.Rectangle(self.x, self.y + 100 + (i - 1) * 100, self.display.game.width // 2 - 225, 100),
+                            (0, 0), 0, rl.WHITE)
+        i += 1
+        rl.draw_texture_pro(self.tablica_image, self.src,
+                            rl.Rectangle(self.x, self.y + 100 + (i - 1) * 100, self.display.game.width // 2 - 225, 100),
+                            (0, 0), 0, rl.WHITE)
 class Atom():
     def __init__(self,display,image,x,y,w,h,name,mass,font_w):
         self.display = display
@@ -260,12 +277,13 @@ class Atom_Bar():
         self.h = h
         self.inv=self.display.get_inv()
         self.atom_images={}
+        self.bar=GameObject(display,assets.images["Taskbar"],x-240,y,w,h,256)
         atom_properites={"hydrogen":['H',1,assets.images["Hydrogen_Standby"]],"helium":['He',2,assets.images["Helium_Standby"]],"oxygen":['O',8,assets.images["Oxygen_Standby"]],"sodium":['Na',11,assets.images["Sodium_Standby"]],"iron":['Fe',26,assets.images["Iron_Standby"]],"zinc":['Zn',30,assets.images["Zinc_Standby"]],"barium":['Ba',56,assets.images["Barium_Standby"]],"krypton":['Kr',36,assets.images["Krypton_Standby"]],"sulphur":['S',16,assets.images["Sulphur_Standby"]]}
         i=0
         for a in self.inv.keys():
             # print(a)
             i += 1
-            self.atom_images[a]=Atom(self.display, atom_properites[a][2], x + self.w-i*100, y, 100, 100, atom_properites[a][0], atom_properites[a][1], 40)
+            self.atom_images[a]=Atom(self.display, atom_properites[a][2], x + self.w-i*100-40-(i-1)*16, y+9, 100, 100, atom_properites[a][0], atom_properites[a][1], 40)
 
     def update(self):
         for i in self.atom_images.values():
@@ -306,12 +324,16 @@ class Table():
         self.atoms=[]
         self.rect=Rect(display,x,y,w-1,h-1)
         self.font=90
-        self.fuse_text=TextObject(display,'Fuse',x+w-int(2.5*self.font),y+h-self.font,self.font,rl.WHITE)
-        self.fuse_ram=Rect(self.display,x+w-int(2.5*self.font),y+h-self.font,int(2.5*self.font)-1,self.font-1)
-        self.clear_text = TextObject(display, 'Clear', x , y+ h - self.font , self.font,
+
+        self.table_object=GameObject(self.display,assets.images["Table"],x-200,y-150,w,h,20)
+        self.fuse_text = TextObject(display, 'Fuse', x + w - int(2.5 * self.font), y + h - self.font, self.font,
                                     rl.WHITE)
-        self.clear_ram = Rect(self.display, x , y + h - self.font, int(3 * self.font) - 1,
+        self.fuse_ram = Rect(self.display, x + w - int(2.5 * self.font), y + h - self.font, int(2.5 * self.font) - 1,
                              self.font - 1)
+        self.clear_text = TextObject(display, 'Clear', x, y + h - self.font, self.font,
+                                     rl.WHITE)
+        self.clear_ram = Rect(self.display, x, y + h - self.font, int(3 * self.font) - 1,
+                              self.font - 1)
         self.atom_properites = {"hydrogen": ['H', 1, assets.images["Hydrogen_Standby"]],
                            "helium": ['He', 2, assets.images["Helium_Standby"]],
                            "oxygen": ['O', 8, assets.images["Oxygen_Standby"]],
@@ -341,23 +363,23 @@ class Table():
         # self.clear()
     def clear(self):
         for atom in self.atoms:
+            print(atom.name)
             try:
                 self.display.inventory.inv[self.translator[atom.name]]+=1
             except:
                 self.display.inventory.inv[self.translator[atom.name]] = 1
                 # self.display.inventory.update()
                 self.display.atom_bar.update()
-            try:
-                atom.delete()
-            except:
-                pass
+
+            atom.delete()
+
         self.atoms=[]
         self.protons=0
     def clear_before_fusion(self):
         for atom in self.atoms:
-            try:
-                atom.delete()
-            except:
-                pass
+            print(atom.name)
+
+            atom.delete()
+
         self.atoms=[]
         self.protons=0
