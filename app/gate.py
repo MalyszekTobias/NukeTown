@@ -54,10 +54,10 @@ class Gate:
 
         # Draw the gate
         if self.required_atom:
-            rl.draw_texture_ex(tex, (dest_x, dest_y), rotation, tile_size / tex.width, rl.RED)
+            rl.draw_texture_ex(tex, (dest_x, dest_y), rotation, 1 / 4 / tile_size, rl.RED)
             rl.draw_text(self.required_atom, dest_x, dest_y, 10, rl.WHITE)
         else:
-            rl.draw_texture_ex(tex, (dest_x, dest_y), rotation, tile_size / tex.width, rl.WHITE)
+            rl.draw_texture_ex(tex, (dest_x, dest_y), rotation, 1 / 4 / tile_size, rl.WHITE)
 
     def collision_rect(self):
         gate_thickness = 4  # pixels
